@@ -1,0 +1,9 @@
+vendor
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/app/uploads/*
+storage/app/data/*.json
+.env
+9a8009ab-b538-47b0-ade5-e8622f062faf.pdf

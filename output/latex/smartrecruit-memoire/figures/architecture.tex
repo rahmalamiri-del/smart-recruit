@@ -1,0 +1,14 @@
+\begingroup\singlespacing
+\begin{tikzpicture}[node distance=13mm]
+\node[block,text width=11cm] (browser) {\textbf{Utilisateurs dans le navigateur}\\Étudiant \quad Recruteur \quad Administrateur};
+\node[block,text width=5.3cm,below left=16mm and -25mm of browser] (web) {\textbf{Application Laravel / Blade}\\Routes et contrôles d'accès\\Profils, offres, candidatures\\Client HTTP et moteur PHP};
+\node[block,text width=4.4cm,right=14mm of web] (ai) {\textbf{Service Python}\\Flask / Waitress\\Extraction PDF\\Matching TF-IDF et compétences};
+\node[block,text width=5.3cm,below=17mm of web] (db) {\textbf{MySQL / SqlStore}\\Utilisateurs et profils\\Offres, candidatures et scores};
+\node[block,text width=4.4cm,below=17mm of ai] (json) {\textbf{Fichier JSON / DemoStore}\\Stockage de démonstration\\indépendant de MySQL};
+\draw[arr] (browser.south -| web.north) -- node[note,left]{HTTP} (web.north);
+\draw[arr] (web.east) -- node[note,above]{HTTP / JSON} (ai.west);
+\draw[arr] (web.south) -- node[note,left]{SQL} (db.north);
+\draw[arr,dashed] (web.south east) -- node[note,above,sloped]{repli si SQL indisponible} (json.north west);
+\end{tikzpicture}
+
+\endgroup

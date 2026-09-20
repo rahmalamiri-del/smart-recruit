@@ -1,0 +1,184 @@
+\chapter{Validation, maîtrise du flux Kanban et perspectives}
+\label{chap:validation}
+
+\section{Périmètre et statut des résultats}
+
+L'évaluation de SmartRecruit poursuit trois objectifs : vérifier que le code disponible constitue un ensemble techniquement cohérent, examiner quelques comportements déterminants et définir les preuves nécessaires avant une utilisation réelle. Elle porte sur le prototype décrit au chapitre~\ref{chap:realisation}. Les sondes chiffrées et contrôles techniques ci-dessous proviennent de l'analyse des 10 et 11 septembre 2026. La révision du 13 septembre relit le code et ajoute les preuves de rendu des interfaces, sans rejouer la campagne historique ni qualifier les parcours MySQL. Ils ne sont pas attribués rétrospectivement au stage de Rahma Amiri chez Best Solutions, qui s'est déroulé du 2 mars au 2 juillet 2026. Cette précision chronologique distingue les réalisations du projet des vérifications complémentaires effectuées pour documenter le mémoire.
+
+Les résultats ne constituent ni une qualification de production ni une étude statistique de la qualité du recrutement. Les vérifications locales n'ont pas exécuté de campagne de charge, d'étude d'utilisabilité, de tests avec des recruteurs, de déploiement Docker ou de scénario complet sur la base métier existante. Aucun taux de précision global ni aucune latence de service ne sont donc annoncés. Les chiffres rapportés correspondent exclusivement aux sorties des contrôles identifiés. Les corrections décrites dans ce chapitre sont proposées ; leur présentation ne signifie pas qu'elles ont été appliquées au code.
+
+\section{Méthodologie de vérification}
+
+\subsection{Trois niveaux de preuve}
+
+Le premier niveau consiste à lire le code et les configurations : routes, middleware, formulaires, magasins de données, parseurs et scripts de lancement. Il permet d'établir l'existence d'un contrôle ou d'un chemin d'exécution, mais pas de prouver le succès d'une transaction sur un serveur réel. Le deuxième niveau repose sur des exécutions locales ciblées : analyse syntaxique PHP, inspection des routes, vérification des dépendances et sondes portant sur les fonctions de calcul ou les frontières HTTP. Le troisième niveau rassemble les essais proposés, qui nécessitent un environnement isolé et un jeu de données préparé.
+
+Ces niveaux sont distingués dans les tableaux et dans le vocabulaire employé. Un défaut observé par lecture est décrit comme une propriété du code ou comme un risque conditionnel. Un résultat exécuté comporte son entrée de référence et sa sortie observable. Un test proposé précise l'oracle attendu, c'est-à-dire la règle permettant de conclure au succès ou à l'échec. Cette discipline empêche de convertir une liste de scénarios souhaitables en bilan de tests prétendument réalisés.
+
+\subsection{Reproductibilité et protection des données}
+
+Les sondes complémentaires sont regroupées dans \path{evidence/probes.php} et \path{evidence/probes.py}, avec des résultats sérialisés en JSON dans le dossier d'accompagnement du mémoire. Les entrées sont synthétiques et les fonctions sont sollicitées sans utiliser les CV personnels existants. L'environnement local relevé comprend PHP 8.2.12 en ligne de commande, Composer 2.7.6 et Python 3.12.3. Ces versions décrivent le poste d'analyse ; elles ne prouvent pas la compatibilité de toutes les images ou versions suggérées ailleurs dans le dépôt.
+
+La vérification de la surface HTTP utilise uniquement un manifeste logiciel non sensible. Aucune requête de lecture de secret ou de document personnel n'est nécessaire pour démontrer que le serveur sert un fichier interne. Le serveur local temporaire a été arrêté après l'essai. Les contrôles isolés du proxy utilisent des adresses de documentation et n'envoient pas de tentatives de connexion vers un système externe. Cette approche maintient une preuve utile tout en limitant les effets de l'audit sur les données et les services.
+
+\section{Résultats des contrôles techniques locaux}
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Contrôles historiques des 10 et 11 septembre 2026}
+\label{tab:validation-outillage}
+\begin{tabularx}{\textwidth}{@{}P{0.26\textwidth}P{0.26\textwidth}X@{}}
+\toprule
+Contrôle & Résultat observé & Portée de la conclusion \\
+\midrule
+Analyse syntaxique PHP & 20 fichiers contrôlés, sans erreur de syntaxe & Les fichiers analysés sont interprétables syntaxiquement ; les parcours métier ne sont pas tous exécutés. \\
+Inspection du routage & 23 routes recensées & Les points d'entrée et leurs middleware peuvent être examinés ; leur présence ne vaut pas test fonctionnel. \\
+Validation Composer & Manifeste valide ; avertissement sur l'absence de licence & Cohérence du manifeste vérifiée, sans conclusion sur les droits de diffusion du projet. \\
+Exigences de plateforme & Contrôle hors dépendances de développement satisfait & Les exigences déclarées sont satisfaites par l'environnement PHP local utilisé. \\
+Ressource interne HTTP & \path{/composer.json} retourne HTTP 200 & Le lancement PHP fourni sert directement un fichier interne sous la racine du projet. \\
+Confiance proxy & L'IP déclarée par l'en-tête devient l'IP client & La confiance globale influe sur l'identité réseau utilisée par le framework. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Le succès de l'analyse syntaxique élimine une catégorie immédiate d'erreurs, comme une accolade manquante ou une expression PHP invalide. Il ne vérifie ni les droits, ni les types retournés par le service Python, ni la disponibilité des tables. De même, la validation du manifeste et le contrôle des exigences de plateforme constituent un socle reproductible, mais ne garantissent pas que chaque dépendance reste adaptée à un autre environnement. L'avertissement relatif à la licence doit être traité avant une diffusion, sans être présenté comme un échec d'exécution.
+
+L'inventaire des routes a permis de relier chaque parcours décrit aux fonctions correspondantes et d'identifier les contrôles explicitement associés. Les routes protégées comportent des restrictions de rôles ; plusieurs opérations vérifient aussi la propriété des offres ou des profils. Cette lecture fournit un point de départ pour une matrice de tests d'autorisation. Pour chaque ressource, cette matrice devra croiser un invité, son propriétaire, un utilisateur du même rôle mais d'un autre compte et l'administrateur. L'oracle dépendra de la règle métier, pas simplement de l'absence d'une erreur serveur.
+
+\section{Vérifications de la révision et critères Kanban}
+La nouvelle rédaction a été rapprochée des routes, du magasin SQL et des services présents le 13 septembre. Les modèles décrivent notamment la persistance MySQL obligatoire, la restauration logique et la revalidation du compte en session. Le rendu isolé a généré 19 gabarits et 32 variantes sans erreur signalée par le script ; douze vues ont été capturées dans le navigateur pour le chapitre~\ref{chap:realisation}. Ces observations établissent la disponibilité de rendus illustrés, sans prouver l'enregistrement des formulaires ou les droits par un essai HTTP de bout en bout.
+
+Les sources ont évolué depuis les sondes : les anciennes empreintes ne qualifient donc pas toutes les classes actuelles. Le marqueur Python, par exemple, est devenu \code{python} au lieu de \code{python-ai}. Les chiffres du tableau suivant restent attachés au fichier historique, avec leurs entrées. Les formules expliquées au chapitre~\ref{chap:moteur} sont relues séparément. Cette distinction évite de confondre une révision documentaire et une nouvelle campagne expérimentale.
+
+Dans Kanban, une preuve accompagne la carte avant son passage à Terminé. Le tableau~\ref{tab:validation-kanban} relie les travaux à des critères observables. Il ne constitue pas une liste de cartes déjà acceptées pendant le stage.
+\begin{table}[H]\centering\small
+\caption{Preuves de vérification et compléments nécessaires par capacité}
+\label{tab:validation-kanban}
+\begin{tabularx}{\textwidth}{@{}P{2cm}XX@{}}\toprule
+Cartes & Éléments disponibles & Compléments avant une recette métier\\\midrule
+K01--K02 & Routes et vues d'identité ; contrôles de rôle relus. & Matrice de droits, sessions et refus pour un compte tiers.\\
+K03--K04 & Profil illustré ; sondes historiques d'extraction. & Import de fichiers synthétiques, correction et persistance relues.\\
+K05--K06 & Formulaires, catalogue et séquence UML. & Création, fermeture, candidature concurrente et restauration en base jetable.\\
+K07--K08 & Sondes historiques de score ; classement illustré. & Contrat partagé, cohérence explication/score et effets d'une décision.\\
+K09--K10 & Tableaux de bord et administration capturés. & Filtres, suppressions et restitutions sur un jeu préparé.\\
+K11--K12 & Lecture de la persistance et protocole d'essais. & Pannes, transactions, déploiement isolé et corpus annoté.\\
+\bottomrule\end{tabularx}\end{table}
+
+L'efficacité du flux se vérifiera par les dates de début et de fin de chaque carte, son âge lorsqu'elle reste ouverte et le nombre de cartes terminées par période. Aucun historique de ces événements n'est disponible pour calculer un temps de cycle moyen ou un débit du stage. L'attente initiale de cinq jours à 85\,\% présentée au chapitre~\ref{chap:besoins} est un objectif proposé à réviser après observation. Elle n'est ni une performance obtenue ni un engagement contractuel envers Best Solutions.
+
+\section{Comportements du moteur de rapprochement}
+
+\subsection{Sondes de cohérence entre PHP et Python}
+
+Deux sondes locales mettent en évidence que les moteurs PHP et Python ne produisent pas systématiquement le même score. La première utilise des textes identiques centrés sur Angular, AWS et MongoDB, sans compétences explicites et avec une expérience nulle. Le moteur PHP reconnaît les familles présentes dans sa configuration ; le dictionnaire Python ne dispose pas de la même couverture. La seconde porte sur une représentation explicite de compétences utilisant Laravel et PHP. Les fixtures exactes sont conservées avec les sondes afin de ne pas réduire la comparaison à quelques nombres détachés de leurs entrées.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Sondes historiques du 11 septembre comparant les deux implémentations}
+\label{tab:validation-scores}
+\begin{tabularx}{\textwidth}{@{}Xp{0.14\textwidth}P{0.14\textwidth}P{0.25\textwidth}@{}}
+\toprule
+Cas synthétique & Score PHP & Score Python & Interprétation \\
+\midrule
+Textes Angular, AWS, MongoDB ; listes explicites vides ; expérience nulle & 95 & 32 & Couverture différente des dictionnaires et des familles de compétences. \\
+Compétences exprimées avec Laravel et PHP & 95 & 71 & Canonicalisation des listes et règles de calcul non équivalentes. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Ces valeurs sont des scores applicatifs sur une échelle de zéro à cent. Elles ne représentent pas des pourcentages de candidats correctement classés ni une probabilité de réussite professionnelle. Les deux moteurs pondèrent différemment les composantes et le calcul PHP ajoute un bonus d'expérience. Il serait donc abusif de conclure qu'un moteur est globalement meilleur parce qu'il attribue une valeur plus élevée à ces exemples. Le résultat établi est une absence d'équivalence, susceptible de modifier le classement lorsqu'un appel distant remplace le résultat local.
+
+La correction proposée consiste à externaliser un référentiel versionné de compétences, à appliquer les mêmes règles de canonicalisation aux listes explicites et au texte extrait, puis à décider si les deux moteurs doivent partager une formule ou assumer deux modèles distincts. Dans le premier cas, des tests de contrat devront comparer les composantes sur un corpus de fixtures. Dans le second, l'interface et les données enregistrées devront conserver clairement la version du moteur. Une tolérance numérique ne doit pas masquer une divergence sémantique de dictionnaire.
+
+\subsection{Expérience et qualité de l'extraction}
+
+Une sonde textuelle contenant l'expression « 24 ans » a produit une expérience de 24 années. La règle PHP accepte une quantité suivie d'une unité d'année, tandis que la mention d'expérience est facultative. Une indication d'âge peut ainsi être interprétée comme une expérience professionnelle. L'erreur est particulièrement significative puisque cette variable contribue au bonus local. Une correction doit exiger un contexte professionnel explicite, distinguer les périodes datées des quantités déclarées et autoriser l'absence de résultat lorsque le texte reste ambigu.
+
+Le test de document a fourni au service un contenu synthétique qui n'était pas un PDF valide. La route a néanmoins répondu HTTP 200 avec 173 caractères de texte. Le mécanisme de repli qui décode les octets peut expliquer cette réponse : l'échec des parseurs spécialisés ne devient pas nécessairement une erreur de document. Ce constat concerne la route Python testée directement. Il ne démontre pas que le même contenu franchirait la validation de fichier du formulaire Laravel. Les deux frontières doivent faire l'objet d'essais séparés.
+
+Un traitement renforcé devrait distinguer document reconnu, texte extrait, extraction insuffisante et échec de format. La quantité de texte ne suffit pas : des octets décodés peuvent former une longue chaîne dépourvue d'information professionnelle. Les tests proposés couvriront PDF textuels, scans, documents tronqués, fichiers textuels renommés et caractères accentués. La chaîne d'extraction doit restituer un diagnostic exploitable, sans confondre l'acceptation d'une requête HTTP avec la validité d'un CV \cite{pdfminer-docs,owasp-upload}.
+
+\section{Accès, sessions et frontière de déploiement}
+
+\subsection{Exposition observée avec le serveur intégré}
+
+Le test HTTP sur \path{/composer.json} retourne le manifeste en réponse 200 lorsque le projet est lancé avec la commande fournie. Le script de routage accepte tous les fichiers existants sous la racine comme des ressources statiques. Cette preuve suffit à établir que la frontière publique n'est pas correctement définie dans ce mode. L'exposition potentielle de fichiers sensibles découle de cette règle de routage ; leur contenu n'a pas été consulté. Les interdictions Apache présentes dans \path{.htaccess} ne sont pas exécutées par le serveur intégré PHP.
+
+La correction proposée est de placer uniquement le point d'entrée et les ressources destinées au navigateur dans une racine publique dédiée, puis de faire pointer chaque mode de lancement vers cette racine. Une vérification de non-régression devra demander plusieurs chemins internes et constater un refus ou une absence de ressource, tout en confirmant le chargement normal des ressources publiques. Cette modification traite la cause structurelle et facilite la conformité aux recommandations de déploiement du framework \cite{laravel-deployment,php-server}.
+
+\subsection{Confiance proxy et authentification}
+
+Le bootstrap fait confiance à tous les proxies. Une exécution isolée du middleware, avec une adresse de connexion locale et une adresse différente dans l'en-tête transmis, montre que cette dernière devient l'adresse client vue par Laravel. Le middleware de limitation installé utilise cette adresse pour construire la clé des requêtes non authentifiées. Lorsque l'application est directement accessible, un client peut donc faire varier cette clé. Le risque est conditionnel au chemin réseau ; un proxy maîtrisé qui nettoie les en-têtes et interdit l'accès direct constitue une situation différente.
+
+Les propositions sont de déclarer les proxies attendus et de vérifier la limitation avec la topologie réellement retenue. La version actuelle relit le compte associé à la session pour prendre en compte un changement de rôle ou une suppression ; cette revalidation ne remplace pas les essais de fixation et d'invalidation. Par ailleurs, les routes de connexion et d'inscription ne régénèrent pas explicitement l'identifiant de session ; la déconnexion oublie l'identité sans invalider entièrement la session. Il s'agit d'un risque de fixation si un attaquant parvient à faire utiliser une session qu'il connaît, et non d'une preuve de prise de compte réalisée. Les tests futurs devront vérifier le changement d'identifiant après authentification et l'inutilisabilité de la session déconnectée \cite{owasp-session}.
+
+La synchronisation automatique des données de démonstration appelle une mesure complémentaire : supprimer son déclenchement pendant les lectures ordinaires et imposer une activation explicite du mode de démonstration. Les comptes de présentation et la commande qui réapplique un mot de passe par défaut à tous les utilisateurs doivent être exclus du fonctionnement normal. Aucun identifiant réel ni secret n'est reproduit dans ce mémoire. Le résultat recherché est l'absence de création ou de réinitialisation de compte provoquée indirectement par une consultation.
+
+\section{Cohérence métier et persistance : constats statiques}
+
+La route d'affichage d'une offre vérifie qu'un étudiant consulte une offre publiée. La route de candidature contrôle l'existence de l'offre et du profil, mais pas l'état de publication. Une demande directe peut donc suivre un chemin différent de celui suggéré par l'interface, notamment après fermeture d'une offre précédemment consultée. Le correctif proposé consiste à appliquer l'invariant au moment de l'écriture. Le test correspondant devra prouver qu'une candidature sur une offre fermée ou en brouillon ne crée aucun enregistrement.
+
+La méthode SQL de mise à jour d'un profil modifie successivement le compte, le profil et le document sans transaction englobante. Le fichier est déplacé avant la sauvegarde métier. Un essai par injection d'échec devra vérifier la cohérence de l'état final et le nettoyage des fichiers devenus inutiles. Les transactions existantes pour certaines créations sont utiles, mais ne couvrent pas automatiquement toutes les opérations du magasin \cite{laravel-database}. Il faut définir l'unité de cohérence de chaque cas d'utilisation, puis organiser les écritures et compensations en conséquence.
+
+La candidature vérifie d'abord l'absence d'un enregistrement avant de l'insérer. La migration prévoit une contrainte d'unicité sur le couple offre--profil, ce qui protège la base contre un doublon persistant. Deux demandes simultanées peuvent néanmoins réussir leur vérification préalable et provoquer ensuite une exception sur l'une des insertions. Cette situation n'a pas été exécutée sur MySQL pendant l'audit. Le test proposé doit confirmer une réponse métier stable et idempotente, en s'appuyant sur la contrainte relationnelle plutôt qu'en supposant la séquentialité des utilisateurs \cite{mysql-constraints}.
+
+La sélection actuelle du magasin utilise MySQL et signale son indisponibilité par une réponse 503. L'ancien magasin JSON demeure dans les sources pour la démonstration, mais n'est plus le repli de persistance des routes métier. Ce changement corrige la description de la version initiale du mémoire. Un test de panne reste nécessaire pour vérifier l'absence de confirmation trompeuse et la conservation d'une session cohérente. La création et la synchronisation de données de démonstration dans le magasin SQL restent un point à isoler du fonctionnement normal.
+
+Enfin, une consultation qui recalcule un score peut modifier le statut d'une candidature en présélection. Ce couplage doit être évalué comme une règle métier à part entière. La proposition est de séparer calcul et décision, de rendre explicite le déclenchement d'une présélection automatique et de journaliser sa cause. Un score conservé devrait référencer les versions du profil, de l'offre et du moteur ayant servi au calcul. Sans ces éléments, une variation ultérieure peut être difficile à expliquer au recruteur.
+
+\section{Protocole proposé d'évaluation de la pertinence}
+
+\subsection{Constitution du corpus et annotations}
+
+Une évaluation scientifique nécessite un corpus distinct des données de démonstration. Les offres doivent couvrir plusieurs familles professionnelles et différents niveaux d'exigence. Les CV associés doivent comprendre des cas pertinents, partiellement pertinents et hors domaine. Les documents d'une même personne, les variantes quasi identiques et les doublons d'offres doivent rester dans la même partition, afin d'éviter une fuite entre le réglage et le test. Le référentiel, les pondérations et les seuils seront ajustés sur une partition de développement, puis figés avant l'évaluation finale.
+
+La vérité de référence repose sur des annotations humaines explicites. Pour chaque couple offre--profil, les évaluateurs examinent les compétences nécessaires, les expériences professionnelles pertinentes, la formation lorsque l'offre la justifie et les éléments factuels du parcours. Le sexe, l'âge, l'origine et les autres caractéristiques sans rapport avec les exigences du poste ne doivent pas devenir des critères de pertinence. L'erreur « âge vers expérience » observée montre pourquoi la qualité de la transformation des données doit être évaluée avant leur utilisation dans un classement.
+
+Une grille graduée peut distinguer absence d'adéquation, adéquation partielle et adéquation forte, à condition que chaque niveau soit défini avant l'annotation. Plusieurs évaluateurs annoteront indépendamment un sous-ensemble commun, puis documenteront leurs désaccords et leur procédure d'arbitrage. Aucun accord humain n'a été mesuré à ce stade. La littérature sur l'évaluation des outils de recrutement invite précisément à interroger la définition de la cible et les hypothèses incorporées aux mesures \cite{raghavan2020}. Un classement de proximité textuelle ne remplace pas une appréciation professionnelle contextualisée.
+
+\subsection{Mesures de classement}
+
+Pour une offre $q$, on note $R_q$ l'ensemble des profils pertinents selon l'annotation, et $T_{q,k}$ les $k$ premiers profils retournés. Les premières mesures proposées sont :
+\begin{align}
+\operatorname{Precision@}k(q) &= \frac{|T_{q,k}\cap R_q|}{k}, \\
+\operatorname{Recall@}k(q) &= \frac{|T_{q,k}\cap R_q|}{|R_q|}.
+\end{align}
+La précision mesure la part de profils pertinents parmi les premiers résultats consultés. Le rappel indique la proportion des profils pertinents retrouvée dans cette même fenêtre. Le protocole fixera des valeurs de $k$ compatibles avec le travail des recruteurs et traitera explicitement les offres sans profil pertinent annoté. Les conventions concernant les listes plus courtes que $k$ doivent également être définies avant le calcul. Les mesures seront d'abord calculées par offre, puis agrégées, pour éviter qu'une seule offre très représentée ne domine l'ensemble \cite{manning2008}.
+
+La NDCG permet de conserver les niveaux de pertinence et de valoriser leur position. Si $r_{q,i}$ est la pertinence graduée du profil placé en position $i$, on définit :
+\begin{align}
+\operatorname{DCG@}k(q) &= \sum_{i=1}^{k}\frac{2^{r_{q,i}}-1}{\log_2(i+1)}, \\
+\operatorname{NDCG@}k(q) &= \frac{\operatorname{DCG@}k(q)}{\operatorname{IDCG@}k(q)}.
+\end{align}
+Le dénominateur représente le meilleur ordre possible pour les mêmes annotations. Le cas d'un dénominateur nul sera signalé selon une convention documentée. Ces mesures comparent un ordre proposé à une référence indépendante ; elles sont donc différentes du score affiché par SmartRecruit. Aucun résultat de précision, rappel ou NDCG n'est fourni tant que ce corpus annoté n'a pas été constitué.
+
+\subsection{Comparaisons et analyse des erreurs}
+
+Le plan expérimental comparera une recherche lexicale simple, la couverture de compétences, le score hybride PHP et le score Python. Une étude d'ablation retirera successivement les synonymes, la proximité de catégories et le bonus d'expérience pour examiner leur contribution. Une évolution vers des représentations vectorielles apprises devra être soumise au même protocole, sans supposer qu'un modèle plus complexe améliore nécessairement la pertinence. Les résultats devront être accompagnés d'une analyse d'erreurs : synonymes absents, compétences ambiguës, extraction incorrecte et recommandations trop générales.
+
+\section{Plan de validation complémentaire et progression}
+
+La prochaine étape consiste à construire des tests fonctionnels avec une base jetable et des fichiers synthétiques. Ils couvriront inscription, connexion, propriétés des offres, visibilité des profils, candidatures et transitions de statut. Les scénarios d'échec introduiront une indisponibilité du service Python, une réponse JSON invalide, une contrainte SQL et une erreur de stockage. Chaque cas devra vérifier la réponse utilisateur et les effets réellement enregistrés. L'objectif est une cohérence observable, y compris lorsque plusieurs composants ne réussissent pas simultanément.
+
+Les performances seront mesurées séparément après cette stabilisation. Les boucles de classement comparent plusieurs offres et plusieurs profils, avec des appels synchrones et des écritures éventuelles. Une campagne devra distinguer coût de calcul, coût réseau et coût SQL, puis observer plusieurs tailles de catalogue et niveaux de concurrence. Elle enregistrera médiane, percentiles élevés, erreurs et consommation de ressources. Les délais configurés dans le client ne sont pas des résultats de cette campagne ; aucun objectif chiffré de capacité n'est validé actuellement.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Progression proposée à partir de l'évaluation du prototype}
+\label{tab:validation-roadmap}
+\begin{tabularx}{\textwidth}{@{}P{0.16\textwidth}XX@{}}
+\toprule
+Priorité & Travaux proposés & Preuve attendue \\
+\midrule
+Immédiate & Racine publique, isolation des données de démonstration, session et contrôle de candidature (K02, K06, K11). & Tests de refus des chemins internes et des opérations interdites. \\
+Fiabilité & Transactions, concurrence, extraction et contrat partagé des moteurs (K04, K07, K11). & Fixtures reproductibles, absence d'état partiel et résultats expliqués. \\
+Pertinence & Corpus séparé, annotations professionnelles et comparaison des classements (K07, K12). & Mesures par offre et analyse documentée des erreurs. \\
+Exploitation & Déploiement isolé, sauvegarde, observabilité et campagne de performance (K11, K12). & Procédure de reprise vérifiée et capacité mesurée. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+L'évaluation confirme ainsi la présence d'un prototype cohérent dans son intention et suffisamment concret pour permettre des vérifications reproductibles. Elle révèle aussi des écarts précis entre continuité de démonstration, cohérence des scores et garanties attendues d'un service exploité. La progression proposée relie chaque limite à une correction et à une preuve future. Elle permet de présenter le travail avec ses résultats effectifs, tout en conservant une responsabilité humaine sur les décisions de recrutement et une traçabilité des évolutions du système.

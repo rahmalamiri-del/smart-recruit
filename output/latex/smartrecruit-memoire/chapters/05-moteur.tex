@@ -1,0 +1,201 @@
+\chapter{Conception et fonctionnement du moteur de matching}
+\label{chap:moteur}
+
+\section{Organisation de la chaîne de traitement}
+
+Le moteur transforme une offre et un profil étudiant en un ensemble d'indicateurs, puis en un score entier compris entre 0 et 100. Son fonctionnement repose sur quatre composants principaux : \path{app/Support/CvParser.php} prépare le contenu d'un CV ; \path{app/Support/SemanticMatcher.php} réalise le calcul local ; \path{app/Support/AiClient.php} communique avec le microservice ; \path{ai-service/app.py} expose l'extraction PDF et une seconde implémentation du score. L'orchestration des appels se trouve dans \path{routes/web.php}.
+
+La figure~\ref{fig:matching-pipeline} présente cette chaîne. Le fichier constitue une source possible du profil, auquel s'ajoutent les champs saisis. Le rapprochement exploite ensuite deux représentations complémentaires : des ensembles de compétences et des vecteurs lexicaux. Les catégories sont déduites des compétences reconnues. Aucun modèle neuronal n'est chargé dans ce parcours et aucun apprentissage de coefficients n'est réalisé à l'exécution.
+
+\begin{figure}[htbp]
+\centering
+\input{figures/matching-pipeline.tex}
+\caption{Chaîne de préparation des données et de calcul du matching dans SmartRecruit}
+\label{fig:matching-pipeline}
+\end{figure}
+
+Le texte de l'offre concatène son titre, sa description et les compétences requises. Celui du candidat concatène son intitulé de profil, sa formation, le texte de son CV et ses compétences. Cette composition est importante : une compétence présente à la fois dans le CV et dans un champ structuré peut apparaître plusieurs fois dans le texte. Les ensembles de compétences sont dédupliqués, mais les fréquences lexicales conservent ces répétitions. Les champs structurés influencent donc les deux branches du calcul.
+
+\section{Extraction et préparation du CV}
+
+\subsection{Sources textuelles et extraction PDF}
+
+La méthode \code{CvParser::parse} accepte un fichier optionnel et un texte manuel. Lorsqu'un fichier est fourni, elle tente d'en extraire le contenu, puis concatène le résultat avec le texte manuel. Le texte saisi complète ainsi le contenu extrait ; il ne le remplace pas automatiquement. La méthode renvoie notamment le texte final, les compétences, une estimation de l'expérience, une formation détectée et des métadonnées de contact.
+
+Pour un fichier portant l'extension PDF, le parseur appelle d'abord \code{AiClient::parseCv} lorsque le client est disponible. L'appel transmet le fichier en multipart au point d'accès \path{/parse-cv}, avec un délai maximal configuré de six secondes. Côté Python, un fichier temporaire est créé, alimenté puis supprimé dans un bloc \code{finally}. Le mécanisme d'accès aux fichiers reçus correspond au modèle décrit par Flask pour les téléversements \cite{flask-docs}.
+
+L'extraction Python tente d'abord \code{pdfminer.high_level.extract_text}. En cas d'exception, elle essaie l'interface PyPDF2 présente dans le code. Si ces tentatives échouent, elle lit les octets et les décode en Latin-1. Ce dernier comportement est une limite : obtenir une chaîne de caractères à partir d'un PDF ne signifie pas avoir extrait son contenu rédactionnel. De plus, lorsque pdfminer retourne une chaîne vide sans exception, la fonction renvoie directement cette chaîne et ne poursuit pas la tentative PyPDF2.
+
+En l'absence de résultat Python non vide, PHP utilise une extraction locale. Les fichiers TXT, Markdown et CSV sont lus comme du texte brut. Pour un PDF, une expression régulière retire certains délimiteurs de parenthèses, puis un filtrage conserve des lettres, chiffres et caractères particuliers. Cette procédure ne décompresse pas les flux PDF et ne reconstruit pas leur structure. Aucune étape de reconnaissance optique de caractères n'est implémentée pour les pages numérisées sous forme d'images.
+
+Le champ \code{extraction_unreliable} devient vrai lorsqu'un fichier a été fourni, que le texte extrait contient moins de 40 caractères et qu'aucun texte manuel ne compense cette situation. Cette garde rend visible un échec simple, mais sa portée reste limitée. Un contenu technique de plus de 40 caractères peut franchir le seuil sans être un CV exploitable. La correction proposée consiste à retourner un statut d'extraction distinct du texte, plutôt qu'à interpréter uniquement sa longueur ; elle ne fait pas partie du code étudié.
+
+\subsection{Compétences, formation et expérience}
+
+Les compétences et les coordonnées sont recherchées dans le texte final. Les adresses électroniques et les numéros de téléphone sont extraits par expressions régulières, sans validation de leur caractère opérationnel. La formation est déterminée par la première correspondance dans une liste ordonnée : doctorat, master, mastère, ingénieur, licence, bachelor et BTS. Ce mécanisme ne reconstitue pas un parcours académique. Il peut retenir un diplôme mentionné comme objectif ou dans une autre partie du document.
+
+L'expérience est obtenue en recherchant un entier suivi d'une expression telle que \emph{ans}, \emph{années} ou \emph{year(s)}. La présence du mot \emph{expérience} est facultative dans l'expression régulière. La méthode retient le maximum des nombres détectés et retourne zéro en l'absence de correspondance. Elle ne calcule pas la durée d'intervalles datés, ne cumule pas des stages et ne gère pas leurs chevauchements.
+
+Cette règle explique qu'une mention d'âge ou de durée d'études puisse devenir une expérience professionnelle. L'incidence est directe puisque cette estimation peut alimenter le profil et le bonus du moteur PHP. Il conviendrait de conserver la provenance de la valeur, de limiter l'inférence aux formulations explicitement professionnelles et de permettre sa vérification. Les sondes ciblées du chapitre~\ref{chap:validation} illustrent ce problème ; elles ne mesurent pas une précision globale d'extraction sur un corpus de CV.
+
+\section{Normalisation, alias et catégories}
+
+\subsection{Traitement lexical effectivement implémenté}
+
+Le moteur PHP transforme le texte en minuscules avec \code{mb_strtolower}, puis tente une translittération vers ASCII avec \code{iconv}. Il remplace ensuite par des espaces les caractères hors de l'ensemble formé des lettres ASCII, chiffres, signes plus, dièse et point. Les espaces successifs sont réduits. Le moteur Python applique une mise en minuscules et un filtrage comparable, mais ne réalise pas la translittération préalable : une lettre accentuée est éliminée par le filtre ASCII. La normalisation du français ne peut donc pas être considérée comme identique dans les deux langages.
+
+L'extraction des compétences recherche chaque alias normalisé avec un espace avant et après. Cette précaution évite certaines correspondances au milieu d'un mot. Cependant, le point est conservé par la normalisation : \emph{Python.} ne correspond pas à l'alias \emph{python} entouré d'espaces. La conservation de caractères utiles aux noms techniques nécessite ainsi un traitement plus précis de la ponctuation terminale.
+
+La tokenisation constitue une opération différente. Après normalisation, les alias sont remplacés successivement par leur nom canonique ; les espaces internes de ce nom deviennent des underscores. Le texte est découpé sur les espaces, puis les tokens de longueur inférieure ou égale à deux et les mots vides français ou anglais sont supprimés. Les substitutions n'utilisent pas les limites de mots de l'extracteur. Leur ordre peut modifier un alias avant qu'un alias plus long soit examiné : \emph{Spring Boot} devient ainsi \emph{java boot}, tandis que \emph{React.js} peut produire \emph{react.javascript}.
+
+\subsection{Rôle du dictionnaire et de la taxonomie}
+
+Le dictionnaire PHP défini dans \path{config/smart_recruit.php} contient 21 compétences canoniques. Celui de Python en contient 16. Les entrées Angular, NoSQL, cloud, mobile et sécurité sont présentes uniquement côté PHP. Certaines correspondances expriment une famille technique : Laravel et Symfony sont associés à PHP ; Spring et Spring Boot à Java ; pandas et NumPy à l'analyse de données. Ce sont des règles de rapprochement retenues dans le prototype, et non des équivalences exhaustives entre niveaux de maîtrise.
+
+La taxonomie associe ensuite chaque compétence connue à une catégorie : Java, PHP et Python au développement backend ; React et Vue au frontend ; SQL aux données ; DevOps à l'infrastructure. Les catégories sont dédupliquées. Posséder plusieurs compétences backend n'apporte donc qu'une catégorie à ce niveau. Cette réduction permet de valoriser une proximité de domaine même sans identité de technologie, mais elle peut aussi rapprocher des connaissances professionnelles très différentes.
+
+Le traitement des compétences explicitement saisies diverge également. PHP les canonise : pour chaque chaîne, il retient la première compétence détectée ou, à défaut, sa forme normalisée. Python conserve les valeurs reçues et les réunit aux compétences extraites du texte, sans canonisation préalable. Une valeur explicite \emph{Laravel} peut ainsi coexister avec la compétence extraite \emph{php}. Cette duplication conceptuelle modifie le dénominateur de la couverture et peut créer un manque artificiel.
+
+\section{Définition des composantes mathématiques}
+
+\subsection{Couverture des compétences et des catégories}
+
+Soient $R$ l'ensemble des compétences considérées comme requises et $P$ l'ensemble des compétences du profil, après les traitements propres au moteur utilisé. Les compétences communes sont $M=R\cap P$ et les manques sont $D=R\setminus P$. La couverture des compétences est définie par :
+\begin{equation}
+C(R,P)=
+\begin{cases}
+\dfrac{|R\cap P|}{|R|}, & \text{si } |R|>0,\\[4pt]
+0, & \text{sinon}.
+\end{cases}
+\label{eq:couverture-competences}
+\end{equation}
+
+Cette mesure est orientée par le besoin : des compétences supplémentaires du candidat n'augmentent pas directement $C$, mais des compétences requises supplémentaires peuvent le diminuer. Toutes les compétences ont le même poids. Le code ne distingue pas une obligation d'une préférence lorsqu'il extrait les compétences de la description de l'offre. La mention d'une technologie dans une phrase contextuelle peut donc enrichir $R$ comme une exigence explicite.
+
+En notant $\Gamma(A)$ l'ensemble des catégories connues associées aux compétences de $A$, la couverture sémantique du code est :
+\begin{equation}
+K(R,P)=
+\begin{cases}
+\dfrac{|\Gamma(R)\cap\Gamma(P)|}{|\Gamma(R)|}, & \text{si } |\Gamma(R)|>0,\\[4pt]
+0, & \text{sinon}.
+\end{cases}
+\label{eq:couverture-categories}
+\end{equation}
+
+Les compétences absentes de la taxonomie ne participent pas à $\Gamma$. Si l'offre n'exige que Java et que le profil ne mentionne que PHP, les catégories backend coïncident : $K=1$ tandis que $C=0$. Ce résultat exprime le choix de granularité de la taxonomie. Il ne prouve pas que le candidat satisfait l'exigence Java.
+
+\subsection{TF-IDF calculé sur une paire de documents}
+
+Soient $d_o$ et $d_c$ les listes de tokens de l'offre et du candidat. Le corpus du calcul est toujours la paire $\mathcal{D}=(d_o,d_c)$, avec deux documents comptés séparément même si leurs textes sont identiques. Pour un terme $t$, $n(t,d)$ désigne son nombre d'occurrences et $|d|$ le nombre de tokens du document. Les deux implémentations utilisent :
+\begin{align}
+\operatorname{tf}(t,d) &= \frac{n(t,d)}{\max(|d|,1)},\\
+\operatorname{df}(t,\mathcal{D}) &=
+\sum_{d\in\mathcal{D}} \mathbf{1}_{\{t\in d\}},\\
+\operatorname{idf}(t,\mathcal{D}) &=
+\ln\left(\frac{1+2}{1+\operatorname{df}(t,\mathcal{D})}\right)+1,\\
+v_d(t) &= \operatorname{tf}(t,d)\operatorname{idf}(t,\mathcal{D}).
+\label{eq:tfidf-projet}
+\end{align}
+
+La constante ajoutée évite une pondération nulle pour un terme commun. Un terme présent dans les deux documents possède une IDF de $1$ ; un terme présent dans un seul document possède une IDF de $1+\ln(3/2)$, soit environ $1{,}405465$. Ces deux valeurs épuisent les cas pour les termes effectivement présents. Le moteur n'estime donc pas la rareté d'une technologie dans une population de candidats.
+
+Le cosinus est calculé sur l'union des termes des deux documents :
+\begin{equation}
+T(d_o,d_c)=
+\begin{cases}
+\dfrac{\sum_t v_{d_o}(t)v_{d_c}(t)}
+{\sqrt{\sum_t v_{d_o}(t)^2}\sqrt{\sum_t v_{d_c}(t)^2}},
+& \text{si les deux normes sont non nulles},\\[7pt]
+0, & \text{sinon}.
+\end{cases}
+\label{eq:cosinus-projet}
+\end{equation}
+
+La division par la longueur du document dans TF multiplie chaque vecteur par un facteur uniforme, qui s'annule dans le cosinus lorsque les normes sont non nulles. Elle ne supprime pas l'effet du vocabulaire supplémentaire : de nouveaux termes modifient la direction du vecteur. De même, répéter sélectivement une compétence peut modifier les fréquences relatives. Le calcul conserve donc une sensibilité à la rédaction du profil.
+
+\section{Formules finales PHP et Python}
+
+En notant $e$ la valeur numérique de \code{experience_years}, avec zéro par défaut, le bonus PHP est défini par :
+\begin{equation}
+B(e)=0{,}05\min\left(\frac{e}{5},1\right).
+\label{eq:bonus-experience}
+\end{equation}
+Il atteint cinq points à partir de cinq ans pour une entrée non négative. Le code ne borne pas séparément ce bonus vers le bas ; la borne générale du score s'applique ensuite. Avec $\operatorname{clip}(x)=\max(0,\min(100,x))$, les formules exactes sont :
+\begin{align}
+S_{\mathrm{PHP}} &= \operatorname{clip}\!\left(
+\operatorname{arrondi}_{\mathrm{PHP}}\!\left[
+100\left(0{,}55C+0{,}30T+0{,}10K+B(e)\right)\right]\right),
+\label{eq:score-php}\\
+S_{\mathrm{Python}} &= \operatorname{clip}\!\left(
+\operatorname{arrondi}_{\mathrm{Python}}\!\left[
+100\left(0{,}58C+0{,}32T+0{,}10K\right)\right]\right).
+\label{eq:score-python}
+\end{align}
+
+Les arrondis désignent les fonctions natives appelées par chaque langage, puis la conversion en entier. Python emploie l'arrondi au pair pour les valeurs exactement à mi-chemin ; PHP utilise par défaut un arrondi des demis en s'éloignant de zéro. Une recherche d'équivalence doit donc couvrir également les valeurs frontières et la représentation flottante, au-delà de l'égalité des coefficients.
+
+Les coefficients sont fixés dans le code. Ils ne résultent pas d'une optimisation sur un corpus annoté. Avec $C=T=K=1$ et $e=0$, PHP retourne 95 tandis que Python retourne 100. En l'absence de toute compétence requise reconnue ou déclarée, $C$ vaut zéro ; lorsque la taxonomie requise est vide, $K$ vaut également zéro. Même des textes identiques peuvent alors obtenir un score limité par les seuls coefficients du cosinus et, en PHP, de l'expérience.
+
+PHP ajoute une explication selon des seuils de 80 et 60, puis selon la présence de compétences communes ou manquantes. Ces textes sont des descriptions de classes de score, pas des justifications causales détaillées. Python ne renvoie pas ce champ. Les deux moteurs utilisent pourtant le même identifiant d'algorithme, \code{tf-idf-cosine+semantic-skill-taxonomy}, ce qui ne suffit pas à identifier précisément les règles exécutées.
+
+\section{Exemple numérique reproductible}
+
+Considérons une offre dont le texte est \emph{java react} et un profil dont le texte est \emph{java sql}. Les autres champs textuels et les listes explicites sont vides ; l'expérience vaut deux ans pour le calcul PHP. Les tokens restent inchangés. Les compétences requises sont $R=\{\text{java},\text{react}\}$ et celles du profil $P=\{\text{java},\text{sql}\}$. Ainsi, $M=\{\text{java}\}$, $D=\{\text{react}\}$ et $C=1/2$.
+
+Les catégories de l'offre sont backend et frontend ; celles du profil sont backend et data. Leur intersection contient une catégorie sur deux, d'où $K=1/2$. Posons $a=1+\ln(3/2)$. Dans l'ordre de dimensions Java, React, SQL, les vecteurs sont :
+\begin{equation}
+v_o=\left(\frac{1}{2},\frac{a}{2},0\right),
+\qquad
+v_c=\left(\frac{1}{2},0,\frac{a}{2}\right).
+\end{equation}
+Le produit scalaire vaut $1/4$ et chaque norme vaut $\sqrt{1+a^2}/2$. Il en résulte :
+\begin{equation}
+T=\frac{1}{1+a^2}\simeq 0{,}336096927.
+\end{equation}
+
+Les contributions sont détaillées dans le tableau~\ref{tab:exemple-score}. Les valeurs intermédiaires gardent ici plusieurs décimales pour rendre le calcul vérifiable ; elles ne constituent pas une mesure expérimentale de pertinence.
+
+\begin{table}[htbp]
+\centering
+\caption{Contributions en points pour l'exemple Java, React et SQL}
+\label{tab:exemple-score}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Composante & PHP & Python \\
+\midrule
+Couverture des compétences & $27{,}50$ & $29{,}00$ \\
+Similarité textuelle & $10{,}082908$ & $10{,}755102$ \\
+Couverture des catégories & $5{,}00$ & $5{,}00$ \\
+Expérience de deux ans & $2{,}00$ & $0{,}00$ \\
+\midrule
+Total avant arrondi & $44{,}582908$ & $44{,}755102$ \\
+Score retourné & $45$ & $45$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Les deux moteurs donnent donc le même entier dans cet exemple malgré des calculs différents. Ils retournent une similarité textuelle arrondie à 34 et une couverture des catégories de 50. La compétence commune est Java et la compétence manquante est React. Cette égalité ponctuelle montre pourquoi quelques exemples positifs ne suffisent pas à démontrer la parité de deux implémentations.
+
+\section{Contrat HTTP et mécanisme de repli}
+
+Le service expose trois points d'accès. \path{GET /health} retourne un statut et l'identifiant de l'algorithme. \path{POST /match} reçoit \code{offer_text}, \code{cv_text}, \code{required_skills} et \code{candidate_skills}, puis retourne le score, les compétences communes et manquantes, les deux indicateurs et la source. \path{POST /parse-cv} reçoit un champ fichier et retourne du texte, des adresses électroniques et des compétences. L'expérience ne figure pas dans la requête de matching Python.
+
+Le contrôle de disponibilité est réalisé avant une série de comparaisons. Pour chaque paire, la fonction \code{sr_match} calcule d'abord le résultat PHP. Lorsque le service est déclaré disponible, elle lui demande un résultat et remplace certains champs si la réponse contient un score. Le délai configuré pour les appels JSON de \code{AiClient} est de 0,4 seconde. Une absence de réponse exploitable conserve le résultat local. Cette organisation protège la disponibilité fonctionnelle, mais ajoute un calcul local même lorsqu'un score Python sera ensuite retenu.
+
+La validation du contrat reste partielle. Le client JSON accepte une réponse décodée en tableau sans contrôler explicitement le statut HTTP. L'orchestrateur exige la présence du score mais ne vérifie pas l'ensemble du schéma. Le point d'accès Python accepte aussi les données sans validation systématique des types. Une requête contenant un nombre à la place d'un texte peut donc déclencher une exception. Ces observations motivent un schéma d'entrée et de sortie commun et des réponses d'erreur contrôlées, proposés comme améliorations.
+
+Le démarrage Python prévoit plusieurs modes. Lorsque Flask et Waitress sont disponibles, Waitress sert l'application WSGI. Sans Waitress, le serveur intégré de Flask est utilisé. Sans Flask, un serveur de secours fondé sur la bibliothèque standard expose encore la santé et le matching, mais retourne 501 pour l'extraction multipart PDF. Un statut de santé positif ne garantit donc pas à lui seul la disponibilité de toutes les capacités du service.
+
+Les classements sont construits par comparaisons synchrones. Pour $n$ profils et $m$ offres, la recommandation du meilleur rapprochement de chaque étudiant peut effectuer $n\times m$ calculs et autant d'appels Python. Il s'agit d'une propriété des boucles présentes, pas d'une mesure de latence. Un traitement par lots ou une mise en cache exigerait une clé tenant compte des textes, compétences et versions du moteur pour éviter de réutiliser un score devenu obsolète.
+
+\section{Divergences constatées et trajectoire de correction}
+
+Les différences décrites ont des conséquences observables. Avec des textes identiques \emph{angular aws mongodb}, sans listes explicites ni expérience, le moteur PHP reconnaît trois compétences et retourne 95 ; Python n'en reconnaît aucune et retourne 32. Ce cas déterministe, repris au chapitre~\ref{chap:validation}, démontre une divergence de contrat métier. Il ne permet pas de conclure à une supériorité générale du moteur PHP sur un jeu de recrutement.
+
+L'intégration présente une autre incohérence : lors du remplacement du résultat PHP par celui de Python, l'explication PHP est conservée. Elle peut donc décrire une forte compatibilité alors que le score final est faible. La correction devrait produire l'explication à partir des indicateurs finalement retenus, ou inclure une explication vérifiée dans le contrat commun. Elle devrait aussi identifier la version du dictionnaire et de la formule, car la seule source \code{local-php} ou \code{python-ai} est insuffisante pour reproduire durablement un résultat.
+
+Une première évolution consisterait à externaliser le dictionnaire, la taxonomie, les coefficients et les règles d'arrondi dans une spécification partagée. Les deux moteurs devraient utiliser la même normalisation des compétences explicites et des alias. Les substitutions devraient respecter les limites de mots et traiter les expressions longues avant leurs fragments. Cette évolution suppose des tests de parité sur des entrées identiques, notamment pour les accents, la ponctuation et les noms techniques composés.
+
+Une seconde évolution concernerait la qualité des données. Le parseur devrait distinguer texte extrait, contenu illisible et saisie manuelle ; les métadonnées inférées devraient conserver leur provenance. Les erreurs du service devraient être observables sans journaliser les CV. Enfin, la cohérence fonctionnelle du repli devrait être testée indépendamment de sa disponibilité réseau : un service de secours est utile seulement si son résultat garde une interprétation maîtrisée.
+
+Ces propositions décrivent un travail restant à réaliser. Elles précèdent logiquement l'ajout d'un modèle appris, car une vectorisation plus élaborée ne corrigerait pas un PDF mal extrait ni des champs incohérents. Une expérimentation future pourrait comparer le moteur stabilisé à des représentations de phrases, mais devrait conserver des entrées, annotations et critères communs. Dans l'état étudié, la contribution est un calcul heuristique explicable dont les formules, conditions de fonctionnement et limites peuvent être examinées et reproduites.

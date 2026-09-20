@@ -1,0 +1,164 @@
+\begin{thebibliography}{22}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Burke(2002)]{burke2002}
+Robin Burke.
+\newblock Hybrid recommender systems: Survey and experiments.
+\newblock \emph{User Modeling and User-Adapted Interaction}, 12:\penalty0
+  331--370, 2002.
+\newblock \doi{10.1023/A:1021240730564}.
+\newblock URL \url{https://link.springer.com/article/10.1023/A:1021240730564}.
+
+\bibitem[Devlin et~al.(2019)Devlin, Chang, Lee, and Toutanova]{devlin2019}
+Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova.
+\newblock {BERT}: Pre-training of deep bidirectional transformers for language
+  understanding.
+\newblock In \emph{Proceedings of NAACL-HLT}, pages 4171--4186. Association for
+  Computational Linguistics, 2019.
+\newblock \doi{10.18653/v1/N19-1423}.
+\newblock URL \url{https://aclanthology.org/N19-1423/}.
+
+\bibitem[{Docker}(s. d.)]{docker-compose}
+{Docker}.
+\newblock Docker compose documentation, s. d.
+\newblock URL \url{https://docs.docker.com/compose/}.
+\newblock Consulté le 11 septembre 2026.
+
+\bibitem[{Laravel}(s. d.{\natexlab{a}})]{laravel-database}
+{Laravel}.
+\newblock Laravel 12.x documentation: Database -- getting started, s.
+  d.{\natexlab{a}}.
+\newblock URL \url{https://laravel.com/docs/12.x/database}.
+\newblock Consulté le 11 septembre 2026.
+
+\bibitem[{Laravel}(s. d.{\natexlab{b}})]{laravel-deployment}
+{Laravel}.
+\newblock Laravel 12.x documentation: Deployment, s. d.{\natexlab{b}}.
+\newblock URL \url{https://laravel.com/docs/12.x/deployment}.
+\newblock Consulté le 11 septembre 2026.
+
+\bibitem[{Laravel}(s. d.{\natexlab{c}})]{laravel-routing}
+{Laravel}.
+\newblock Laravel 12.x documentation: Routing, s. d.{\natexlab{c}}.
+\newblock URL \url{https://laravel.com/docs/12.x/routing}.
+\newblock Consulté le 11 septembre 2026.
+
+\bibitem[{Laravel}(s. d.{\natexlab{d}})]{laravel-validation}
+{Laravel}.
+\newblock Laravel 12.x documentation: Validation, s. d.{\natexlab{d}}.
+\newblock URL \url{https://laravel.com/docs/12.x/validation}.
+\newblock Consulté le 11 septembre 2026.
+
+\bibitem[Lewis and Fowler(2014)]{fowler2014}
+James Lewis and Martin Fowler.
+\newblock Microservices, 2014.
+\newblock URL \url{https://martinfowler.com/articles/microservices.html}.
+\newblock Consulté le 11 septembre 2026.
+
+\bibitem[Manning et~al.(2008)Manning, Raghavan, and Schütze]{manning2008}
+Christopher~D. Manning, Prabhakar Raghavan, and Hinrich Schütze.
+\newblock \emph{Introduction to Information Retrieval}.
+\newblock Cambridge University Press, 2008.
+\newblock URL \url{https://nlp.stanford.edu/IR-book/}.
+\newblock Édition en ligne des auteurs, consultée le 11 septembre 2026.
+
+\bibitem[Martin et~al.(2020)Martin, Muller, Suárez, Dupont, Romary, Éric
+  Villemonte de~la Clergerie, Seddah, and Sagot]{martin2020}
+Louis Martin, Benjamin Muller, Pedro Javier~Ortiz Suárez, Yoann Dupont,
+  Laurent Romary, Éric Villemonte de~la Clergerie, Djamé Seddah, and Benoît
+  Sagot.
+\newblock {CamemBERT}: a tasty french language model.
+\newblock In \emph{Proceedings of the 58th Annual Meeting of the Association
+  for Computational Linguistics}, pages 7203--7219, 2020.
+\newblock \doi{10.18653/v1/2020.acl-main.645}.
+\newblock URL \url{https://aclanthology.org/2020.acl-main.645/}.
+
+\bibitem[Mikolov et~al.(2013)Mikolov, Chen, Corrado, and Dean]{mikolov2013}
+Tomas Mikolov, Kai Chen, Greg Corrado, and Jeffrey Dean.
+\newblock Efficient estimation of word representations in vector space.
+\newblock \emph{arXiv preprint arXiv:1301.3781}, 2013.
+\newblock URL \url{https://arxiv.org/abs/1301.3781}.
+
+\bibitem[{Object Management Group}(2017)]{omg-uml}
+{Object Management Group}.
+\newblock Unified modeling language, version 2.5.1, 2017.
+\newblock URL \url{https://www.omg.org/spec/UML/2.5.1}.
+\newblock Spécification, consultée le 11 septembre 2026.
+
+\bibitem[{Oracle}(s. d.{\natexlab{a}})]{mysql-constraints}
+{Oracle}.
+\newblock Mysql 8.0 reference manual: Foreign key constraints, s.
+  d.{\natexlab{a}}.
+\newblock URL
+  \url{https://dev.mysql.com/doc/refman/8.0/en/create-table-foreign-keys.html}.
+\newblock Consulté le 11 septembre 2026.
+
+\bibitem[{Oracle}(s. d.{\natexlab{b}})]{mysql-unique}
+{Oracle}.
+\newblock Mysql 8.0 reference manual: Create index statement -- unique indexes,
+  s. d.{\natexlab{b}}.
+\newblock URL \url{https://dev.mysql.com/doc/refman/8.0/en/create-index.html}.
+\newblock Consulté le 11 septembre 2026.
+
+\bibitem[{OWASP Foundation}(s. d.{\natexlab{a}})]{owasp-session}
+{OWASP Foundation}.
+\newblock Session management cheat sheet, s. d.{\natexlab{a}}.
+\newblock URL
+  \url{https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html}.
+\newblock Consulté le 11 septembre 2026.
+
+\bibitem[{OWASP Foundation}(s. d.{\natexlab{b}})]{owasp-upload}
+{OWASP Foundation}.
+\newblock File upload cheat sheet, s. d.{\natexlab{b}}.
+\newblock URL
+  \url{https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html}.
+\newblock Consulté le 11 septembre 2026.
+
+\bibitem[{Pallets Projects}(s. d.)]{flask-docs}
+{Pallets Projects}.
+\newblock Flask documentation, 3.1.x, s. d.
+\newblock URL \url{https://flask.palletsprojects.com/en/stable/}.
+\newblock Consulté le 11 septembre 2026.
+
+\bibitem[{pdfminer.six contributors}(s. d.)]{pdfminer-docs}
+{pdfminer.six contributors}.
+\newblock pdfminer.six documentation, s. d.
+\newblock URL \url{https://pdfminersix.readthedocs.io/en/latest/}.
+\newblock Consulté le 11 septembre 2026.
+
+\bibitem[Raghavan et~al.(2020)Raghavan, Barocas, Kleinberg, and
+  Levy]{raghavan2020}
+Manish Raghavan, Solon Barocas, Jon Kleinberg, and Karen Levy.
+\newblock Mitigating bias in algorithmic hiring: Evaluating claims and
+  practices.
+\newblock In \emph{Proceedings of the 2020 Conference on Fairness,
+  Accountability, and Transparency}, pages 469--481, 2020.
+\newblock \doi{10.1145/3351095.3372828}.
+\newblock URL \url{https://arxiv.org/abs/1906.09208}.
+
+\bibitem[Reimers and Gurevych(2019)]{reimers2019}
+Nils Reimers and Iryna Gurevych.
+\newblock Sentence-{BERT}: Sentence embeddings using siamese {BERT}-networks.
+\newblock In \emph{Proceedings of EMNLP-IJCNLP}, pages 3982--3992, 2019.
+\newblock \doi{10.18653/v1/D19-1410}.
+\newblock URL \url{https://aclanthology.org/D19-1410/}.
+
+\bibitem[Salton and Buckley(1988)]{salton1988}
+Gerard Salton and Christopher Buckley.
+\newblock Term-weighting approaches in automatic text retrieval.
+\newblock \emph{Information Processing \& Management}, 24\penalty0
+  (5):\penalty0 513--523, 1988.
+\newblock \doi{10.1016/0306-4573(88)90021-0}.
+
+\bibitem[{The PHP Group}(s. d.)]{php-server}
+{The PHP Group}.
+\newblock Php manual: Built-in web server, s. d.
+\newblock URL
+  \url{https://www.php.net/manual/en/features.commandline.webserver.php}.
+\newblock Consulté le 11 septembre 2026.
+
+\end{thebibliography}

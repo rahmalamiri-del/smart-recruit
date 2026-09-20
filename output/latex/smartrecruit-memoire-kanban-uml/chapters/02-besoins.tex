@@ -1,0 +1,268 @@
+\chapter{Spécification des besoins et organisation du travail par Kanban}
+\label{chap:besoins}
+
+Ce chapitre établit le contrat fonctionnel de SmartRecruit et le traduit en unités de travail pilotables par Kanban. Les acteurs et les cas d'utilisation déterminent les comportements attendus ; les exigences fixent des critères observables ; les cartes relient ces critères aux activités de conception, de réalisation et de vérification. Le cadre méthodologique présenté à la section~\ref{sec:cadre-kanban} se concrétise ainsi dans un flux, des politiques de passage et des indicateurs.
+
+La spécification repose donc sur les parcours visibles dans le dépôt, les contrôles des routes, le modèle de données et la documentation disponible. Elle distingue systématiquement trois catégories : une capacité effectivement présente, une exigence nécessaire pour rendre cette capacité fiable et une évolution proposée. Un critère d'acceptation exprime un résultat à vérifier ; sa présence dans ce chapitre ne constitue pas une preuve de réussite d'un test.
+
+\section{Problématique et périmètre fonctionnel}
+
+Un dossier de candidature réunit des informations structurées, comme une adresse électronique ou une liste de compétences, et un document largement non structuré, le curriculum vitæ. De son côté, une offre décrit un poste ou un stage au moyen d'un intitulé, d'un texte libre et de compétences recherchées. Le rapprochement de ces informations exige de reconnaître certaines variantes de vocabulaire et de rendre les résultats comparables. Une simple liste chronologique de candidatures ne répond pas à ce besoin d'orientation.
+
+SmartRecruit organise cette relation autour de quatre objets métier : le compte, le profil étudiant, l'offre et la candidature. L'analyse du CV complète le profil ; le calcul de compatibilité relie un profil à une offre ; le suivi de candidature représente une démarche explicite de l'étudiant. Cette dernière distinction est essentielle. Un profil peut être recommandé pour une offre sans avoir candidaté. Le classement proposé au recruteur ne doit donc pas être présenté comme une liste de personnes ayant manifesté leur intérêt lorsque le calcul porte sur l'ensemble du vivier.
+
+Le périmètre comprend l'inscription d'étudiants et de recruteurs, l'authentification par mot de passe, la modification des profils, le dépôt et la consultation des CV, la création et la modification d'offres, la candidature en un clic, le classement des profils et le changement d'état des candidatures. Les interfaces affichent des informations adaptées au rôle connecté. L'administration permet également de gérer les comptes, de réaffecter une offre et d'utiliser des opérations de corbeille et de restauration. Un point de diagnostic renseigne sur la communication avec le service Python. La persistance métier repose sur MySQL ; la fonction qui sélectionne le stockage ne bascule plus vers un fichier JSON.
+
+Le périmètre ne comprend pas une chaîne complète de recrutement jusqu'à la contractualisation. Aucun module de visioconférence, de messagerie entre utilisateurs, de calendrier d'entretiens, de notification automatique ou de signature n'est établi par le code étudié. L'état \code{interview} représente une catégorie de suivi, pas une réservation de rendez-vous. De même, une valeur numérique de compatibilité constitue une aide à l'examen des dossiers ; elle ne démontre ni la qualité future du travail d'une personne ni la probabilité de réussite de son recrutement.
+
+\section{Acteurs et responsabilités}
+
+L'acteur principal du parcours candidat est l'étudiant. Il crée un compte, décrit son profil, apporte son CV, consulte les offres publiées et suit ses candidatures. Le recruteur constitue l'autre acteur principal : il publie des offres, consulte les profils accessibles, examine les classements et renseigne les états de candidature associés à ses offres. L'administrateur dispose d'une visibilité plus large et peut intervenir sur les comptes, profils, offres et candidatures, y compris dans les parcours de corbeille. Le visiteur accède à l'accueil et aux formulaires d'entrée dans le système.
+
+Le service d'analyse Python intervient comme système secondaire sollicité par l'application. Il n'est pas un utilisateur authentifié de l'interface et ne décide pas de l'autorisation d'une opération métier. La base de données et le stockage de fichiers sont, quant à eux, des moyens internes de persistance. Cette séparation permet de ne pas confondre les droits d'une personne, les échanges entre applications et la localisation physique des informations.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Responsabilités principales des acteurs}
+\label{tab:acteurs-besoins}
+\begin{tabularx}{\textwidth}{@{}P{0.19\textwidth}XX@{}}
+\toprule
+Acteur & Actions attendues & Limite de responsabilité \\
+\midrule
+Étudiant & Compléter son profil et candidater. & Ne pas modifier un autre profil. \\
+Recruteur & Gérer ses offres et leur suivi. & Ne pas décider pour les offres d'un autre recruteur. \\
+Administrateur & Consulter la synthèse et gérer les objets autorisés. & Ne pas confondre administration et validation du score. \\
+Visiteur & Consulter l'accueil, s'inscrire, se connecter. & Aucun accès implicite aux opérations protégées. \\
+Service Python & Extraire du texte et calculer un rapprochement. & Aucun accès direct aux décisions métier. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Le diagramme UML des cas d'utilisation figure au chapitre~\ref{chap:conception}, figure~\ref{fig:uml-usecases}. Les scénarios suivants précisent les contrôles de propriété, les erreurs de validation et les conséquences d'une indisponibilité.
+
+\section{Spécification des cas d'utilisation}
+
+\subsection{UC01 : créer un compte et ouvrir une session}
+
+\textbf{Préconditions.} L'utilisateur n'a pas besoin d'être connecté pour accéder à l'inscription. La base SQL doit être disponible, car les routes d'inscription et de connexion refusent ces opérations lorsque ce stockage est inaccessible. L'inscription publique accepte les rôles étudiant et recruteur ; elle ne propose pas de créer un administrateur.
+
+\textbf{Scénario nominal.} L'utilisateur choisit son rôle, fournit son identité de connexion, renseigne les informations requises pour son type de profil et confirme son mot de passe. Laravel vérifie les champs, notamment le format et l'unicité de l'adresse électronique, la longueur minimale du mot de passe et sa confirmation. Le compte et le profil associé sont créés ensemble dans une transaction. Le système place ensuite les informations nécessaires dans la session et présente le tableau de bord du rôle retenu. Lors d'une connexion ultérieure, il recherche le compte puis vérifie le mot de passe à partir de son empreinte.
+
+\textbf{Alternatives et postconditions.} Un formulaire invalide ne doit pas créer de compte partiel. Une adresse déjà utilisée doit produire une erreur exploitable, sans attribuer le compte existant à une nouvelle personne. Une connexion échouée conserve un message générique. La session ouverte identifie un seul utilisateur et son rôle. Les routes actuelles limitent la fréquence des demandes de connexion et d'inscription ; la régénération de l'identifiant de session et l'invalidation complète à la déconnexion restent des exigences de durcissement, conformément aux recommandations relatives aux sessions~\cite{owasp-session}.
+
+\subsection{UC02 : compléter le profil et déposer un CV}
+
+\textbf{Préconditions.} L'étudiant est connecté et agit sur le profil associé à son compte. L'administrateur dispose d'un parcours distinct pour créer ou modifier un profil. Un recruteur peut consulter les profils accessibles, mais ne bénéficie pas de l'autorisation de les modifier.
+
+\textbf{Scénario nominal.} L'étudiant renseigne un intitulé, sa formation, son expérience, ses compétences et, éventuellement, des liens professionnels. Il fournit un fichier ou du texte de CV. Le formulaire vérifie les types et les longueurs ; les formats annoncés par la validation sont PDF, TXT et Markdown, avec une limite de 4~Mo. Le parseur tente d'extraire le texte et des informations utiles. Les compétences déclarées et détectées peuvent être combinées, puis le profil est enregistré avec ses métadonnées. La page de détail permet de relire le résultat et de corriger les informations.
+
+\textbf{Alternatives et postconditions.} Un document peu lisible ne doit pas être transformé silencieusement en profil complet. Le code prévoit un avertissement lorsque l'extraction paraît insuffisante et invite à compléter le texte manuellement. Cette possibilité est indispensable pour un PDF composé d'images, puisque l'OCR n'est pas établi dans le MVP. Le contrôle du type MIME et de la taille constitue une première barrière, mais ne garantit pas, à lui seul, un traitement sûr de tout document~\cite{owasp-upload}. La postcondition attendue est un profil cohérent avec les informations réellement conservées, accompagné d'un état explicite de l'extraction.
+
+\subsection{UC03 : publier et maintenir une offre}
+
+\textbf{Préconditions.} Le recruteur ou l'administrateur est connecté. Pour une modification par un recruteur, l'offre doit appartenir à ce compte. L'offre comprend au minimum un intitulé, une entreprise et une description ; les compétences recherchées peuvent être saisies séparément.
+
+\textbf{Scénario nominal.} L'acteur complète le formulaire, soumet les informations et reçoit la confirmation de création. Dans l'état actuel, une offre nouvelle est publiée par défaut. Le formulaire de modification permet ensuite de choisir un état parmi \code{draft}, \code{published} et \code{closed}. Le recruteur retrouve ses offres dans une liste filtrable par état et peut isoler celles qui ont reçu des candidatures. Les étudiants disposent d'une liste limitée aux offres publiées.
+
+\textbf{Alternatives et postconditions.} Une offre inexistante donne lieu à une réponse d'absence ; la tentative de modification d'une offre appartenant à un autre recruteur est refusée. Une validation incorrecte préserve les données déjà enregistrées. La fermeture d'une offre doit signifier qu'aucune nouvelle candidature ne peut être reçue. Cette dernière règle constitue une exigence à compléter : le contrôle existe pour la consultation d'une offre par un étudiant, mais la route de candidature ne revalide pas explicitement son état.
+
+\subsection{UC04 : candidater à une offre}
+
+\textbf{Préconditions.} L'étudiant possède une session et un profil valides. L'offre existe et, selon la règle métier attendue, son état est publié. La candidature désigne le profil de la session ; son identité ne doit pas être choisie librement dans une valeur envoyée par le navigateur.
+
+\textbf{Scénario nominal.} L'étudiant ouvre une offre, déclenche l'action de candidature et reçoit un message de confirmation. Le système relie l'offre au profil, affecte l'état initial \code{submitted} et enregistre la date de candidature. Le tableau de bord étudiant permet ensuite de retrouver cette démarche et son état. Le dépôt d'un nouveau CV relève du parcours de mise à jour du profil ; aucun formulaire distinct de candidature avec création simultanée de profil ne doit être supposé sur la base d'une ancienne description documentaire.
+
+\textbf{Alternatives et postconditions.} Une seconde demande concernant le même couple actif doit rester sans effet sur le nombre de candidatures. Le stockage SQL possède une contrainte unique pour ce couple et la méthode de candidature vérifie préalablement son existence. Si une candidature antérieure a été retirée logiquement, le code la restaure avec l'état initial et actualise sa date. Deux requêtes simultanées peuvent néanmoins franchir la vérification d'absence avant l'insertion ; il reste nécessaire de convertir le conflit SQL en réponse métier stable. Après réussite, une candidature active unique relie les deux objets, sans modifier l'identité du candidat ni les caractéristiques de l'offre.
+
+\subsection{UC05 : examiner un classement explicable}
+
+\textbf{Préconditions.} Le recruteur consulte une offre qui lui appartient, ou l'administrateur ouvre une offre accessible. Des profils sont disponibles. Une candidature préalable n'est pas nécessaire au calcul d'une recommandation, puisque les classements actuels peuvent porter sur tout le vivier.
+
+\textbf{Scénario nominal.} Le système rapproche la description de l'offre et chaque profil, attribue un score, produit des listes de compétences reconnues ou manquantes, puis trie les résultats. Il utilise le service Python lorsqu'il obtient une réponse exploitable ; sinon, le moteur PHP fournit un résultat local. Les recommandations d'offres à destination des étudiants suivent le raisonnement symétrique : un profil est comparé aux offres publiées.
+
+\textbf{Alternatives et postconditions.} Une indisponibilité du service ne doit pas provoquer une présentation trompeuse de l'origine du calcul. Le classement doit identifier la méthode utilisée et distinguer un texte inexploitable d'une faible compatibilité réellement calculée. L'absence de compétences détectées ne prouve pas leur absence chez la personne. Dans le MVP, un score peut être enregistré lorsqu'une candidature existe et provoquer une présélection automatique. L'exigence cible consiste à séparer cette assistance de la décision humaine et à rendre toute transition automatique explicite et traçable.
+
+\subsection{UC06 : suivre et qualifier une candidature}
+
+\textbf{Préconditions.} La candidature existe. Le recruteur est propriétaire de l'offre associée, ou l'acteur est administrateur. L'état demandé appartient à la liste reconnue : soumise, présélectionnée, entretien ou rejetée.
+
+\textbf{Scénario nominal.} Le recruteur examine le dossier et son explication de score, choisit l'état approprié et soumet sa décision. Le système contrôle le rôle, l'appartenance de l'offre et la valeur demandée, puis actualise la candidature. L'étudiant retrouve cet état dans son espace. Les codes internes doivent être distingués des libellés de présentation : la configuration actuelle affiche notamment \code{interview} comme « Acceptée ». Cette acceptation affichée ne constitue ni une réservation d'entretien ni une contractualisation.
+
+\textbf{Alternatives et postconditions.} Une tentative sur la candidature d'un autre recruteur est refusée. Une valeur non reconnue est rejetée. La conception cible devra aussi définir les transitions autorisées entre états et conserver l'auteur, la date et la raison éventuelle d'un changement. Le code actuel valide une liste de valeurs, sans machine à états ni journal des décisions ; l'historique complet ne peut donc pas être présenté comme une fonctionnalité acquise.
+
+\subsection{UC07 : administrer les données et leur corbeille}
+
+\textbf{Préconditions.} L'acteur est administrateur et le stockage SQL est disponible. Il sélectionne un compte, un profil, une offre ou une candidature existante depuis les listes prévues à cet effet. Les opérations de restauration portent sur des éléments précédemment retirés logiquement.
+
+\textbf{Scénario nominal.} L'administrateur consulte les données, recherche l'élément concerné et utilise l'action de gestion adaptée. Selon l'objet, le code fournit des modifications de compte, une réaffectation d'offre, un retrait logique ou une restauration. Les listes distinguent les objets actifs de ceux placés dans la corbeille. Le résultat attendu est une transition cohérente de l'objet et de ses dépendances, accompagnée d'une confirmation dans l'interface.
+
+\textbf{Alternatives et postconditions.} Une référence inconnue ou une combinaison de données interdite ne doit pas produire une opération partielle. La restauration d'un objet nécessite de vérifier l'état de ses relations, afin de ne pas faire réapparaître une candidature dont l'offre ou le profil reste indisponible. Une corbeille ne constitue pas une preuve d'effacement physique de toutes les informations ni des documents associés. Les contrôles de ce parcours relèvent de la carte K10 et des exigences d'intégrité.
+
+\section{Exigences identifiées et critères d'acceptation}
+
+Les exigences du tableau~\ref{tab:exigences-fonctionnelles} servent de repères pour relier les parcours, la conception et une future campagne de tests. Le mot attendu désigne une obligation de résultat à vérifier. Une fonctionnalité visible peut satisfaire une partie du critère sans satisfaire ses cas limites, notamment en présence de concurrence, d'un fichier inattendu ou d'un service indisponible.
+
+\begin{longtable}{@{}P{0.13\textwidth}P{0.30\textwidth}P{0.50\textwidth}@{}}
+\caption{Exigences fonctionnelles et observations vérifiables}\label{tab:exigences-fonctionnelles}\\
+\toprule
+Identifiant & Exigence & Critère d'acceptation attendu \\
+\midrule
+\endfirsthead
+\toprule
+Identifiant & Exigence & Critère d'acceptation attendu \\
+\midrule
+\endhead
+EF01 & Authentifier les comptes. & Des identifiants valides ouvrent le bon espace ; les identifiants invalides sont refusés. \\
+EF02 & Limiter les modifications au propriétaire. & Un étudiant ne peut modifier un autre profil ; un recruteur ne peut modifier une offre tierce. \\
+EF03 & Permettre la correction du CV. & Les champs corrigés sont restitués après sauvegarde ; une extraction insuffisante est signalée. \\
+EF04 & Gérer la publication. & Une offre fermée ou en brouillon ne reçoit aucune nouvelle candidature étudiante. \\
+EF05 & Assurer l'unicité des candidatures. & Deux soumissions, même simultanées, conservent un seul couple offre/profil. \\
+EF06 & Expliquer les rapprochements. & Le résultat indique un score, les éléments de rapprochement et la source du calcul. \\
+EF07 & Contrôler le suivi. & Seul un acteur habilité change l'état ; une valeur inconnue est refusée. \\
+EF08 & Distinguer vivier et candidatures. & L'interface permet d'identifier si un profil classé a effectivement candidaté. \\
+EF09 & Administrer les objets et leur corbeille. & Les opérations autorisées de retrait et de restauration conservent des relations cohérentes et un affichage conforme. \\
+\bottomrule
+\end{longtable}
+
+Les exigences non fonctionnelles concernent d'abord la confidentialité des CV et l'intégrité des décisions. Une route protégée par rôle ne suffit pas lorsque l'opération vise un objet individuel : il faut aussi vérifier le droit sur cet objet. La validation serveur doit s'appliquer à chaque entrée, même si le formulaire la contrôle déjà dans le navigateur~\cite{laravel-validation}. Les fichiers doivent disposer de règles d'accès et d'un cycle de conservation cohérents avec les profils auxquels ils se rapportent.
+
+La disponibilité est définie par fonction. Un moteur de score local peut maintenir une aide au classement en cas de panne Python. Pour les données métier, MySQL est l'unique source de vérité sélectionnée par \code{sr_store()} : son indisponibilité provoque une réponse 503. La présence résiduelle d'une classe de démonstration ou d'un libellé de diagnostic mentionnant le JSON n'implique pas qu'un repli de stockage soit actif. L'exigence consiste à conserver ce comportement explicite et à présenter une information cohérente dans toutes les vues de diagnostic.
+
+La performance doit être mesurée sur un volume décrit de profils, d'offres et de documents, avec une configuration matérielle connue. Aucun temps de réponse garanti n'est déduit du dépôt. Les critères à construire portent sur la durée de l'extraction, la latence d'un classement et le nombre de requêtes par page. La maintenabilité sera appréciée par la séparation des responsabilités, la stabilité des contrats entre PHP et Python et la possibilité de tester les règles sans lancer tout le système.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Exigences de qualité à vérifier lors de la consolidation}
+\label{tab:exigences-qualite}
+\begin{tabularx}{\textwidth}{@{}P{0.13\textwidth}P{0.25\textwidth}X@{}}
+\toprule
+Identifiant & Qualité attendue & Critère d'acceptation proposé \\
+\midrule
+ENF01 & Confidentialité & Une demande sans autorisation ne permet pas d'obtenir un document privé. \\
+ENF02 & Intégrité & Une modification interrompue ne laisse pas un profil partiellement mis à jour. \\
+ENF03 & Disponibilité maîtrisée & Une panne SQL est annoncée sans changer de stockage métier ; le repli du calcul Python vers PHP reste identifiable. \\
+ENF04 & Diagnostic & Un échec réseau est distingué d'un document dont le texte est inexploitable. \\
+ENF05 & Performance mesurable & Chaque mesure précise volume, configuration, méthode et distribution des durées observées. \\
+ENF06 & Reproductibilité & Des entrées identiques et une même version de moteur donnent un résultat vérifiable. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Le tableau~\ref{tab:exigences-qualite} complète les exigences fonctionnelles sans attribuer au prototype des garanties non mesurées. Il permet de préparer des essais d'échec et de reprise, au même titre que les parcours nominaux. Les seuils quantitatifs de performance restent à fixer à partir d'un contexte d'utilisation explicite et d'une première mesure reproductible.
+
+\section{Définition du flux de travail Kanban}
+\label{sec:flux-kanban}
+
+\subsection{Unité de travail et bornes d'engagement}
+
+Une carte représente une capacité limitée et vérifiable, ou la correction d'un défaut dont l'effet est décrit. Elle contient un identifiant, le besoin concerné, le périmètre, un critère d'acceptation, les dépendances, la prochaine action et les liens vers la conception ou les preuves. Une carte « corriger la candidature sur offre fermée » est ainsi plus exploitable qu'une carte « améliorer le backend ». La première possède un déclencheur, un résultat attendu et un contrôle ; la seconde ne permet pas de déterminer sa fin.
+
+Le flux retenu comporte cinq états : Réserve, Prêt, En cours, Vérification et Terminé. L'entrée dans En cours constitue le point de début ; l'entrée dans Terminé constitue le point de fin. La Réserve contient les besoins à préciser ou à ordonner. Prêt contient les éléments suffisamment définis pour être engagés lorsque la capacité le permet. L'attente dans ces deux premières colonnes n'entre pas dans le temps de cycle défini ici. Les attentes survenues après le début, y compris un blocage ou une revue différée, y restent intégrées.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{\input{figures/kanban-board.tex}}
+\caption{Flux Kanban proposé, capacités et bornes de mesure}
+\label{fig:kanban-board}
+\end{figure}
+
+\subsection{Tirage et limites de travail en cours}
+
+La capacité proposée pour une étudiante seule est d'une carte dans En cours et d'une carte dans Vérification, soit un maximum global de deux cartes commencées mais non terminées. La colonne Prêt est plafonnée à trois cartes afin de conserver une courte sélection exploitable ; ce plafond ne constitue pas du WIP, puisque le point de début n'a pas encore été franchi. La figure~\ref{fig:kanban-board} rend ces bornes visibles.
+
+Une carte est tirée depuis Prêt lorsqu'une place est disponible dans En cours et que le WIP global reste inférieur à deux. Une carte en attente de vérification doit être traitée avant de commencer un nouvel élément, sauf si sa prochaine action dépend effectivement d'une réponse extérieure. Dans ce cas, une seconde carte indépendante peut utiliser la capacité restante. La limite autorise deux engagements ; elle ne suppose pas qu'une personne exécute deux tâches simultanément.
+
+Un blocage est un attribut de la carte, pas une colonne qui la soustrait au WIP. La carte reste dans En cours ou Vérification, avec le motif, la date d'apparition du blocage et l'action de résolution. Si les deux places sont occupées, aucune troisième carte n'est démarrée. Le travail porte alors sur la résolution du blocage, l'obtention d'une décision ou la clarification de la prochaine action. Un défaut de droits d'accès prioritaire réordonne Prêt ; il n'accorde pas automatiquement une place supplémentaire. Toute révision des limites doit être explicite et motivée.
+
+\subsection{Politiques d'entrée et de sortie}
+
+Les politiques du tableau~\ref{tab:politiques-kanban} rendent le déplacement d'une carte contrôlable. Un passage n'est pas déduit du temps passé ni du nombre de fichiers modifiés. Les exigences et les critères d'acceptation déterminent ce qui doit être démontré. Une dépendance non levée empêche l'entrée dans Prêt si elle interdit toute prochaine action autonome sur la carte.
+
+\begingroup
+\small
+\begin{longtable}{@{}P{0.18\textwidth}P{0.36\textwidth}P{0.38\textwidth}@{}}
+\caption{Politiques explicites du tableau Kanban}\label{tab:politiques-kanban}\\
+\toprule
+État & Condition d'entrée & Condition de sortie \\
+\midrule
+\endfirsthead
+\toprule
+État & Condition d'entrée & Condition de sortie \\
+\midrule
+\endhead
+Réserve & Besoin ou défaut formulé avec sa valeur attendue. & Périmètre borné, priorité définie, critère observable et dépendances identifiées. \\
+Prêt & Informations suffisantes pour agir ; pas de dépendance empêchant le démarrage. & Place disponible dans En cours et capacité globale respectée. \\
+En cours & Carte tirée ; début enregistré ; prochaine action concrète. & Réalisation relue, vérifiable et accompagnée des éléments de contrôle. \\
+Vérification & Capacité disponible ; code ou artefact prêt à contrôler. & Critères satisfaits, résultats consignés et documentation cohérente. \\
+Terminé & Définition d'achèvement satisfaite ; fin enregistrée. & Archivage consultable avec les preuves et références conservées. \\
+\bottomrule
+\end{longtable}
+\endgroup
+
+Une correction découverte en Vérification appartient à la même carte tant qu'elle relève de son critère initial. Elle ne remet pas à zéro sa date de début. La carte peut revenir en En cours lorsque la capacité de cette colonne est disponible ; elle reste sinon bloquée en Vérification avec son action de correction explicitée. Ce choix évite de masquer les reprises par la création d'éléments artificiellement nouveaux.
+
+La définition d'achèvement impose quatre conditions complémentaires : le comportement annoncé est présent ; les contrôles correspondant au risque ont un résultat conservé ; les éléments UML et les textes concernés correspondent au fonctionnement décrit ; la preuve est accessible et ne contient pas de données privées. Une capture montre l'apparence d'un état, mais ne remplace pas une vérification d'autorisation ou de transaction. Un résultat partiel reste en Vérification ou conduit à redéfinir explicitement le périmètre ; il ne devient pas une validation complète par simple déplacement vers Terminé.
+
+\section{Cartes de travail et priorisation des besoins}
+\label{sec:cartes-kanban}
+
+Les cartes K01 à K12 constituent le catalogue de travail du tableau~\ref{tab:cartes-kanban}. Leurs identifiants servent à relier besoin, conception et preuve, sans établir un ordre chronologique de réalisation. Une capacité déjà visible dans le dépôt peut nécessiter une carte de consolidation : sa présence et la vérification de ses cas limites sont deux questions distinctes. Les critères indiqués délimitent les éléments à examiner avant un passage dans Terminé.
+
+\begingroup
+\small
+\begin{longtable}{@{}P{0.13\textwidth}P{0.36\textwidth}P{0.43\textwidth}@{}}
+\caption{Cartes Kanban reliées aux besoins et aux preuves attendues}\label{tab:cartes-kanban}\\
+\toprule
+Carte & Capacité et références & Contrôle ou preuve associé \\
+\midrule
+\endfirsthead
+\toprule
+Carte & Capacité et références & Contrôle ou preuve associé \\
+\midrule
+\endhead
+K01 & Inscription et session ; UC01, EF01. & Compte valide, refus d'identifiants incorrects et état de session vérifiés. \\
+K02 & Droits sur profils, offres et CV ; EF02, ENF01. & Accès propriétaire autorisé ; accès tiers interdit pour les opérations protégées. \\
+K03 & Profil et compétences corrigibles ; UC02, EF03. & Saisie enregistrée puis restituée ; capture du profil avec données synthétiques. \\
+K04 & Extraction du CV et avertissement ; UC02, EF03, ENF04. & Cas textuel et cas inexploitable différenciés ; corrections manuelles possibles. \\
+K05 & Cycle de publication d'une offre ; UC03, EF04. & États reconnus, propriété contrôlée et offre fermée non recevable pour une candidature. \\
+K06 & Candidature unique et restauration ; UC04, EF05. & Double soumission maîtrisée ; cas concurrent et restauration logique examinés. \\
+K07 & Score, explication et origine ; UC05, EF06, ENF06. & Entrées synthétiques, score et compétences affichées cohérents avec le moteur utilisé. \\
+K08 & Décision et statut de candidature ; UC06, EF07. & Acteur habilité et valeur valide ; absence d'écrasement d'une décision lors d'un recalcul. \\
+K09 & Tableaux de bord et filtres ; EF08. & Rôle, filtres et valeurs visibles contrôlés ; distinction entre vivier et candidatures. \\
+K10 & Administration et corbeilles ; UC07, EF09. & Retrait, restauration et réaffectation contrôlés avec leurs relations. \\
+K11 & Persistance MySQL et intégrité ; ENF02, ENF03. & Échec SQL explicite, absence de repli métier et modification relationnelle cohérente. \\
+K12 & Dossier de preuves et traçabilité ; ENF05, ENF06. & Modèles UML, captures clés, versions et résultats reliés aux critères examinés. \\
+\bottomrule
+\end{longtable}
+\endgroup
+
+La priorisation combine impact pour l'utilisateur, risque de résultat incorrect, dépendances et possibilité de vérifier l'élément. Les cartes de droits et d'intégrité prennent le pas sur une amélioration purement visuelle lorsqu'un défaut permet une action non autorisée ou une incohérence de données. Le profil précède les comparaisons qui en dépendent ; une offre et un profil de test précèdent le contrôle d'une candidature. Le remplacement du moteur par un modèle linguistique plus complexe reste dans la Réserve tant qu'un besoin explicite et un protocole d'évaluation ne justifient pas son engagement.
+
+Lors du réapprovisionnement de Prêt, le périmètre doit rester réalisable et contrôlable comme un ensemble. Si K02 couvre trop de règles pour une seule unité, la carte est découpée avant démarrage en éléments liés, par exemple K02a pour le profil et K02b pour le document CV. Le suivi conserve leur relation au besoin d'origine. Une carte mère de regroupement n'est pas comptée une seconde fois dans le débit : seuls les éléments réellement engagés et achevés constituent les unités mesurées.
+
+\section{Cadences, mesures de flux et attente de service}
+\label{sec:mesures-kanban}
+
+\subsection{Cadences adaptées à une réalisation individuelle}
+
+Une revue quotidienne de cinq à dix minutes est proposée pour examiner les cartes actives, leur âge, les blocages et la prochaine action. Elle commence par Vérification afin de favoriser l'achèvement. Le tableau est actualisé au moment d'un changement d'état, plutôt qu'à la seule occasion de cette revue. Les échanges avec l'encadrement portent sur les décisions nécessaires et les preuves à examiner, sans supposer une disponibilité permanente pour valider chaque opération.
+
+Un réapprovisionnement hebdomadaire d'environ vingt minutes permet de sélectionner jusqu'à trois cartes prêtes, en tenant compte des dépendances et du besoin le plus utile. Une revue des politiques toutes les deux semaines, ou à l'apparition d'un blocage récurrent, examine les raisons d'attente, le découpage des cartes et les contrôles trop tardifs. Ces rendez-vous ne créent aucune obligation de livrer un lot fixe à leur terme. Une capacité terminée peut être intégrée dès que ses critères sont satisfaits.
+
+\subsection{Définition et usage des indicateurs}
+
+Le WIP compte les cartes commencées non terminées. L'âge mesure, pour une carte active, le temps écoulé depuis son début. Le temps de cycle utilise les mêmes bornes pour une carte terminée. Le débit compte les cartes terminées par unité de temps. Ces quatre mesures de flux sont définies dans le Guide Kanban~\cite{kanban-guide2025}. Leur interprétation dépend des bornes d'engagement et de la définition d'achèvement retenues ci-dessus.
+
+Pour SmartRecruit, les horodatages seraient conservés dans un journal de changements d'état avec l'identifiant de carte et le motif d'un blocage éventuel. Les durées sont exprimées en jours calendaires, ce qui conserve les attentes plutôt que de les confondre avec du temps de programmation. Le débit est présenté par semaine sous forme d'un nombre entier d'unités terminées, jamais comme un total de points ou de lignes de code. Un champ de classe de travail permet de distinguer, si nécessaire, une correction ciblée d'un ensemble fonctionnel plus large.
+
+L'âge d'une carte sert à déclencher une action : clarifier une dépendance, réduire une attente de vérification ou reconsidérer un périmètre mal borné. Le temps de cycle d'éléments achevés permet d'observer la dispersion des durées. Le débit décrit la capacité observée du système de travail, pas la productivité individuelle à comparer à celle d'autres personnes. Aucune courbe de ces indicateurs n'est tracée sans journal horodaté ; le tableau conserve leurs définitions pour rendre une collecte ultérieure cohérente.
+
+\subsection{Attente de niveau de service initiale}
+
+L'attente de niveau de service, ou SLE, est fixée comme hypothèse de pilotage à 85\,\% des cartes terminées en cinq jours calendaires ou moins entre En cours et Terminé. Cette valeur s'applique à des unités préalablement bornées lors de l'entrée dans Prêt. Elle ne constitue ni un délai garanti, ni un résultat mesuré, ni une date de fin du projet. Le seuil sert à examiner les cartes dont l'âge augmente et à rendre explicite l'incertitude de livraison.
+
+Lorsque des temps de cycle sont disponibles, l'hypothèse peut être remplacée par une durée correspondant au percentile choisi sur un ensemble de cartes comparables, en indiquant la taille de l'échantillon et la période. Une petite série reste fragile et doit être interprétée avec sa dispersion. Dépasser le SLE ne conduit pas à réinitialiser une carte ou à exclure ses jours bloqués : il invite à examiner le fonctionnement du flux. Inversement, augmenter le nombre de cartes démarrées ne constitue pas, à lui seul, une amélioration du service.
+
+Le cadre Kanban relie ainsi les besoins à une réalisation limitée par la capacité et à un achèvement fondé sur la preuve. Le chapitre suivant précise les modèles UML qui soutiennent cette traçabilité : acteurs et cas d'utilisation, responsabilités des classes, relations de données et interactions entre composants.

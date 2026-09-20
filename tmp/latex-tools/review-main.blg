@@ -1,0 +1,17 @@
+This is BibTeX, Version 0.99d
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: review-main.aux
+The style file: plainnat.bst
+Database file #1: references.bib
+Warning--empty year in docker-compose
+Warning--empty year in laravel-database
+Warning--empty year in laravel-deployment
+Warning--empty year in laravel-routing
+Warning--empty year in laravel-validation
+Warning--empty year in mysql-constraints
+Warning--empty year in owasp-session
+Warning--empty year in owasp-upload
+Warning--empty year in flask-docs
+Warning--empty year in pdfminer-docs
+Warning--empty year in php-server
+(There were 11 warnings)

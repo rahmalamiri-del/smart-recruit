@@ -1,0 +1,16 @@
+\begingroup\setstretch{1}
+\begin{tikzpicture}[font=\small,comp/.style={draw=navy,fill=lightgray,align=center,text width=4.1cm,minimum height=1.25cm},dep/.style={-{Stealth[length=2mm]},dashed,draw=navy}]
+\node[comp] (ui) at (0,0) {\guillemotleft composant\guillemotright\\Vues Blade + CSS};
+\node[comp] (web) at (0,-3) {\guillemotleft composant\guillemotright\\Routes, session, autorisations};
+\node[comp] (sql) at (-4,-6) {\guillemotleft composant\guillemotright\\SqlStore / Query Builder};
+\node[comp] (ai) at (3.5,-6) {\guillemotleft composant\guillemotright\\AiClient + CvParser};
+\node[comp] (local) at (6,-3) {\guillemotleft composant\guillemotright\\SemanticMatcher PHP};
+\node[comp] (db) at (-4,-9) {\guillemotleft base de données\guillemotright\\MySQL};
+\node[comp] (py) at (3.5,-9) {\guillemotleft composant\guillemotright\\Service Python / Flask};
+\draw[dep] (ui)--node[right]{rendu et formulaires}(web);
+\draw[dep] (web)--(sql);\draw[dep] (web)--(ai);\draw[dep] (web)--node[above,font=\footnotesize]{calcul local}(local);
+\draw[dep] (sql)--node[left]{SQL}(db);\draw[dep] (ai)--node[right]{HTTP / JSON / fichier}(py);
+\node[font=\footnotesize,align=center,text width=12cm,text=midgray] at (0,-10.5) {Les documents CV sont conservés dans le système de fichiers. MySQL reste la source des objets métier ; le chemin PHP est un repli de calcul, pas un stockage de substitution.};
+\end{tikzpicture}
+
+\endgroup

@@ -1,0 +1,178 @@
+\chapter{Dictionnaire synthétique des données}
+\label{ann:dictionnaire}
+
+Ce dictionnaire complète la conception par une lecture opérationnelle des informations persistées. Il décrit la migration présente dans le dépôt et ne reproduit aucune ligne de données. La notation PK désigne une clé primaire ; FK désigne une référence contrôlée par une clé étrangère. Les tableaux JSON représentent des valeurs structurées à l'intérieur d'une colonne, et non des tables relationnelles supplémentaires.
+
+\begingroup
+\small
+\begin{longtable}{@{}P{0.27\textwidth}P{0.31\textwidth}P{0.34\textwidth}@{}}
+\caption{Dictionnaire des sept tables métier}\label{tab:ann-dictionnaire}\\
+\toprule
+Table & Champs caractéristiques & Contraintes et remarques \\
+\midrule
+\endfirsthead
+\toprule
+Table & Champs caractéristiques & Contraintes et remarques \\
+\midrule
+\endhead
+\code{sr_users} & \code{id}, \code{public_id}, \code{name}, \code{email}, \code{role}, \code{password}. & PK numérique ; identifiant public et adresse uniques ; rôle borné à trois valeurs. \\
+\code{sr_student_profiles} & \code{user_id}, \code{headline}, \code{education}, \code{experience_years}, \code{skills}, \code{cv_text}. & FK utilisateur obligatoire ; compétences, liens et métadonnées en JSON ; expérience entière non négative. \\
+\code{sr_recruiter_profiles} & \code{user_id}, \code{company_name}, \code{position}, \code{website}. & FK utilisateur obligatoire ; entreprise requise ; fonction et site facultatifs. \\
+\code{sr_cv_documents} & \code{student_profile_id}, \code{original_name}, \code{stored_path}, \code{mime_type}, \code{size}, \code{parser_result}. & FK profil obligatoire ; plusieurs documents possibles ; taille par défaut : zéro. \\
+\code{sr_offers} & \code{recruiter_profile_id}, \code{title}, \code{description}, \code{required_skills}, \code{status}. & FK recruteur facultative ; état borné ; compétences JSON ; index état/date. \\
+\code{sr_applications} & \code{offer_id}, \code{student_profile_id}, \code{status}, \code{applied_at}. & Deux FK obligatoires ; unicité du couple offre/profil ; état borné. \\
+\code{sr_match_scores} & \code{application_id}, \code{score}, \code{text_similarity}, \code{semantic_coverage}, \code{raw_response}. & FK candidature obligatoire ; composantes entières ; absence d'unicité par candidature. \\
+\bottomrule
+\end{longtable}
+\endgroup
+
+Les utilisateurs, profils étudiants, profils recruteurs, offres et candidatures possèdent un identifiant public distinct de leur clé numérique. Les documents et scores ne disposent pas de cette même colonne. Les sept tables contiennent des dates de création et de modification. Le compte prévoit aussi une date de vérification électronique et un jeton de mémorisation, mais leur présence ne prouve pas l'existence d'un parcours de vérification ou de connexion persistante dans l'interface.
+
+La relation compte/profil n'impose pas l'unicité de \code{user_id}. Le dictionnaire décrit donc une référence obligatoire depuis le profil, sans transformer cette relation en un-à-un garanti par SQL. La même prudence s'applique aux scores : plusieurs lignes peuvent référencer une candidature, alors que le store tend à actualiser la dernière. Une évolution doit fixer explicitement la sémantique attendue avant de renforcer les contraintes ou de développer un historique.
+
+Les valeurs autorisées pour les offres sont \code{draft}, \code{published} et \code{closed}. Les candidatures utilisent \code{submitted}, \code{shortlisted}, \code{interview} et \code{rejected}. Aucune valeur ne représente une embauche définitive. Les scores sont représentés par de petits entiers non signés ; le type SQL seul n'impose pas une borne supérieure de 100. La validité métier du score dépend donc aussi de sa production et de sa validation applicative.
+
+Les opérations de suppression logique et de restauration utilisent des marqueurs applicatifs sans effacement immédiat. Les règles SQL suivantes concernent un effacement physique : les suppressions en cascade assurent la cohérence entre utilisateurs, profils, documents, candidatures et scores suivant leurs références. La suppression d'un profil recruteur conserve ses offres avec une référence mise à null. Ces mécanismes n'effacent pas les fichiers physiques des CV. Les règles complémentaires à préparer concernent la conservation des documents, l'identification des fichiers orphelins et la définition d'un accès autorisé. Elles ne sont pas remplacées par une clé étrangère ou un nom de fichier difficile à deviner.
+
+\chapter{Contrats des interfaces d'analyse}
+\label{ann:api}
+
+Les exemples suivants utilisent exclusivement des contenus synthétiques. Ils documentent l'interface Flask présente dans le code ; ils ne constituent pas une capture d'échanges avec un service distant. Une réponse syntaxiquement valide ne suffit pas à prouver la qualité d'une extraction ou d'un rapprochement. Le client doit examiner les champs utiles, leur type et la signification de leurs valeurs.
+
+\section{Diagnostic par \code{GET /health}}
+
+L'opération ne reçoit pas de charge utile. Elle retourne un objet de diagnostic indiquant un état, un message, un nom de service et un identifiant d'algorithme. L'extrait ci-dessous omet volontairement le message textuel. Le nom de service correspond à l'interface Flask ; le serveur de secours fondé sur la bibliothèque standard annonce une autre valeur.
+
+\begin{lstlisting}[caption={Extrait structurel du diagnostic Flask}]
+{
+  "status": "ok",
+  "service": "Python/Flask",
+  "algorithm": "tf-idf-cosine+semantic-skill-taxonomy"
+}
+\end{lstlisting}
+
+Cette réponse renseigne sur le service qui traite la demande. Elle ne vérifie pas MySQL, les droits d'un utilisateur ou la capacité à extraire un PDF particulier. Elle ne doit pas être confondue avec une preuve de disponibilité de toute la plateforme. La route Laravel de diagnostic combine d'autres observations, mais elle n'appartient pas au contrat Python décrit ici.
+
+\section{Rapprochement par \code{POST /match}}
+
+La charge attendue est un objet JSON. Les champs \code{offer_text} et \code{cv_text} représentent des chaînes ; \code{required_skills} et \code{candidate_skills} représentent des listes de chaînes. La fonction récupère des valeurs par défaut lorsque des champs sont absents, sans validation systématique préalable des types. L'exemple suivant correspond au couple utilisé dans la sonde de calcul détaillée.
+
+\begin{lstlisting}[caption={Requête synthétique de rapprochement}]
+{
+  "offer_text": "java react",
+  "cv_text": "java sql",
+  "required_skills": [],
+  "candidate_skills": []
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Résultat Python enregistré pour ce couple}]
+{
+  "score": 45,
+  "matched_skills": ["java"],
+  "missing_skills": ["react"],
+  "text_similarity": 34,
+  "semantic_coverage": 50,
+  "algorithm": "tf-idf-cosine+semantic-skill-taxonomy",
+  "source": "python"
+}
+\end{lstlisting}
+
+Le score et les composantes sont des entiers exprimés sur une échelle de 0 à 100. Les listes décrivent les rapprochements produits par le référentiel du moteur. Elles ne certifient pas les compétences d'une personne. Une chaîne arbitraire dans la liste des compétences n'est pas nécessairement normalisée de la même façon qu'une compétence détectée dans le texte ; la sonde d'alias explicites montre une divergence sur ce point.
+
+Trois charges invalides ont été essayées localement avec le client de test Flask : un nombre comme texte d'offre, une chaîne à la place d'une liste de compétences et une liste à la place de l'objet principal. Les trois réponses enregistrées portent le statut 500. Le contrat cible doit refuser ces types par une erreur de validation documentée, sans exception interne. Ce comportement cible reste proposé, et non acquis.
+
+\section{Extraction par \code{POST /parse-cv}}
+
+Cette opération attend un formulaire \code{multipart/form-data} contenant un champ fichier nommé \code{file}. Elle crée un fichier temporaire, tente l'extraction, puis demande sa suppression. La réponse contient le texte, une liste d'adresses détectées et une liste de compétences. La structure illustrée ci-dessous est synthétique et ne représente pas un document effectivement évalué.
+
+\begin{lstlisting}[caption={Structure illustrative d'une extraction}]
+{
+  "text": "Java SQL",
+  "emails": [],
+  "skills": ["java", "sql"]
+}
+\end{lstlisting}
+
+Le code retourne 422 lorsque le champ \code{file} manque. Il ne définit pas un schéma complet d'erreurs distinguant document invalide, texte absent et échec d'une bibliothèque. Le dernier repli peut décoder directement les octets en Latin-1. La sonde de faux PDF montre ainsi un statut 200 et 173 caractères de texte pour 173 octets synthétiques invalides. Ce résultat ne démontre pas une extraction correcte ; il illustre la nécessité d'un indicateur de fiabilité et d'un contrôle de format indépendant.
+
+\chapter{Guide de reproduction des sondes}
+\label{ann:reproductibilite}
+
+Les vérifications techniques associées au mémoire ont été préparées durant les 10 et 11 septembre 2026. Le fichier de résultats porte précisément l'horodatage UTC du 11 septembre 2026 à 02:01:16. Les versions consignées sont PHP~8.2.12 et Python~3.12.3. Ces dates correspondent à l'analyse du dépôt pour le mémoire ; elles ne sont pas des dates de recette du stage ni des preuves d'une validation par Best Solutions.
+
+Les éléments de reproduction se trouvent dans le dossier \path{output/latex/smartrecruit-memoire-kanban-uml/evidence}. Le fichier \path{probes.php} charge les classes utiles et construit six couples synthétiques, sans démarrer Laravel. Le fichier \path{probes.py} exécute la sonde PHP, charge le module Python, complète les mesures et écrit \path{results.json}. Ce dernier contient les entrées, sorties, versions et empreintes SHA-256 des fichiers analysés le 11 septembre. Il conserve le marqueur historique \code{python-ai}, alors que le contrat actuel illustré ci-dessus emploie \code{python}. Les sources ayant évolué, ces empreintes ne doivent pas être attribuées à toute la version du 13 septembre. Il est la référence des chiffres présentés ici.
+
+\section{Préparation et lancement}
+
+La reproduction suppose que PHP et Python sont accessibles dans le terminal, que les dépendances PHP sont présentes dans \path{vendor} et que les bibliothèques Python nécessaires sont installées. Flask est requis pour les vérifications de routes par client de test. En son absence, le script signale que ces contrôles n'ont pas été exécutés. Une exécution doit partir de la racine du projet ; le script calcule ensuite les chemins des fichiers qu'il utilise.
+
+\begin{lstlisting}[caption={Commandes de reproduction depuis la racine}]
+php --version
+python --version
+python output/latex/smartrecruit-memoire-kanban-uml/evidence/probes.py
+\end{lstlisting}
+
+Le lancement régénère \path{evidence/results.json}. Pour comparer deux versions du code, il convient de conserver séparément le résultat antérieur avec ses empreintes. L'horodatage et les versions doivent être relus après exécution, sans supposer qu'ils resteront identiques. La sonde PHP peut aussi être lancée seule pour inspecter ses résultats, mais elle ne produit pas la comparaison complète avec Python.
+
+Ces commandes ne constituent pas un déploiement. Les fonctions de score sont appelées directement ; les routes Flask sont interrogées en mémoire par leur client de test. Aucun appel HTTP externe, aucune connexion à une base réelle et aucun démarrage Docker ne font partie du périmètre enregistré. Le succès du script ne permet donc pas de conclure que l'authentification, les écritures SQL ou le téléchargement de documents fonctionnent dans un serveur déployé.
+
+\section{Résultats de référence}
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Scores enregistrés pour les six cas synthétiques}
+\label{tab:ann-six-cas}
+\begin{tabularx}{\textwidth}{@{}Xrr@{}}
+\toprule
+Cas & PHP & Python \\
+\midrule
+Angular, AWS et MongoDB identiques & 95 & 32 \\
+Alias explicites Laravel et PHP & 95 & 71 \\
+Java/React face à Java/SQL & 45 & 45 \\
+Java identique des deux côtés & 95 & 100 \\
+Java/React face à Python/SQL & 5 & 5 \\
+Textes et listes vides & 0 & 0 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Trois couples produisent des scores égaux et trois des scores différents. Cette observation est limitée à ces entrées ; elle n'est ni un taux de précision ni une estimation de pertinence métier. Une sonde complémentaire interprète le texte synthétique indiquant un âge de 24 ans comme 24 années d'expérience. Les deux moteurs ne détectent aucune compétence pour \code{Python.}, et la transformation de \code{React.js} produit le jeton \code{react.javascript}. Ces sorties facilitent la définition de tests de régression ciblés sur l'extraction et la normalisation.
+
+\chapter{Matrice de consolidation et évaluation humaine}
+\label{ann:evaluation}
+
+Les contrôles de cette annexe sont proposés pour compléter les sondes exécutées. Ils nécessitent un environnement isolé, des données synthétiques et, pour les parcours relationnels, une base de test dédiée. Aucune ligne du tableau suivant n'est présentée comme validée. L'objectif est de rendre observable une règle précise, sans utiliser une démonstration visuelle comme preuve suffisante de son respect.
+
+\begingroup
+\small
+\begin{longtable}{@{}P{0.13\textwidth}P{0.34\textwidth}P{0.45\textwidth}@{}}
+\caption{Scénarios proposés pour la consolidation}\label{tab:ann-tests-proposes}\\
+\toprule
+Repère & Mise en situation & Observation attendue \\
+\midrule
+\endfirsthead
+\toprule
+Repère & Mise en situation & Observation attendue \\
+\midrule
+\endhead
+T01 & Modifier un profil avec un autre compte étudiant. & Refus d'accès et absence de modification persistée. \\
+T02 & Candidater directement à une offre fermée. & Refus métier même si le formulaire n'est pas utilisé. \\
+T03 & Soumettre simultanément deux candidatures identiques. & Une seule ligne et réponses cohérentes aux deux demandes. \\
+T04 & Interrompre une mise à jour de profil entre deux écritures. & Annulation de l'ensemble relationnel et traitement du fichier éventuel. \\
+T05 & Refuser une candidature pendant un recalcul élevé. & Conservation de la décision humaine, sans écrasement silencieux. \\
+T06 & Couper SQL pendant une session déjà ouverte. & Indisponibilité explicite ; aucune confirmation d'écriture dans le JSON démo. \\
+T07 & Envoyer des types JSON incorrects au moteur. & Erreurs de validation stables, sans statut 500 inattendu. \\
+T08 & Comparer les mêmes entrées dans les deux moteurs. & Écarts documentés ou parité démontrée pour une version donnée. \\
+\bottomrule
+\end{longtable}
+\endgroup
+
+L'évaluation humaine de la pertinence exige un protocole distinct. Il faut constituer un ensemble d'offres et de profils dont le contenu peut être utilisé pour cette finalité, puis fixer une grille avant d'observer les scores. Une grille possible distingue les compétences indispensables, les compétences complémentaires et les informations insuffisantes. Les évaluateurs doivent examiner le contenu professionnel sans interpréter une absence d'extraction comme une absence de compétence.
+
+Chaque couple serait annoté indépendamment par plusieurs évaluateurs à l'aide d'une échelle ordonnée, par exemple non pertinent, partiellement pertinent et pertinent. Les désaccords seraient conservés, puis discutés à partir des critères formulés. Un accord apparent obtenu après discussion ne doit pas remplacer les annotations initiales : conserver les deux permet de comprendre la difficulté du cas. Les scores automatiques resteraient masqués pendant cette première annotation afin de limiter leur influence.
+
+La comparaison pourrait ensuite porter sur la qualité des premiers résultats proposés pour chaque offre, le rang des profils jugés pertinents et les erreurs par famille de compétences. Les offres utilisées pour ajuster les poids ou le référentiel devraient être séparées de celles réservées à l'évaluation finale. Le nombre de profils, leur répartition, les règles d'exclusion et les cas ambigus seraient publiés avec les résultats, sous une forme respectant la confidentialité.
+
+Enfin, une amélioration moyenne ne suffirait pas à conclure à une meilleure expérience pour tous les cas. Il faudrait examiner les faux négatifs, les documents mal extraits et les différences entre domaines techniques. Les mesures de durée seraient réalisées séparément de cette annotation de pertinence. Cette procédure n'a pas été exécutée dans les éléments fournis ; elle définit les conditions nécessaires pour transformer les observations techniques du prototype en une évaluation métier argumentée.

@@ -1,0 +1,132 @@
+\chapter{Contexte du projet et fondements scientifiques}
+\label{chap:contexte}
+
+\section{Cadre académique et professionnel}
+
+Ce mémoire présente SmartRecruit, une plateforme de mise en relation entre étudiants et entreprises intégrant un moteur de rapprochement entre offres et profils. Il s'inscrit dans le cadre du Master en Développement Logiciel de l'Institut Supérieur d'Informatique (ISI), Université de Tunis El Manar. Le travail est porté par Rahma Amiri, dans le cadre d'un stage réalisé auprès de Best Solutions du 2 mars au 2 juillet 2026, sous l'encadrement professionnel de Hammami Houssem.
+
+Le projet associe deux dimensions complémentaires du développement logiciel. La première concerne la construction d'une application métier : représenter les utilisateurs, gérer des offres, enregistrer des candidatures et présenter des informations cohérentes selon le rôle connecté. La seconde concerne le traitement de documents : extraire le texte d'un curriculum vitae, reconnaître des compétences, construire une représentation comparable et produire un score accompagné d'éléments d'explication. La valeur attendue provient de l'intégration de ces dimensions dans un parcours utilisable.
+
+Best Solutions constitue l'organisme d'accueil du stage et le cadre de l'encadrement professionnel indiqué ci-dessus. La présentation du projet ne suppose aucune information supplémentaire sur l'effectif, l'historique, les clients ou l'organisation interne de cette structure. L'analyse porte sur le système SmartRecruit et sur ses choix de conception. Elle n'attribue pas à l'entreprise des pratiques de recrutement, des difficultés opérationnelles mesurées ou des résultats économiques qui ne sont pas documentés.
+
+Le dépôt examiné fournit les éléments techniques mobilisés dans ce mémoire : code applicatif, configuration, microservice Python et documentation du projet. Ces artefacts permettent d'expliquer le fonctionnement observable du prototype. Ils ne constituent pas, à eux seuls, un journal détaillé des activités du stage. La rédaction distingue donc les fonctions présentes, les limites constatées et les évolutions proposées, sans reconstruire artificiellement une chronologie de réalisation.
+
+\section{Enjeux d'une plateforme de recrutement étudiant}
+
+\subsection{Des informations hétérogènes à rendre comparables}
+
+Une offre exprime un besoin au moyen d'un intitulé, d'une description et de compétences recherchées. Un profil étudiant présente une formation, des projets, des expériences éventuelles et un ensemble de savoir-faire. Ces deux descriptions répondent à des intentions différentes : l'entreprise formule ses attentes tandis que le candidat décrit son parcours. Leur comparaison exige de construire des correspondances sans effacer cette différence de perspective.
+
+Le vocabulaire technique constitue une première difficulté. Une offre peut demander Java, alors qu'un candidat mentionne Spring Boot ; une autre peut employer une formulation française pour une compétence généralement nommée en anglais. Une recherche strictement littérale distingue ces expressions, même lorsqu'un rapprochement peut être pertinent. Inversement, assimiler toutes les technologies voisines serait excessif : l'utilisation d'un framework ne démontre pas la maîtrise de toutes les composantes de son écosystème. Le système doit donc rendre explicite la granularité de ses rapprochements.
+
+La structure des documents introduit une seconde difficulté. Un CV textuel, un PDF contenant du texte et un document numérisé sous forme d'image ne fournissent pas les mêmes possibilités d'extraction. Une mise en page à plusieurs colonnes peut aussi perturber l'ordre de lecture. Le score ne peut être plus fiable que les informations effectivement accessibles au moteur. Une absence de compétence détectée peut correspondre à une absence réelle dans le document, à une formulation inconnue ou à une extraction défaillante.
+
+Dans un contexte étudiant, les expériences ne se limitent pas à des emplois antérieurs. Les stages, travaux pratiques, projets personnels et réalisations universitaires peuvent documenter des compétences. Le prototype doit permettre de présenter ces éléments, tout en évitant de leur attribuer automatiquement une valeur professionnelle identique. Cette distinction motive le recours à une aide à l'examen des profils plutôt qu'à une décision automatique d'acceptation ou de refus.
+
+\subsection{Trois points de vue sur le même processus}
+
+Pour l'étudiant, la plateforme doit rendre possible la constitution d'un profil compréhensible et la consultation d'offres pertinentes. Le dépôt d'un CV facilite la saisie, mais ne dispense pas de vérifier les informations extraites. La possibilité d'ajouter un texte manuel devient particulièrement utile lorsque le fichier est difficile à lire. Le candidat a besoin d'un résultat interprétable : une compétence non détectée doit pouvoir être distinguée d'une compétence qu'il ne possède pas.
+
+Pour le recruteur, l'intérêt du classement est de structurer l'ordre de consultation des candidatures. Une liste triée réduit l'effort nécessaire pour repérer les profils partageant des caractéristiques avec une offre. Elle ne remplace ni la lecture du CV ni l'évaluation menée lors d'un entretien. Le résultat doit conserver les éléments qui permettent de contester une proposition du moteur : compétences communes, compétences manquantes et origine du calcul.
+
+Pour l'administration de la plateforme, les enjeux concernent la cohérence des comptes, des offres et des candidatures, ainsi que la continuité du fonctionnement. Une architecture comprenant plusieurs composants peut rencontrer des indisponibilités partielles. La séparation du calcul en Python crée ainsi une exigence supplémentaire : l'application doit savoir reconnaître l'indisponibilité du service et fournir un comportement compréhensible. Le repli local répond à cet objectif, à condition que sa signification métier reste maîtrisée.
+
+\section{Problématique et objectifs}
+
+\subsection{Question centrale}
+
+La problématique du projet peut être formulée ainsi : comment concevoir une plateforme web capable de rapprocher des offres et des profils étudiants à partir de données structurées et de CV, tout en produisant un résultat explicable et en restant utilisable lorsqu'un composant de traitement est indisponible ? Cette question relie la modélisation métier, le traitement automatique du texte et la robustesse de l'intégration.
+
+Le terme \emph{compatibilité} doit être défini avec précision. Dans SmartRecruit, il désigne une proximité calculée entre les informations déclarées dans une offre et celles disponibles dans un profil. Il ne désigne pas une probabilité validée de réussite professionnelle. Une valeur de 80 sur 100 indique le résultat d'une formule pondérée ; elle ne signifie pas que le candidat possède 80\,\% de chances d'être recruté. Cette interprétation évite de transformer une mesure technique en promesse prédictive.
+
+Plusieurs tensions traversent cette problématique. Une représentation simple facilite l'explication mais reconnaît moins de variations linguistiques. Un service spécialisé facilite l'évolution du traitement mais ajoute une dépendance à l'exécution. Un dictionnaire de compétences améliore certains rapprochements tout en imposant des choix de catégorisation. Le projet doit rendre ces compromis visibles, car ils influencent les recommandations autant que le choix d'un langage ou d'un framework.
+
+\subsection{Objectifs fonctionnels et techniques}
+
+Le premier objectif consiste à organiser un parcours cohérent entre création du profil, publication d'une offre et candidature. Les informations doivent être réutilisables : le texte d'un CV et les compétences déclarées alimentent plusieurs comparaisons sans imposer une nouvelle saisie à chaque offre. Les résultats doivent être rattachés aux objets métier concernés, afin que l'utilisateur puisse revenir au profil et au besoin qui ont produit le rapprochement.
+
+Le deuxième objectif est de rendre le matching calculable et inspectable. La présence d'une compétence recherchée, la proximité du vocabulaire et le partage d'une catégorie technique constituent des signaux distincts. Les combiner permet de produire un ordre de consultation, tandis que leur restitution aide à comprendre cet ordre. L'intérêt scientifique du prototype réside notamment dans la possibilité de relier chaque résultat à des opérations identifiées dans le code.
+
+Le troisième objectif porte sur l'intégration d'un service Python avec l'application PHP. Cette séparation constitue un point d'extension pour les traitements de documents et les futurs modèles de langage. Un moteur local fournit une continuité lorsque le service distant n'est pas exploitable. Cependant, la simple présence de deux implémentations n'établit pas leur équivalence : celle-ci doit être vérifiée sur les données d'entrée, la normalisation, la formule et le résultat retourné.
+
+Le quatrième objectif est de documenter les conditions de validité du système. Une extraction partielle, une compétence absente du dictionnaire ou une différence entre moteurs peuvent influencer le classement. Décrire ces situations fait partie de la qualité du logiciel. La validation doit ainsi couvrir les comportements attendus et les cas qui révèlent une limite, sans confondre un test de fonctionnement réussi avec la démonstration d'une pertinence générale en recrutement.
+
+\section{État de l'art et approches de rapprochement}
+
+\subsection{Gestion des candidatures et recommandation}
+
+La gestion des candidatures et la recommandation répondent à deux besoins distincts. La première organise les informations et les transitions d'un processus : création d'une offre, réception d'une candidature, consultation puis décision. La seconde propose un ordre ou une sélection à partir de critères. Une application peut gérer correctement des candidatures sans disposer d'un moteur de recommandation pertinent ; réciproquement, une bonne mesure de similarité ne constitue pas une plateforme complète.
+
+Burke distingue plusieurs familles de systèmes de recommandation, notamment les approches fondées sur le contenu, le filtrage collaboratif et les approches fondées sur des connaissances. Son étude examine également des combinaisons hybrides de ces techniques \cite{burke2002}. Cette distinction permet de situer SmartRecruit : le rapprochement exploite le contenu des profils et des offres, enrichi par un dictionnaire et une taxonomie. Il n'utilise pas un apprentissage des préférences à partir d'historiques de comportements comparables.
+
+Dans le périmètre du projet, aucune matrice d'interactions annotée n'est utilisée pour entraîner un modèle collaboratif. Une candidature enregistrée constitue un événement métier, mais elle ne devient pas automatiquement un exemple fiable de pertinence : un étudiant peut postuler par exploration, et l'absence de candidature peut simplement traduire une offre non consultée. Le choix d'un moteur fondé sur le contenu permet de calculer un résultat dès qu'une offre et un profil disposent d'une description, sans supposer un historique d'usage déjà constitué.
+
+\subsection{Représentation lexicale par TF-IDF et cosinus}
+
+Les représentations vectorielles classiques attribuent à chaque terme un poids décrivant sa contribution à un document. Les travaux de Salton et Buckley étudient les choix de pondération des termes pour la recherche documentaire \cite{salton1988}. TF-IDF associe une fréquence dans le document à une pondération liée à la diffusion du terme dans un corpus. Le cosinus compare ensuite l'orientation des vecteurs. Manning, Raghavan et Schütze présentent ces notions dans le cadre du modèle vectoriel de recherche d'information \cite{manning2008}.
+
+Pour SmartRecruit, cette approche offre un calcul facile à inspecter : les dimensions correspondent à des tokens issus des textes. Un rapprochement peut être relié à des termes communs, même si leur contribution n'est pas détaillée individuellement dans l'interface actuelle. La méthode ne nécessite aucun entraînement neuronal. Elle exige néanmoins des décisions de prétraitement, car le résultat dépend directement de ce qui est conservé, supprimé ou remplacé avant la vectorisation.
+
+La variante du prototype calcule l'IDF sur deux documents seulement : l'offre et le profil comparés. Elle constitue donc une adaptation locale du principe TF-IDF, et non un index statistique construit sur l'ensemble des CV. Cette décision simplifie l'exécution mais réduit la diversité des fréquences documentaires possibles. Les conséquences mathématiques et les formules exactes sont exposées au chapitre~\ref{chap:moteur}.
+
+\subsection{Word2Vec : apprendre des représentations de mots}
+
+Mikolov, Chen, Corrado et Dean proposent en 2013 des architectures permettant d'apprendre des représentations vectorielles continues de mots, notamment les modèles Continuous Bag-of-Words et Skip-gram \cite{mikolov2013}. Les relations entre mots sont apprises à partir de contextes observés dans un corpus. Cette approche permet de dépasser l'identité stricte des chaînes de caractères : des mots distincts peuvent obtenir des représentations proches. Une représentation statique associe toutefois un même vecteur à un mot, indépendamment de chacun de ses contextes d'emploi.
+
+Une intégration à SmartRecruit demanderait de choisir le corpus ou les vecteurs préentraînés, puis une règle pour représenter un CV complet à partir de ses mots. Une simple moyenne risquerait de diluer une exigence technique importante dans le reste du document. L'amélioration ne pourrait donc pas être déduite du seul remplacement de TF-IDF par des vecteurs denses. Aucun modèle Word2Vec n'est chargé, entraîné ou évalué dans l'implémentation étudiée.
+
+\subsection{BERT et contextualisation du langage}
+
+BERT, présenté par Devlin, Chang, Lee et Toutanova, repose sur des représentations bidirectionnelles préentraînées à partir de texte non annoté, puis adaptées à différentes tâches de traitement du langage \cite{devlin2019}. Les représentations tiennent compte du contexte gauche et droit, ce qui les distingue des vecteurs statiques de mots. Le modèle fournit ainsi un cadre pour exploiter des relations linguistiques plus riches que la seule cooccurrence de tokens dans deux documents.
+
+Dans le projet, une telle évolution introduirait de nouveaux choix : segmentation des documents longs, représentation des sections du CV et adaptation éventuelle à la tâche de rapprochement. Il faudrait également déterminer comment convertir la sortie du modèle en explication utile au recruteur. La présence du nom BERT dans un dictionnaire de compétences ne signifie pas que BERT est exécuté : dans SmartRecruit, ce nom peut simplement être reconnu comme indice d'une compétence en traitement du langage.
+
+\subsection{CamemBERT et prise en compte du français}
+
+Martin et ses coauteurs présentent CamemBERT comme un modèle de langue pour le français fondé sur les Transformers. Leur étude évalue notamment l'étiquetage morphosyntaxique, l'analyse en dépendances, la reconnaissance d'entités nommées et l'inférence en langue naturelle \cite{martin2020}. Ces travaux fournissent une référence pour envisager une représentation linguistique adaptée au français. Leurs résultats concernent les tâches et jeux de données de l'article ; ils ne constituent pas une mesure de performance sur les CV de SmartRecruit.
+
+Le choix d'un modèle francophone pourrait être pertinent pour des descriptions de formation et d'expérience rédigées en français. Il resterait cependant à traiter les noms de technologies, souvent anglophones, ainsi que les documents mélangeant plusieurs langues. Le projet ne dispose pas d'une expérimentation permettant de choisir CamemBERT sur ce fondement. Il s'agit d'une piste d'évolution à comparer au moteur existant dans un protocole commun.
+
+\subsection{Sentence-BERT et similarité entre textes}
+
+Reimers et Gurevych proposent Sentence-BERT, une adaptation de BERT utilisant des structures siamoises et triplets pour produire des représentations de phrases comparables par similarité cosinus \cite{reimers2019}. Cette construction vise la comparaison sémantique entre textes et permet de calculer des représentations séparées avant leur comparaison. Elle est donc conceptuellement plus proche d'un besoin de recherche par similarité que l'emploi direct d'un modèle BERT sans adaptation particulière.
+
+Pour SmartRecruit, cette piste pourrait conduire à indexer séparément offres et profils, puis à comparer leurs vecteurs. Elle ne résoudrait pas à elle seule les différences entre une compétence obligatoire, une préférence et une expérience simplement mentionnée. Une forte proximité linguistique pourrait subsister malgré l'absence d'une exigence déterminante. Le maintien d'indicateurs explicites de couverture des compétences resterait alors un choix de conception à évaluer, et non une conséquence automatique du modèle.
+
+\section{Positionnement retenu pour le prototype}
+
+\subsection{Une combinaison explicable de signaux}
+
+SmartRecruit retient un moteur hybride au sens opérationnel : plusieurs signaux calculés sont combinés dans une formule. La couverture des compétences mesure une correspondance explicite. Le cosinus fournit une proximité lexicale pondérée. La taxonomie valorise le partage de familles techniques. Dans le moteur PHP, un bonus supplémentaire dépend de l'expérience déclarée ou extraite. Le mot \emph{sémantique} désigne ici principalement l'organisation manuelle d'alias et de catégories ; il ne doit pas être assimilé à une compréhension générale du CV.
+
+Cette approche convient à l'objectif d'un produit minimum viable dont le comportement peut être étudié à partir du code. Elle rend les dépendances du résultat accessibles : une modification d'alias, de catégorie ou de coefficient peut être expliquée et testée. En contrepartie, la qualité du dictionnaire et des règles devient centrale. L'explicabilité de la formule ne garantit ni l'exactitude des informations extraites ni la pertinence du classement pour toutes les spécialités.
+
+Le tableau~\ref{tab:positionnement-methodes} synthétise les options selon leur rôle possible dans le projet. Il présente une comparaison conceptuelle, sans classement expérimental des méthodes. Les coûts matériels, les temps de réponse et la pertinence ne sont pas chiffrés, car aucune campagne commune de mesure n'a été réalisée sur ces alternatives.
+
+\begin{table}[htbp]
+\centering
+\caption{Positionnement des familles de méthodes pour SmartRecruit}
+\label{tab:positionnement-methodes}
+\small
+\begin{tabularx}{\textwidth}{@{}P{2.7cm}XX@{}}
+\toprule
+Approche & Apport envisagé & Point à vérifier dans le projet \\
+\midrule
+Règles et alias & Rapprochements techniques explicitement définis & Couverture, ambiguïtés et maintenance du dictionnaire \\
+TF-IDF et cosinus & Similarité fondée sur le vocabulaire observé & Qualité des tokens et choix du corpus IDF \\
+Word2Vec & Proximité apprise entre mots & Agrégation des mots et adéquation du corpus \\
+BERT / CamemBERT & Représentations dépendant du contexte & Adaptation à la tâche et traitement des CV longs \\
+Sentence-BERT & Comparaison de représentations de textes & Pertinence métier et conservation des exigences explicites \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Explicabilité, responsabilité et limites des preuves}
+
+L'application du classement à des personnes exige de distinguer la visibilité des règles de leur justification. Raghavan, Barocas, Kleinberg et Levy analysent les revendications et pratiques de fournisseurs d'évaluations algorithmiques de recrutement, notamment leurs choix de données, de cibles et de validation \cite{raghavan2020}. Cette référence invite à examiner ce qu'un score mesure effectivement et les preuves qui soutiennent son usage. Elle ne permet pas d'affirmer que SmartRecruit supprime des biais de recrutement.
+
+Dans le prototype, un vocabulaire limité aux technologies recensées favorise mécaniquement les profils qui emploient ces expressions. La longueur du texte, la qualité de l'extraction et la manière de présenter les projets influencent également les entrées du calcul. Ces facteurs sont des conséquences de conception identifiables ; leur effet sur des populations ne peut pas être quantifié sans données et protocole adaptés. Le mémoire ne présente donc aucune mesure d'équité, aucune validation psychométrique et aucune estimation de réussite professionnelle.
+
+La contribution du projet est située au niveau de l'ingénierie logicielle : intégrer un parcours de recrutement, un traitement de CV et un calcul explicable dans une architecture étudiable. Les exemples numériques servent à vérifier le calcul. Les sondes ciblées du chapitre~\ref{chap:validation} servent à observer des comportements précis. Une évaluation scientifique de pertinence exigerait, en complément, des couples offre--profil annotés, des critères d'évaluation établis et une comparaison reproductible entre méthodes.
+
+Ce positionnement permet de développer les choix d'architecture et de réalisation sans surinterpréter le terme d'intelligence artificielle. Le moteur constitue une base de référence explicable et un point d'extension pour des expérimentations ultérieures. Ses limites actuelles définissent les questions à traiter avant de lui confier un rôle plus important dans une décision de recrutement.

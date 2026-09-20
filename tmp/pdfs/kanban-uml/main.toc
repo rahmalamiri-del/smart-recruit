@@ -1,0 +1,135 @@
+\babel@toc {french}{}\relax 
+\babel@toc {french}{}\relax 
+\babel@toc {french}{}\relax 
+\contentsline {chapter}{Remerciements}{i}{chapter*.1}%
+\contentsline {chapter}{Résumé}{ii}{chapter*.2}%
+\contentsline {chapter}{Abstract}{iii}{chapter*.3}%
+\babel@toc {english}{}\relax 
+\babel@toc {french}{}\relax 
+\contentsline {chapter}{Note de périmètre et de traçabilité}{iv}{chapter*.4}%
+\contentsline {chapter}{Liste des figures}{x}{chapter*.5}%
+\contentsline {chapter}{Liste des tableaux}{xi}{chapter*.6}%
+\contentsline {chapter}{Liste des abréviations}{xii}{chapter*.8}%
+\contentsline {chapter}{Introduction générale}{1}{chapter*.9}%
+\contentsline {chapter}{\numberline {1}Contexte du projet, cadre Kanban et fondements scientifiques}{3}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Cadre académique et professionnel}{3}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Kanban comme cadre de conduite du projet}{4}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}Positionnement méthodologique}{4}{subsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.2.2}Justification du choix pour SmartRecruit}{4}{subsection.1.2.2}%
+\contentsline {subsection}{\numberline {1.2.3}Articulation entre besoins, conception et preuve}{5}{subsection.1.2.3}%
+\contentsline {section}{\numberline {1.3}Enjeux d'une plateforme de recrutement étudiant}{5}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Des informations hétérogènes à rendre comparables}{5}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {1.3.2}Trois points de vue sur le même processus}{6}{subsection.1.3.2}%
+\contentsline {section}{\numberline {1.4}Problématique et objectifs}{7}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Question centrale}{7}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {1.4.2}Objectifs fonctionnels et techniques}{7}{subsection.1.4.2}%
+\contentsline {section}{\numberline {1.5}État de l'art et approches de rapprochement}{8}{section.1.5}%
+\contentsline {subsection}{\numberline {1.5.1}Gestion des candidatures et recommandation}{8}{subsection.1.5.1}%
+\contentsline {subsection}{\numberline {1.5.2}Représentation lexicale par TF-IDF et cosinus}{9}{subsection.1.5.2}%
+\contentsline {subsection}{\numberline {1.5.3}Word2Vec : apprendre des représentations de mots}{9}{subsection.1.5.3}%
+\contentsline {subsection}{\numberline {1.5.4}BERT et contextualisation du langage}{10}{subsection.1.5.4}%
+\contentsline {subsection}{\numberline {1.5.5}CamemBERT et prise en compte du français}{10}{subsection.1.5.5}%
+\contentsline {subsection}{\numberline {1.5.6}Sentence-BERT et similarité entre textes}{10}{subsection.1.5.6}%
+\contentsline {section}{\numberline {1.6}Positionnement retenu pour le prototype}{11}{section.1.6}%
+\contentsline {subsection}{\numberline {1.6.1}Une combinaison explicable de signaux}{11}{subsection.1.6.1}%
+\contentsline {subsection}{\numberline {1.6.2}Explicabilité, responsabilité et limites des preuves}{11}{subsection.1.6.2}%
+\contentsline {chapter}{\numberline {2}Spécification des besoins et organisation du travail par Kanban}{13}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Problématique et périmètre fonctionnel}{13}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Acteurs et responsabilités}{14}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Spécification des cas d'utilisation}{15}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}UC01 : créer un compte et ouvrir une session}{15}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}UC02 : compléter le profil et déposer un CV}{16}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}UC03 : publier et maintenir une offre}{16}{subsection.2.3.3}%
+\contentsline {subsection}{\numberline {2.3.4}UC04 : candidater à une offre}{17}{subsection.2.3.4}%
+\contentsline {subsection}{\numberline {2.3.5}UC05 : examiner un classement explicable}{17}{subsection.2.3.5}%
+\contentsline {subsection}{\numberline {2.3.6}UC06 : suivre et qualifier une candidature}{18}{subsection.2.3.6}%
+\contentsline {subsection}{\numberline {2.3.7}UC07 : administrer les données et leur corbeille}{18}{subsection.2.3.7}%
+\contentsline {section}{\numberline {2.4}Exigences identifiées et critères d'acceptation}{19}{section.2.4}%
+\contentsline {section}{\numberline {2.5}Définition du flux de travail Kanban}{20}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Unité de travail et bornes d'engagement}{21}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Tirage et limites de travail en cours}{21}{subsection.2.5.2}%
+\contentsline {subsection}{\numberline {2.5.3}Politiques d'entrée et de sortie}{22}{subsection.2.5.3}%
+\contentsline {section}{\numberline {2.6}Cartes de travail et priorisation des besoins}{23}{section.2.6}%
+\contentsline {section}{\numberline {2.7}Cadences, mesures de flux et attente de service}{25}{section.2.7}%
+\contentsline {subsection}{\numberline {2.7.1}Cadences adaptées à une réalisation individuelle}{25}{subsection.2.7.1}%
+\contentsline {subsection}{\numberline {2.7.2}Définition et usage des indicateurs}{25}{subsection.2.7.2}%
+\contentsline {subsection}{\numberline {2.7.3}Attente de niveau de service initiale}{26}{subsection.2.7.3}%
+\contentsline {chapter}{\numberline {3}Conception UML et architecture de SmartRecruit}{27}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Objectifs et périmètre de la conception}{27}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Diagramme de cas d'utilisation}{27}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Diagramme de classes métier et persistance}{28}{section.3.3}%
+\contentsline {section}{\numberline {3.4}Architecture et diagramme de composants}{30}{section.3.4}%
+\contentsline {section}{\numberline {3.5}Séquence d'enregistrement d'une candidature}{31}{section.3.5}%
+\contentsline {section}{\numberline {3.6}Séquence de recommandation et repli de calcul}{33}{section.3.6}%
+\contentsline {section}{\numberline {3.7}Activité de traitement d'un CV}{34}{section.3.7}%
+\contentsline {section}{\numberline {3.8}États et suivi des candidatures}{36}{section.3.8}%
+\contentsline {section}{\numberline {3.9}Synthèse et traçabilité vers la réalisation}{37}{section.3.9}%
+\contentsline {chapter}{\numberline {4}Réalisation de la plateforme et interfaces web}{38}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Organisation de la réalisation avec Kanban}{38}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Environnement et choix techniques}{38}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Structure de l'application}{39}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Identité visuelle et navigation}{40}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Implémentation des parcours métier}{40}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}Inscription, session et autorisations}{40}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}Profil, CV et correction des informations}{41}{subsection.4.5.2}%
+\contentsline {subsection}{\numberline {4.5.3}Offres, classement et candidatures}{41}{subsection.4.5.3}%
+\contentsline {subsection}{\numberline {4.5.4}Administration et restauration}{41}{subsection.4.5.4}%
+\contentsline {section}{\numberline {4.6}Présentation des interfaces web clés}{42}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}Connexion}{43}{subsection.4.6.1}%
+\contentsline {subsection}{\numberline {4.6.2}Choix du profil à l'inscription}{44}{subsection.4.6.2}%
+\contentsline {subsection}{\numberline {4.6.3}Espace candidat}{45}{subsection.4.6.3}%
+\contentsline {subsection}{\numberline {4.6.4}Profil et informations du CV}{46}{subsection.4.6.4}%
+\contentsline {subsection}{\numberline {4.6.5}Catalogue des offres}{47}{subsection.4.6.5}%
+\contentsline {subsection}{\numberline {4.6.6}Détail d'une offre}{48}{subsection.4.6.6}%
+\contentsline {subsection}{\numberline {4.6.7}Espace recruteur}{49}{subsection.4.6.7}%
+\contentsline {subsection}{\numberline {4.6.8}Création d'une offre}{50}{subsection.4.6.8}%
+\contentsline {subsection}{\numberline {4.6.9}Vivier des candidats}{51}{subsection.4.6.9}%
+\contentsline {subsection}{\numberline {4.6.10}Classement pour une offre}{52}{subsection.4.6.10}%
+\contentsline {subsection}{\numberline {4.6.11}Supervision administrative}{53}{subsection.4.6.11}%
+\contentsline {subsection}{\numberline {4.6.12}Gestion des candidatures}{54}{subsection.4.6.12}%
+\contentsline {section}{\numberline {4.7}Intégration, limites et préparation du déploiement}{55}{section.4.7}%
+\contentsline {chapter}{\numberline {5}Conception et fonctionnement du moteur de matching}{56}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Organisation de la chaîne de traitement}{56}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Extraction et préparation du CV}{57}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Sources textuelles et extraction PDF}{57}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Compétences, formation et expérience}{58}{subsection.5.2.2}%
+\contentsline {section}{\numberline {5.3}Normalisation, alias et catégories}{59}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}Traitement lexical effectivement implémenté}{59}{subsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.3.2}Rôle du dictionnaire et de la taxonomie}{60}{subsection.5.3.2}%
+\contentsline {section}{\numberline {5.4}Définition des composantes mathématiques}{60}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Couverture des compétences et des catégories}{60}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}TF-IDF calculé sur une paire de documents}{61}{subsection.5.4.2}%
+\contentsline {section}{\numberline {5.5}Formules finales PHP et Python}{62}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Exemple numérique reproductible}{63}{section.5.6}%
+\contentsline {section}{\numberline {5.7}Contrat HTTP et mécanisme de repli}{64}{section.5.7}%
+\contentsline {section}{\numberline {5.8}Divergences constatées et trajectoire de correction}{65}{section.5.8}%
+\contentsline {chapter}{\numberline {6}Validation, maîtrise du flux Kanban et perspectives}{66}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Périmètre et statut des résultats}{66}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Méthodologie de vérification}{66}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}Trois niveaux de preuve}{66}{subsection.6.2.1}%
+\contentsline {subsection}{\numberline {6.2.2}Reproductibilité et protection des données}{67}{subsection.6.2.2}%
+\contentsline {section}{\numberline {6.3}Résultats des contrôles techniques locaux}{67}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Vérifications de la révision et critères Kanban}{68}{section.6.4}%
+\contentsline {section}{\numberline {6.5}Comportements du moteur de rapprochement}{69}{section.6.5}%
+\contentsline {subsection}{\numberline {6.5.1}Sondes de cohérence entre PHP et Python}{69}{subsection.6.5.1}%
+\contentsline {subsection}{\numberline {6.5.2}Expérience et qualité de l'extraction}{70}{subsection.6.5.2}%
+\contentsline {section}{\numberline {6.6}Accès, sessions et frontière de déploiement}{71}{section.6.6}%
+\contentsline {subsection}{\numberline {6.6.1}Exposition observée avec le serveur intégré}{71}{subsection.6.6.1}%
+\contentsline {subsection}{\numberline {6.6.2}Confiance proxy et authentification}{72}{subsection.6.6.2}%
+\contentsline {section}{\numberline {6.7}Cohérence métier et persistance : constats statiques}{72}{section.6.7}%
+\contentsline {section}{\numberline {6.8}Protocole proposé d'évaluation de la pertinence}{73}{section.6.8}%
+\contentsline {subsection}{\numberline {6.8.1}Constitution du corpus et annotations}{73}{subsection.6.8.1}%
+\contentsline {subsection}{\numberline {6.8.2}Mesures de classement}{74}{subsection.6.8.2}%
+\contentsline {subsection}{\numberline {6.8.3}Comparaisons et analyse des erreurs}{75}{subsection.6.8.3}%
+\contentsline {section}{\numberline {6.9}Plan de validation complémentaire et progression}{75}{section.6.9}%
+\contentsline {chapter}{Conclusion générale}{77}{chapter*.40}%
+\contentsline {chapter}{Bibliographie}{79}{section*.41}%
+\contentsline {chapter}{\numberline {A}Dictionnaire synthétique des données}{81}{appendix.A}%
+\contentsline {chapter}{\numberline {B}Contrats des interfaces d'analyse}{83}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Diagnostic par \nolinkurl {GET /health}}{83}{section.B.1}%
+\contentsline {section}{\numberline {B.2}Rapprochement par \nolinkurl {POST /match}}{83}{section.B.2}%
+\contentsline {section}{\numberline {B.3}Extraction par \nolinkurl {POST /parse-cv}}{84}{section.B.3}%
+\contentsline {chapter}{\numberline {C}Guide de reproduction des sondes}{86}{appendix.C}%
+\contentsline {section}{\numberline {C.1}Préparation et lancement}{86}{section.C.1}%
+\contentsline {section}{\numberline {C.2}Résultats de référence}{87}{section.C.2}%
+\contentsline {chapter}{\numberline {D}Matrice de consolidation et évaluation humaine}{88}{appendix.D}%

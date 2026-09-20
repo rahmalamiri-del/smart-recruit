@@ -1,0 +1,66 @@
+% SmartRecruit -- mémoire de Master, Rahma Amiri
+% Compilation : tectonic main.tex OU latexmk -xelatex main.tex
+\documentclass[12pt,a4paper,oneside,openany]{report}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[utf8]{inputenc}
+  \usepackage[T1]{fontenc}
+  \usepackage{lmodern}
+\else
+  \usepackage{fontspec}
+  \setmainfont{texgyrepagella-regular.otf}[BoldFont=texgyrepagella-bold.otf,ItalicFont=texgyrepagella-italic.otf,BoldItalicFont=texgyrepagella-bolditalic.otf]
+  \setsansfont{texgyreheros-regular.otf}[BoldFont=texgyreheros-bold.otf,ItalicFont=texgyreheros-italic.otf]
+  \setmonofont{lmmono10-regular.otf}
+\fi
+\usepackage[french,english]{babel}
+\usepackage[a4paper,left=28mm,right=24mm,top=25mm,bottom=25mm,headheight=17pt,headsep=9mm]{geometry}
+\usepackage{microtype,setspace}
+\usepackage[table]{xcolor}
+\definecolor{navy}{HTML}{17324D}
+\definecolor{teal}{HTML}{187D8D}
+\definecolor{lightgray}{HTML}{F1F4F6}
+\definecolor{midgray}{HTML}{586574}
+\usepackage{graphicx,array,tabularx,longtable,booktabs,multirow}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem,titlesec,fancyhdr}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc,shapes.geometric,backgrounds}
+\usepackage{listings}
+\usepackage{caption,float,placeins}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{xurl}
+\usepackage[unicode,colorlinks=true,linkcolor=navy,citecolor=teal,urlcolor=teal,bookmarksnumbered=true]{hyperref}
+\usepackage{bookmark}
+\hypersetup{pdftitle={SmartRecruit -- Mémoire de Master Développement Logiciel},pdfauthor={Rahma Amiri},pdfsubject={Conception et réalisation d'une plateforme de mise en relation étudiants-entreprises assistée par un moteur de recommandation intelligent},pdfkeywords={recrutement, recommandation, Laravel, Python, TF-IDF, Master, ISI}}
+\selectlanguage{french}
+\newcommand{\nomEtudiante}{Rahma Amiri}
+\newcommand{\nomProjet}{SmartRecruit}
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\setlength{\parindent}{0.6cm}
+\setlength{\parskip}{0.3em}
+\setlength{\emergencystretch}{2.5em}
+\onehalfspacing
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{3}
+\setlist{itemsep=0.15em,topsep=0.3em,leftmargin=*}
+\renewcommand{\arraystretch}{1.22}
+\captionsetup{font=small,labelfont={bf,color=navy},margin=0.4cm}
+\titleformat{\chapter}[display]{\normalfont\sffamily\bfseries\color{navy}}{\large\MakeUppercase{\chaptertitlename}~\thechapter}{0.3em}{\huge}
+\titlespacing*{\chapter}{0pt}{0pt}{24pt}
+\titleformat{\section}{\large\sffamily\bfseries\color{navy}}{\thesection}{0.7em}{}
+\titleformat{\subsection}{\normalsize\sffamily\bfseries\color{navy}}{\thesubsection}{0.7em}{}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\sffamily\color{midgray}SmartRecruit}
+\fancyhead[R]{\small\sffamily\color{midgray}\nouppercase{\leftmark}}
+\fancyfoot[L]{\small\color{midgray}\nomEtudiante\quad |\quad Master Développement Logiciel}
+\fancyfoot[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\renewcommand{\chaptermark}[1]{\markboth{\chaptername~\thechapter}{}}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[L]{\small\color{midgray}\nomEtudiante\quad |\quad Master Développement Logiciel}\fancyfoot[R]{\small\thepage}\renewcommand{\headrulewidth}{0pt}}
+\lstset{basicstyle=\ttfamily\footnotesize,backgroundcolor=\color{lightgray},frame=single,rulecolor=\color{lightgray},breaklines=true,columns=fullflexible,keepspaces=true,showstringspaces=false,tabsize=2,aboveskip=1em,belowskip=1em,numbers=none,captionpos=b}
+\tikzset{block/.style={draw=navy,rounded corners=2pt,fill=lightgray,align=center,font=\small,inner sep=7pt},arr/.style={-{Stealth[length=2mm]},draw=navy,line width=0.65pt},note/.style={font=\footnotesize,align=center,text=midgray}}
+\begin{document}Vérification typographique du mémoire SmartRecruit.\end{document}

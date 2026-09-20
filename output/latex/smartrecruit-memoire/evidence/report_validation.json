@@ -1,0 +1,23 @@
+{
+  "author": "Rahma Amiri",
+  "stage": "MDL/26/12",
+  "pages": 84,
+  "chapters": 6,
+  "appendices": 4,
+  "figures": 6,
+  "bibliography_entries": 22,
+  "checks": [
+    "LaTeX compilation completed",
+    "BibTeX without warnings",
+    "All citations and labels resolved",
+    "No overfull boxes or missing glyphs",
+    "All pages rendered and visually inspected",
+    "No text outside page bounds",
+    "Cover identity and internship details checked"
+  ],
+  "limitations": [
+    "No institutional ISI template was supplied",
+    "No full MySQL/Docker acceptance test claimed"
+  ],
+  "pdf_sha256": "9fa80c1f751bc286f473cbd4a8156f0af74727627b8467ce594a649ac5e5b834"
+}

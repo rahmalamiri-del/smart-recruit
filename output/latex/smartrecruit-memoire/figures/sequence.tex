@@ -1,0 +1,22 @@
+\begingroup\singlespacing
+\begin{tikzpicture}[x=1cm,y=1cm]
+\foreach \x/\t in {0/Recruteur,3.8/Laravel,7.4/MySQL,11/Python}{
+\node[block,text width=2.1cm] at (\x,0) {\textbf{\t}};
+\draw[dashed,midgray] (\x,-0.45)--(\x,-11.3);
+}
+\draw[arr] (0,-1)--node[note,above,fill=white,inner sep=2pt]{Consulter le classement}(3.8,-1);
+\node[note,text width=3cm,anchor=west] at (4,-1.75){Contrôle d'accès};
+\draw[arr] (3.8,-2.65)--node[note,above,fill=white,inner sep=2pt]{Lire les profils}(7.4,-2.65);
+\draw[arr,dashed] (7.4,-3.35)--node[note,above,fill=white,inner sep=2pt]{Profils / candidatures}(3.8,-3.35);
+\draw[arr] (3.8,-4.1)--node[note,above,fill=white,inner sep=2pt]{GET /health}(11,-4.1);
+\draw[arr,dashed] (11,-4.8)--node[note,above,fill=white,inner sep=2pt]{État du service}(3.8,-4.8);
+\draw[teal,rounded corners] (2.2,-5.3) rectangle (12.2,-9.7);
+\node[note,anchor=north west,fill=white] at (2.35,-5.4){Pour chaque profil};
+\node[note,anchor=west,text width=4cm] at (4,-6.15){Calcul PHP de secours};
+\draw[arr] (3.8,-7)--node[note,above,fill=white,inner sep=2pt]{POST /match si Python disponible}(11,-7);
+\draw[arr,dashed] (11,-7.8)--node[note,above,fill=white,inner sep=2pt]{Score et indicateurs}(3.8,-7.8);
+\draw[arr] (3.8,-9)--node[note,above,text width=3.5cm,fill=white,inner sep=2pt]{Sauver si une candidature existe}(7.4,-9);
+\draw[arr,dashed] (3.8,-10.55)--node[note,above,fill=white,inner sep=2pt]{Classement trié}(0,-10.55);
+\node[note,text width=12cm] at (5.5,-12.1){Séquence observée de consultation. La candidature est une action distincte. La sauvegarde du score peut aussi déclencher une présélection dans le code actuel.};
+\end{tikzpicture}
+\endgroup

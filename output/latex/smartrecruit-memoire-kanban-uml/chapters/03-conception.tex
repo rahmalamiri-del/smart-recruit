@@ -1,0 +1,90 @@
+\chapter{Conception UML et architecture de SmartRecruit}
+\label{chap:conception}
+
+\section{Objectifs et périmètre de la conception}
+La conception traduit les exigences du chapitre précédent en responsabilités, structures et scénarios vérifiables. Elle utilise UML pour représenter les points de vue complémentaires du système : les services attendus par les acteurs, les objets manipulés, l'ordre des échanges et les changements d'état. UML est un langage de modélisation ; il ne remplace ni le processus Kanban ni les critères d'acceptation des cartes \cite{omg-uml}. Dans ce projet, une carte prête à être réalisée doit identifier le modèle concerné et les règles à respecter. Une modification de ces règles implique de relire le modèle avant la vérification.
+
+Les figures décrivent le code examiné le 13 septembre 2026, avec un niveau d'abstraction adapté au mémoire. Les classes métier sont des représentations des informations persistées : le projet n'implémente pas une classe Eloquent par entité. Les routes sont majoritairement définies par des fonctions anonymes dans \path{routes/web.php} ; \code{SqlStore} fournit les opérations de persistance et retourne des tableaux aux vues. Cette distinction permet de lire le diagramme de classes sans lui attribuer une organisation objet absente du code.
+
+\section{Diagramme de cas d'utilisation}
+Les trois acteurs métier sont l'étudiant, le recruteur et l'administrateur. L'interface actuelle emploie également le mot \emph{candidat} pour l'espace associé au rôle technique \code{student}. Dans le périmètre académique de SmartRecruit, ce candidat est l'étudiant qui présente son parcours et recherche un stage. L'inscription et la connexion constituent des préalables communs ; les opérations protégées supposent une session valable et le rôle approprié.
+
+L'étudiant gère ses informations et consulte les offres publiées. Le recruteur publie ses offres, examine les profils et suit les candidatures de son périmètre. L'administrateur intervient sur l'ensemble des comptes et des objets métier, y compris les fonctions de restauration. Les associations de la figure~\ref{fig:uml-usecases} expriment la participation aux cas d'utilisation, et non un ordre d'exécution. Les contraintes de propriété complètent le rôle : être recruteur ne suffit pas pour modifier l'offre d'un autre compte.
+
+\begin{figure}[H]\centering
+\resizebox{.9\textwidth}{!}{\input{figures/uml-cas-utilisation.tex}}
+\caption{Diagramme UML des cas d'utilisation des trois acteurs métier}
+\label{fig:uml-usecases}\end{figure}
+
+Ce modèle soutient notamment les cartes K01 et K02 relatives à l'identité et aux droits, ainsi que K09 et K10 pour les espaces de suivi et l'administration. Chaque association doit être traduite en scénarios positifs et négatifs : accès autorisé pour le bon acteur, refus ou absence d'action pour un tiers. La visibilité d'un bouton ne constitue pas, à elle seule, une autorisation.
+
+\section{Diagramme de classes métier et persistance}
+Le noyau relationnel comprend sept ensembles : comptes, profils étudiants, profils recruteurs, documents CV, offres, candidatures et scores. Le compte porte l'identité et le rôle ; les profils portent les attributs propres à l'acteur. La candidature relie une offre à un étudiant. Le score conserve les composantes d'une comparaison associée à une candidature. Le document CV décrit une ressource stockée dans le système de fichiers, dont le chemin et le résultat de traitement sont référencés dans la base.
+
+La figure~\ref{fig:uml-classes} adopte des multiplicités correspondant aux contraintes relationnelles observées. Une référence de profil vers un compte est obligatoire, mais la migration ne rend pas \code{user_id} unique dans les tables de profils. La création applicative produit le profil adapté au rôle ; un véritable un-à-un imposé par SQL nécessiterait une contrainte supplémentaire. De même, la table des scores n'impose pas une seule ligne par candidature, même si le magasin actualise un résultat existant dans son fonctionnement courant.
+
+\begin{figure}[H]\centering
+\resizebox{\textwidth}{!}{\input{figures/uml-classes.tex}}
+\caption{Diagramme de classes des informations métier et de leurs associations}
+\label{fig:uml-classes}\end{figure}
+
+L'unicité du couple offre--profil étudiant empêche la présence de deux candidatures persistées pour la même association. Cette contrainte ne dispense pas de traiter correctement deux requêtes concurrentes. La suppression d'un recruteur peut laisser une offre sans propriétaire selon les mécanismes relationnels ou applicatifs concernés ; l'administration dispose d'une réaffectation. Les suppressions logiques doivent être distinguées des cascades SQL, qui concernent un effacement physique. Les champs JSON de compétences ou de métadonnées sont des colonnes structurées de MySQL, pas un mécanisme de stockage alternatif.
+
+Les classes de la figure n'exposent pas d'opérations artificiellement attribuées aux entités. Les opérations effectives, comme \code{addOffer}, \code{apply}, \code{updateApplicationStatus} et \code{saveMatchScore}, sont regroupées dans \code{SqlStore}. La table de correspondance détaillée entre noms de tables et attributs est fournie dans l'annexe~\ref{ann:dictionnaire}.
+
+\section{Architecture et diagramme de composants}
+La séparation retenue distingue présentation, orchestration métier, persistance et traitement de texte. Blade génère les pages et les formulaires. Les routes reçoivent les requêtes, contrôlent les paramètres et sollicitent les services. Le magasin relationnel encapsule les lectures et les écritures. Le service Python expose un contrat HTTP ; le client PHP transforme les paramètres locaux en charges utiles et restitue une réponse exploitable par l'orchestration.
+
+\begin{figure}[H]\centering
+\resizebox{\textwidth}{!}{\input{figures/uml-composants.tex}}
+\caption{Diagramme de composants et dépendances principales}
+\label{fig:uml-composants}\end{figure}
+
+MySQL est la source métier sélectionnée par \code{sr_store}. Si la base est indisponible, les routes concernées renvoient une erreur 503 ; elles ne basculent plus vers \code{DemoStore}. Cette dernière classe reste présente pour des usages de démonstration et la représentation de l'invité. Le mécanisme de repli réellement actif dans le parcours de recommandation concerne le calcul : \code{SemanticMatcher} fournit une réponse locale lorsque le service distant ne fournit pas un score exploitable.
+
+Cette architecture rend possible une évolution du moteur sans changer les formulaires. Elle ne garantit pas automatiquement l'équivalence des deux calculs ni la validité des documents. Les contrats de données et les erreurs constituent donc des éléments de conception à part entière. Les cartes K04, K07 et K11 portent respectivement le traitement du CV, le score et la cohérence de persistance.
+
+\section{Séquence d'enregistrement d'une candidature}
+Le scénario commence lorsque l'étudiant déclenche le formulaire de candidature. Le traitement vérifie la session, le rôle, l'offre et l'existence du profil associé. Le magasin recherche ensuite l'association offre--profil avant de créer une nouvelle ligne. Le chemin nominal conserve un état initial \code{submitted}. Si une association existe déjà, le magasin applique sa logique de restitution ou de réactivation au lieu de créer une seconde candidature.
+
+\begin{figure}[H]\centering
+\resizebox{\textwidth}{!}{\input{figures/uml-sequence-candidature.tex}}
+\caption{Séquence UML simplifiée du dépôt d'une candidature}
+\label{fig:uml-seq-candidature}\end{figure}
+
+La figure~\ref{fig:uml-seq-candidature} suppose des contrôles préalables réussis. Les branches d'erreur restent des scénarios de vérification distincts : compte incorrect, profil manquant, offre absente, indisponibilité SQL ou conflit d'unicité. La présence d'une vérification avant insertion n'établit pas l'idempotence sous concurrence ; un essai avec deux demandes simultanées devra vérifier le message retourné et l'état final de la base.
+
+L'enregistrement de la candidature et le calcul du classement ne doivent pas être confondus. La recommandation peut comparer le vivier de profils avant qu'ils ne postulent. Une personne classée n'est donc pas nécessairement candidate à l'offre. Les interfaces distinguent cette situation par l'absence d'action de décision lorsqu'aucune candidature n'est liée au profil.
+
+\section{Séquence de recommandation et repli de calcul}
+L'orchestration construit les textes et les ensembles de compétences puis appelle le moteur PHP. Ce résultat est calculé avant l'éventuel appel distant. Si le diagnostic préalable annonce le service disponible, \code{AiClient} interroge \code{POST /match}. Une réponse contenant un score remplace les champs correspondants du résultat local ; une absence de réponse exploitable laisse le résultat PHP disponible. La séquence suivante représente une comparaison ; le classement répète cette opération sur les éléments à comparer puis les trie.
+
+\begin{figure}[H]\centering
+\resizebox{\textwidth}{!}{\input{figures/uml-sequence-recommandation.tex}}
+\caption{Séquence UML d'une comparaison avec branche distante optionnelle}
+\label{fig:uml-seq-match}\end{figure}
+
+Le fragment \emph{opt} représente la sollicitation conditionnelle du service, et le fragment \emph{alt} distingue les résultats retenus. Dans la version étudiée, la présence du champ score constitue le contrôle central ; un schéma complet de validation des types et des bornes reste à renforcer. Une réponse distante peut ainsi être partiellement combinée avec les valeurs locales. Le chapitre~\ref{chap:moteur} précise les différences entre les formules et les référentiels, afin que cette continuité de service ne soit pas interprétée comme une identité de résultats.
+
+\section{Activité de traitement d'un CV}
+L'importation associe saisie structurée, fichier facultatif et texte manuel. Pour un PDF, le parseur sollicite d'abord le service Python lorsqu'il est disponible dans le client ; un texte vide ou un échec entraîne une extraction locale. Le texte extrait est ensuite concaténé avec le texte manuel. Les compétences et les coordonnées sont détectées sur ce résultat. L'avertissement repose sur une longueur extraite inférieure à quarante caractères, lorsqu'un fichier a été fourni et qu'aucun texte manuel ne compense cette faiblesse.
+
+\begin{figure}[H]\centering
+\resizebox{.88\textwidth}{!}{\input{figures/uml-activite-cv.tex}}
+\caption{Diagramme d'activité du traitement du CV et de sa restitution}
+\label{fig:uml-activite-cv}\end{figure}
+
+La figure décrit le parcours de création ou de mise à jour après validation des champs. Le stockage d'un fichier et l'écriture des données ne forment pas automatiquement une transaction atomique. Un échec SQL après déplacement du document peut nécessiter une compensation. Ce point justifie un critère de vérification spécifique sur les fichiers orphelins. Le marqueur de fiabilité est également une heuristique : un texte long peut rester incohérent et un document court peut être pertinent. Il informe l'utilisateur sans certifier l'extraction.
+
+\section{États et suivi des candidatures}
+La candidature possède quatre valeurs de suivi : reçue, présélectionnée, acceptée et refusée. Le code conserve les identifiants \code{submitted}, \code{shortlisted}, \code{interview} et \code{rejected}. Le libellé affiché pour \code{interview} est « Acceptée » ; il ne représente pas une embauche définitive. La route de mise à jour accepte ces valeurs sans imposer un enchaînement linéaire. Un même statut peut donc être choisi à nouveau et une décision antérieure peut être modifiée par un acteur habilité.
+
+\begin{figure}[H]\centering
+\resizebox{.9\textwidth}{!}{\input{figures/uml-etats-candidature.tex}}
+\caption{États métier d'une candidature et visibilité après suppression logique}
+\label{fig:uml-etats}\end{figure}
+
+La figure~\ref{fig:uml-etats} présente la distribution vers les quatre valeurs autorisées, et sépare cette dimension de la suppression logique. Elle montre également l'effet de \code{saveMatchScore} : lorsqu'une candidature est encore reçue et que le score enregistré atteint 70, son statut devient présélectionné. Ce seuil applicatif n'est pas une probabilité. L'acceptation et le refus restent des actions humaines ; séparer la mise à jour du score et la présélection est une amélioration proposée. Une candidature supprimée conserve son statut pour sa restauration. Ce modèle évite de confondre « refusée » et « supprimée » : le premier est une décision visible dans le suivi, le second retire l'élément des listes actives. Les boutons actuellement exposés aux recruteurs mettent surtout en avant l'acceptation et le refus, bien que le contrat de route connaisse quatre valeurs.
+
+\section{Synthèse et traçabilité vers la réalisation}
+La conception associe chaque besoin à une représentation adaptée. Les cas d'utilisation structurent les accès, les classes expliquent les données, les composants délimitent les dépendances, les séquences décrivent les échanges et les diagrammes d'activité et d'états exposent les décisions. Avant de déplacer une carte Kanban vers Vérification, les écarts entre modèle et implémentation doivent être identifiés. Le chapitre suivant présente les choix de réalisation et les interfaces qui rendent ces fonctions accessibles aux utilisateurs.

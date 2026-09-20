@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Connexion · SmartRecruit</title>
+    <link rel="icon" type="image/svg+xml" href="assets/brand/smartrecruit-mark.svg">
+    <meta name="theme-color" content="#126b5b">
+    <link rel="stylesheet" href="assets/app.css?v=20260911">
+<meta name="smartrecruit-preview" content="Données entièrement fictives. Aperçu statique sans base ni actions métier."></head>
+<body class="public-site">
+<a class="skip-link" href="#main-content">Aller au contenu</a>
+    <header class="topbar">
+        <a class="brand" href="dashboard-guest.html" aria-label="SmartRecruit, accueil">
+    <img class="brand-mark" src="assets/brand/smartrecruit-mark.svg" width="40" height="40" alt="">
+    <span class="brand-word" aria-hidden="true">
+        <span class="brand-name"><span class="brand-word-light">Smart</span><span class="brand-word-strong">Recruit</span></span>
+        <small>Candidats &amp; entreprises</small>
+    </span>
+</a>
+
+        <nav class="nav" aria-label="Navigation principale">
+            <a href="dashboard-guest.html" class="" >
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+            </svg>
+            <span>Accueil</span>
+        </a>
+    </nav>
+
+        <div class="session">
+                            <a class="button ghost" href="login.html">Se connecter</a>
+                <a class="button" href="register.html">Créer un compte</a>
+                    </div>
+    </header>
+
+    <main class="page" id="main-content" tabindex="-1">
+                        <div class="alert danger" role="alert">
+                            <div>Cette adresse fictive illustre une erreur de validation.</div>
+                    </div>
+    
+    <section class="auth-shell" aria-labelledby="login-title">
+    <aside class="auth-aside" aria-labelledby="login-welcome">
+        <p class="auth-kicker">Candidats &amp; entreprises</p>
+        <h2 id="login-welcome">Les bons profils.<br>Les bonnes opportunités.</h2>
+        <p>Un espace commun pour faire se rencontrer les compétences et les projets.</p>
+
+        <ul class="auth-benefits">
+            <li>
+                <strong>Vous êtes candidat</strong>
+                <span>Présentez votre parcours, découvrez les offres et retrouvez vos candidatures.</span>
+            </li>
+            <li>
+                <strong>Vous recrutez</strong>
+                <span>Publiez vos offres, explorez les profils et suivez les candidatures reçues.</span>
+            </li>
+        </ul>
+    </aside>
+
+    <div class="auth-content">
+        <div class="section-title">
+            <h1 id="login-title">Connexion</h1>
+            <a href="dashboard-guest.html">Retour à l'accueil</a>
+        </div>
+        <p class="muted">Bienvenue. Connectez-vous pour retrouver votre espace.</p>
+
+        <form class="form-card" method="post" action="#preview-static" data-preview-action="disabled">
+            <input type="hidden" name="_token" value="previewpreviewpreviewpreviewpreviewpreview" autocomplete="off">            <div class="form-section">
+                <label for="login-email">
+                    Adresse e-mail
+                    <input id="login-email" type="email" name="email" value="" autocomplete="username" required autofocus>
+                </label>
+                <label for="login-password">
+                    Mot de passe
+                    <input id="login-password" type="password" name="password" autocomplete="current-password" required>
+                </label>
+            </div>
+
+            <button class="button" type="submit">Se connecter</button>
+        </form>
+
+        <p class="auth-footer">
+            Vous découvrez SmartRecruit ? <a href="register.html">Créer un compte</a>
+        </p>
+    </div>
+</section>
+</main>
+<script>document.addEventListener("submit",function(event){event.preventDefault();},true);</script></body>
+</html>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 342 80" fill="none" role="img" aria-labelledby="title">
+  <title id="title">SmartRecruit — Étudiants &amp; entreprises</title>
+  <g transform="translate(8 8)">
+    <rect width="64" height="64" rx="18" fill="#126B5B"/>
+    <path d="M34 26h-9a10 10 0 0 0-10 10v3a10 10 0 0 0 10 10h3a10 10 0 0 0 10-10v-5" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M30 38h9a10 10 0 0 0 10-10v-3a10 10 0 0 0-10-10h-3a10 10 0 0 0-10 10v5" stroke="#A8E6CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="88" y="40" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="32" letter-spacing="-.8"><tspan fill="#FFFFFF" font-weight="550">Smart</tspan><tspan fill="#A8E6CE" font-weight="800">Recruit</tspan></text>
+  <text x="89" y="61" fill="#B9D2C9" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="15">Étudiants &amp; entreprises</text>
+</svg>

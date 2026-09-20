@@ -1,0 +1,26 @@
+{
+  "pages": 102,
+  "chapters": 6,
+  "appendices": 4,
+  "uml_diagrams": 7,
+  "screenshots": 12,
+  "total_figures": 21,
+  "bibliography_entries_printed": 21,
+  "landscape_pdf_pages": [
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67
+  ],
+  "all_references_resolved": true,
+  "no_overflow_missing_glyphs_or_outside_text": true,
+  "pdf_sha256": "7754b8c39a76dfe2bfc8354f6621006cb3666ba22183db7a8d731520208c6365"
+}

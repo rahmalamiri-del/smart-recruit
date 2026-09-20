@@ -1,0 +1,18 @@
+\chapter*{Conclusion générale}
+\markboth{Conclusion générale}{}
+\addcontentsline{toc}{chapter}{Conclusion générale}
+SmartRecruit structure la mise en relation entre étudiants et entreprises. Le prototype réunit profils, CV, offres et candidatures dans une application qui fournit un classement accompagné d'indicateurs sur les compétences. Le projet articule ainsi développement web, stockage relationnel, extraction de texte et recherche d'information au sein d'un même parcours utilisateur.
+
+L'architecture associe Laravel, Blade, MySQL et un service Python. La séparation du traitement de texte facilite l'évolution du moteur, tandis que le calcul PHP fournit un chemin de secours. La représentation par compétences, TF-IDF et catégories rend le score inspectable. Ces choix permettent d'expliquer les étapes du rapprochement et de construire un protocole de comparaison.
+
+La démarche Kanban fournit une organisation explicite du travail : une réserve de demandes, des cartes prêtes à être tirées, une capacité limitée en réalisation et en vérification, puis des critères d'achèvement partagés. La correspondance entre cartes, besoins, modèles UML et preuves de réalisation rend le périmètre plus facile à suivre. En l'absence d'historique horodaté du stage, cette structuration ne permet pas de conclure à une amélioration mesurée du débit ou du temps de cycle ; elle fournit un cadre exploitable pour la poursuite du projet.
+
+La conception UML décrit les rôles, les entités, les scénarios de traitement et les changements de statut. Les captures d'écran complètent cette conception par une vue concrète des parcours étudiant, recruteur et administrateur. L'identité visuelle, la navigation et les formulaires sont harmonisés, tandis que les scores et les statuts restent rattachés aux objets métier concernés.
+
+L'évaluation nuance ce bilan. Les sondes historiques révèlent des écarts entre les moteurs et des limites de parsing ; leur date et leur périmètre sont conservés afin de ne pas attribuer ces résultats à toutes les versions ultérieures. Le rendu actuel des interfaces a été vérifié séparément sur des fixtures. Le magasin MySQL constitue désormais la source métier utilisée par les routes, mais les contrôles en base réelle, les essais de charge et la qualification du déploiement restent à compléter. La configuration de lancement et les mécanismes de démonstration demandent également une attention particulière.
+
+Ces limites touchent la confiance accordée au résultat. Un score de matching indique une proximité entre des informations disponibles ; il ne mesure ni la valeur d'une personne ni sa réussite future. La présélection doit rester interprétable, contestable et soumise à une appréciation humaine des éléments professionnels pertinents.
+
+La poursuite du projet peut alimenter la réserve Kanban avec des travaux de déploiement, d'intégrité des données et de validation fonctionnelle, puis avec l'unification du contrat de matching et les tests de régression. Un corpus annoté permettra de comparer la méthode actuelle à des encodeurs de phrases adaptés au français. L'OCR et les traitements asynchrones pourront être évalués après clarification de leurs critères d'acceptation. Les dates d'entrée, de démarrage et d'achèvement des nouvelles cartes devront alors être enregistrées pour observer le flux réel.
+
+Le mémoire fournit une réalisation documentée et une méthode de progression. L'articulation entre conception, preuve et réflexion critique constitue l'apport central de ce travail dans le cadre du Master Développement Logiciel.

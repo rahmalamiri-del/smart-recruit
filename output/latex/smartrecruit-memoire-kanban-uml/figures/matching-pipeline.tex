@@ -1,0 +1,20 @@
+\begingroup\singlespacing
+\begin{tikzpicture}[node distance=9mm]
+\node[block,text width=11cm] (in) {\textbf{Données d'entrée}\\Texte de l'offre, texte du CV, compétences explicites};
+\node[block,text width=11cm,below=of in] (norm) {\textbf{Préparation}\\Normalisation, extraction de compétences, remplacement d'alias};
+\node[block,text width=3.1cm,below=13mm of norm] (cos) {TF-IDF sur la paire\\Similarité cosinus};
+\node[block,text width=3.1cm,left=7mm of cos] (skill) {Couverture des\\compétences requises};
+\node[block,text width=3.1cm,right=7mm of cos] (cat) {Couverture des\\catégories techniques};
+\node[block,text width=11cm,below=15mm of cos] (score) {\textbf{Combinaison pondérée et arrondi}\\PHP : bonus d'expérience ; Python : pondérations différentes};
+\node[block,text width=11cm,below=of score] (out) {\textbf{Résultat de matching}\\Score 0--100, compétences trouvées et manquantes, source};
+\draw[arr](in)--(norm);
+\draw[arr](norm)--(cos);
+\draw[arr](norm.south -| skill.north)--(skill);
+\draw[arr](norm.south -| cat.north)--(cat);
+\draw[arr](cos)--(score);
+\draw[arr](skill.south)--(score.north -| skill.south);
+\draw[arr](cat.south)--(score.north -| cat.south);
+\draw[arr](score)--(out);
+\end{tikzpicture}
+
+\endgroup

@@ -1,0 +1,61 @@
+@startuml
+autonumber
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam roundcorner 10
+skinparam maxmessagesize 150
+
+title Soumission et Analyse d'une Candidature
+
+actor "Étudiant" as User
+boundary "Interface Web\n(Laravel Blade)" as View
+control "ApplicationController\n(Laravel Backend)" as Controller
+database "Base de données\n(MySQL)" as DB
+entity "Microservice IA\n(Python)" as AI
+
+User -> View : Remplit le formulaire et upload le CV
+activate View
+
+View -> Controller : POST /offers/{id}/apply
+activate Controller
+deactivate View
+
+Controller -> Controller : Valider fichier, profil et offre
+Controller -> DB : INSERT sr_applications\nstatus=submitted
+activate DB
+DB --> Controller : ID candidature
+deactivate DB
+
+Controller -> AI : POST /match\noffer_text + cv_text
+activate AI
+
+note right of AI
+  NLP:
+  1. Normalisation
+  2. Vectorisation TF-IDF
+  3. Similarité cosinus
+  4. Couverture compétences
+end note
+
+alt Analyse réussie
+    AI --> Controller : JSON score + détails
+    deactivate AI
+    Controller -> DB : UPSERT sr_match_scores
+    activate DB
+    DB --> Controller : Score enregistré
+    deactivate DB
+    Controller -> View : Redirect avec succès
+else IA indisponible
+    AI --> Controller : Timeout / erreur
+    deactivate AI
+    Controller -> Controller : Fallback matching PHP
+    Controller -> DB : UPSERT sr_match_scores\nsource=local-php
+    activate DB
+    DB --> Controller : Score de secours enregistré
+    deactivate DB
+    Controller -> View : Redirect avec succès partiel
+end
+
+View -> User : Affiche score et état candidature
+deactivate Controller
+@enduml

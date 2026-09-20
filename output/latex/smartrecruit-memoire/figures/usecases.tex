@@ -1,0 +1,25 @@
+\begingroup\singlespacing
+\begin{tikzpicture}[x=1cm,y=1cm]
+\node[block,fill=white,text width=2.9cm] (student) at (0,0) {\textbf{Étudiant}};
+\node[block,fill=white,text width=2.9cm] (recruiter) at (0,-4) {\textbf{Recruteur}};
+\node[block,fill=white,text width=2.9cm] (admin) at (0,-7.5) {\textbf{Administrateur}};
+\node[block,ellipse,text width=5.2cm] (auth) at (6.5,1) {S'inscrire / se connecter};
+\node[block,ellipse,text width=5.2cm] (profile) at (6.5,-0.6) {Gérer son profil et son CV};
+\node[block,ellipse,text width=5.2cm] (apply) at (6.5,-2.2) {Consulter les offres et postuler};
+\node[block,ellipse,text width=5.2cm] (offers) at (6.5,-3.8) {Créer et modifier ses offres};
+\node[block,ellipse,text width=5.2cm] (rank) at (6.5,-5.4) {Consulter le classement\\et décider d'une suite};
+\node[block,ellipse,text width=5.2cm] (summary) at (6.5,-7.3) {Consulter les synthèses\\et administrer les parcours};
+\draw[navy] (student) -- (auth);
+\draw[navy] (student) -- (profile);
+\draw[navy] (student) -- (apply);
+\draw[navy] (recruiter) -- (offers);
+\draw[navy] (recruiter) -- (rank);
+\draw[navy] (admin) -- (summary);
+\draw[navy] (admin) -- (rank);
+\begin{scope}[on background layer]
+\node[draw=teal,rounded corners,fit=(auth)(profile)(apply)(offers)(rank)(summary),inner sep=6mm,label={[font=\small\bfseries,text=teal]above:SmartRecruit}] {};
+\end{scope}
+\node[note,text width=11cm] at (4,-9) {Vue synthétique des objectifs. L'authentification est une précondition des parcours protégés ; les autorisations détaillées sont précisées dans le texte.};
+\end{tikzpicture}
+
+\endgroup

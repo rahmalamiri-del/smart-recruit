@@ -1,0 +1,22 @@
+\begingroup\setstretch{1}
+\begin{tikzpicture}[font=\small,msg/.style={-{Stealth[length=2mm]},draw=navy},ret/.style={-{Stealth[length=2mm]},dashed,draw=navy},head/.style={draw=navy,fill=lightgray,minimum width=2.35cm,minimum height=.9cm,align=center}]
+\foreach \x/\id/\txt in {0/o/Orchestration,4/l/Moteur PHP,8/a/AiClient,12/p/Service Python}{\node[head] at (\x,0) {\txt};\draw[dashed,gray] (\x,-.5)--(\x,-13.1);}
+\draw[msg] (0,-1.3)--node[above]{score(offre, profil)}(4,-1.3);
+\draw[ret] (4,-2)--node[above]{Résultat local}(0,-2);
+\draw[navy] (-.7,-2.7) rectangle (13.2,-8.3);
+\node[anchor=north west,fill=lightgray,font=\bfseries\footnotesize] at (-.7,-2.7) {opt};
+\node[anchor=west,font=\footnotesize] at (.2,-3.2) {[service annoncé disponible par le diagnostic préalable]};
+\draw[msg] (0,-4)--node[above]{match(textes, compétences)}(8,-4);
+\draw[msg] (8,-4.8)--node[above]{POST /match}(12,-4.8);
+\draw[ret] (12,-5.7)--node[above,font=\footnotesize]{Réponse ou échec}(8,-5.7);
+\draw[ret] (8,-6.5)--node[above]{Tableau décodé ou null}(0,-6.5);
+\node[align=left,font=\footnotesize,text=midgray,text width=10cm] at (6,-7.5) {Le résultat PHP existe déjà : le chemin distant ne le remplace que si une réponse contenant un score est disponible.};
+\draw[navy] (-.7,-8.7) rectangle (13.2,-11.3);
+\node[anchor=north west,fill=lightgray,font=\bfseries\footnotesize] at (-.7,-8.7) {alt};
+\node[anchor=west,font=\footnotesize] at (.2,-9.25) {[réponse distante avec score] : fusionner les champs distants};
+\draw[dashed,gray] (-.7,-9.9)--(13.2,-9.9);
+\node[anchor=west,font=\footnotesize] at (.2,-10.6) {[sinon] : conserver le résultat local};
+\node[draw=navy,fill=lightgray,align=left,text width=12cm,font=\footnotesize] at (6,-12.4) {Puis : saveMatchScore si applicable ; tri des résultats ; restitution à la vue. La persistance d'un score exige une candidature associée dans le magasin actuel.};
+\end{tikzpicture}
+
+\endgroup

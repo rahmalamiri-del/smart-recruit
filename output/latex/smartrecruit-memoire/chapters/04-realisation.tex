@@ -1,0 +1,139 @@
+\chapter{Réalisation et intégration de SmartRecruit}
+\label{chap:realisation}
+
+\section{Du besoin fonctionnel au prototype exécutable}
+
+La réalisation de SmartRecruit traduit le besoin de rapprochement entre étudiants et entreprises en une application Web organisée autour des profils, des offres et des candidatures. Le travail s'inscrit dans le stage de Rahma Amiri chez Best Solutions, du 2 mars au 2 juillet 2026, sous l'encadrement professionnel de Hammami Houssem. Le présent chapitre décrit les mécanismes effectivement présents dans la version du code disponible pour la rédaction. Il distingue leur fonctionnement observable des améliorations envisagées. Cette distinction évite d'attribuer au prototype des capacités qui relèvent encore d'une évolution, notamment en matière d'authentification complète, d'exploitation en production et d'évaluation de la pertinence.
+
+Le produit possède une interface rendue par Laravel, une persistance relationnelle accessible par le constructeur de requêtes du framework et un service Python chargé de traitements textuels. Un moteur PHP permet également de produire un classement lorsque le service externe ne répond pas. Cette organisation rend possible une démonstration progressive : les parcours métier restent compréhensibles sans déployer immédiatement tous les composants. Elle implique toutefois plusieurs modes de fonctionnement, dont les résultats et les garanties doivent être explicités. Une démonstration avec stockage JSON, par exemple, ne constitue pas une validation du comportement transactionnel de MySQL.
+
+\section{Organisation du code et responsabilités}
+
+\subsection{Une application Laravel à organisation compacte}
+
+Le manifeste Composer déclare PHP à partir de la branche 8.2 et Laravel dans la branche majeure 12. L'espace de noms applicatif \code{SmartRecruit} est associé au répertoire \path{app/} par un chargement PSR-4. Le point d'entrée HTTP se trouve actuellement dans \path{index.php}, à la racine du projet. Il charge les dépendances, initialise l'application définie dans \path{bootstrap/app.php}, puis transmet la requête capturée au framework. Le bootstrap enregistre les routes Web, les commandes de console, une route de santé et le middleware de contrôle des rôles.
+
+La structure utilise des routes définies par des fonctions anonymes dans \path{routes/web.php}. Ce fichier rassemble aussi des fonctions auxiliaires pour sélectionner le stockage, récupérer l'utilisateur courant, composer les textes et ordonner les résultats. Il n'existe donc pas, dans cette version, une séparation complète entre contrôleurs métier, services applicatifs et politiques d'autorisation. Il serait inexact de présenter une architecture à contrôleurs et modèles Eloquent qui ne correspondrait pas aux fichiers livrés. Les conventions Laravel restent mobilisées pour le routage, les réponses, les vues et la validation \cite{laravel-routing,laravel-validation}.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Répartition des responsabilités dans le code disponible}
+\label{tab:realisation-responsabilites}
+\begin{tabularx}{\textwidth}{@{}P{0.29\textwidth}X@{}}
+\toprule
+Composant & Responsabilité observée \\
+\midrule
+\path{routes/web.php} & Orchestration des parcours, validation HTTP, autorisations liées aux objets et préparation des vues. \\
+\code{EnsureRole} & Contrôle du rôle stocké en session avant l'exécution des routes protégées. \\
+\code{SqlStore} & Requêtes relationnelles, création des entités, transformation des enregistrements et mémorisation des scores. \\
+\code{DemoStore} & Lecture et écriture d'un jeu de données JSON destiné au fonctionnement de démonstration. \\
+\code{CvParser} & Coordination de l'extraction du CV et production de métadonnées structurées. \\
+\code{SemanticMatcher} & Extraction de compétences, rapprochement lexical et calcul du score local PHP. \\
+\code{AiClient} & Appels HTTP vers les fonctions de santé, de matching et d'extraction Python. \\
+\path{resources/views/} & Templates Blade des formulaires, tableaux de bord et écrans de consultation. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Cette répartition apporte une lisibilité suffisante pour suivre une candidature de bout en bout. Les deux magasins de données exposent des opérations comparables et retournent des tableaux manipulables par les vues. En revanche, leur interchangeabilité repose sur une convention de méthodes, et non sur une interface explicitement déclarée. La progression naturelle consiste à formaliser ce contrat, puis à déplacer les cas d'utilisation vers des services testables indépendamment du routage. Une telle évolution conserverait les parcours existants tout en réduisant la concentration de responsabilités.
+
+\subsection{Circulation d'une requête}
+
+Une requête traverse d'abord les mécanismes Web de Laravel, notamment la gestion de session et la protection des formulaires contre les requêtes intersites. Le middleware \code{EnsureRole}, lorsqu'il est associé à la route, détermine ensuite si le rôle courant est accepté. La fonction de route valide les champs, vérifie éventuellement la propriété de l'objet, appelle le stockage et prépare une réponse HTML ou JSON. Les redirections transportent des messages temporaires de succès, d'erreur ou d'avertissement. Cette chaîne explique pourquoi masquer un bouton dans l'interface ne suffit pas : l'autorisation doit également être contrôlée avant l'opération serveur.
+
+\section{Authentification et maîtrise des accès}
+
+\subsection{Connexion et création de compte actuelles}
+
+La version étudiée possède une connexion par adresse électronique et mot de passe. La route de connexion recherche le compte dans le stockage SQL, compare le secret saisi au hash enregistré avec \code{password_verify}, puis place les informations utiles de l'utilisateur en session en excluant le hash. L'inscription publique accepte uniquement les rôles étudiant et recruteur. Elle contrôle notamment le format et l'unicité de l'adresse électronique, la confirmation du mot de passe et une longueur minimale de huit caractères. Le hash d'un nouveau compte est produit avec bcrypt.
+
+L'inscription crée, dans une transaction, le compte et le profil correspondant. Le recruteur fournit une raison sociale ; l'étudiant renseigne un titre de profil. La session devient active après cette création. Les routes de connexion et d'inscription comportent une limitation de dix requêtes par minute. Cette description corrige un décalage documentaire : certains documents du dépôt évoquent encore une connexion de démonstration sans mot de passe. Cette ancienne description ne représente plus le formulaire ni le traitement actuellement présents.
+
+L'authentification demeure spécifique à l'application : les informations sont conservées sous une clé de session propre à SmartRecruit, sans mise en place complète des parcours habituels de récupération du mot de passe, de vérification de l'adresse électronique ou de révocation des sessions. La présence d'un hash ne suffit donc pas à qualifier l'ensemble de solution prête pour la production. La régénération de l'identifiant de session après connexion et l'invalidation complète à la déconnexion figurent parmi les corrections proposées au chapitre~\ref{chap:validation}, conformément aux principes de gestion de session \cite{owasp-session}.
+
+\subsection{Rôles et contrôle de propriété}
+
+Le middleware distingue l'invité, l'étudiant, le recruteur et l'administrateur. Un invité qui demande une ressource protégée est redirigé vers la connexion ; un utilisateur connecté dont le rôle est incompatible reçoit une interdiction d'accès. Les contrôles portant sur une ressource sont ensuite réalisés dans les routes. L'étudiant ne peut consulter ou modifier que le profil associé à son compte. Le recruteur ne peut consulter, modifier ou demander le classement que pour ses propres offres. Une modification de statut de candidature exige également que l'offre concernée lui appartienne.
+
+Les recruteurs ont accès à la liste des profils et au contenu des CV présentés par l'application. Il s'agit d'un fonctionnement de CVthèque, plus large que la seule consultation des personnes ayant déjà candidaté. Ce choix doit être expliqué aux futurs utilisateurs et confirmé dans les règles métier d'un déploiement réel. Le code réserve les modifications de profils aux étudiants concernés et aux administrateurs. La séparation entre consultation et modification est ainsi déjà matérialisée, même si une politique détaillée de visibilité des données reste à formaliser.
+
+\section{Parcours d'interface}
+
+\subsection{Navigation et tableaux de bord}
+
+L'interface repose sur un layout Blade partagé. La navigation dépend du rôle : les accès aux offres, aux étudiants, au profil personnel et à l'administration apparaissent selon les droits. Les templates utilisent l'échappement de Blade pour restituer les contenus saisis. Les formulaires de mutation comportent un jeton CSRF. Ces mécanismes sont particulièrement utiles pour les descriptions libres et les textes de CV, qui doivent rester des données affichées et non devenir des instructions exécutées par le navigateur.
+
+Le tableau de bord invité présente le principe du matching et quelques compteurs. Celui de l'étudiant regroupe son profil et ses candidatures. Le recruteur consulte ses offres, le nombre de candidatures associées et les meilleurs rapprochements calculés. Des filtres distinguent les états des offres et permettent de retenir celles qui ont reçu des candidatures. L'administrateur dispose d'une vision transversale des offres et des profils, ainsi que d'une console listant les comptes. Ces variantes répondent à des objectifs différents sans multiplier les applications clientes.
+
+La description de ces écrans provient des templates et des traitements de routes. Une validation ergonomique future devra examiner les écrans réellement rendus, sur plusieurs largeurs de fenêtre, et vérifier la compréhension des libellés. Le mémoire peut ainsi rendre compte de la réalisation de l'interface sans transformer son existence dans le code en preuve de son utilisabilité.
+
+\subsection{Profil étudiant et dépôt du CV}
+
+L'étudiant inscrit dispose d'un profil qu'il peut compléter avec une localisation, une formation, des années d'expérience, des compétences et des liens professionnels. L'administrateur peut également créer un profil. Le formulaire accepte du texte de CV et un fichier PDF, TXT ou Markdown, dans la limite de 4 Mo. Les champs textuels sont bornés et les liens sont validés comme des URL. La mise à jour associe les compétences saisies manuellement aux compétences extraites lorsqu'un nouveau fichier est fourni.
+
+La page de profil rend visibles le titre professionnel, la formation, les compétences, le nom du document et le texte du CV extrait ou saisi. Elle présente aussi les adresses électroniques et les numéros de téléphone détectés par le parseur. Cette restitution joue un rôle de contrôle : l'utilisateur peut repérer une extraction incomplète et corriger les informations. Les métadonnées ne doivent cependant pas être interprétées comme des informations vérifiées. Elles sont issues de règles de reconnaissance et peuvent contenir des erreurs, particulièrement dans les documents à mise en page complexe.
+
+\subsection{Offres et candidatures}
+
+Un recruteur crée une offre avec un intitulé, une entreprise, une description et des compétences demandées. L'offre est publiée par défaut ; le formulaire de modification permet ensuite les états brouillon, publiée et fermée. La liste d'offres destinée aux étudiants ne présente que les offres publiées, ordonnées selon leur adéquation lorsque le profil est disponible. Le recruteur retrouve ses propres offres, avec des filtres et un classement fondé sur les rapprochements calculés. L'implémentation couvre donc la création, la lecture et la mise à jour ; elle ne fournit pas un CRUD complet comprenant une suppression générique de chaque entité.
+
+La candidature en un clic réutilise le profil déjà enregistré. Elle ne dépose pas un CV distinct pour chaque offre. La page de détail indique ensuite le statut de la candidature de l'étudiant. Du côté recruteur, le classement inclut tous les profils comparés, y compris ceux qui n'ont pas encore candidaté. Les actions de décision apparaissent pour les lignes associées à une candidature. Cette différence entre profil recommandé et candidature reçue est essentielle pour comprendre les nombres affichés et éviter de confondre recherche de talents et traitement d'un dossier déposé.
+
+Les statuts techniques sont \code{submitted}, \code{shortlisted}, \code{interview} et \code{rejected}. Le bouton présenté comme une acceptation écrit actuellement le statut \code{interview}. Il exprime donc une progression dans le processus de sélection, et ne matérialise ni une embauche ni la signature d'une convention de stage. Une évolution des libellés devra rendre cette sémantique plus explicite. De même, le contrôle du caractère publié de l'offre doit être appliqué lors du POST de candidature, pas uniquement lors de l'affichage de sa page.
+
+\section{Persistance et cohérence métier}
+
+Le stockage relationnel sépare comptes, profils étudiants, profils recruteurs, documents de CV, offres, candidatures et scores de rapprochement. Des identifiants publics servent à désigner les objets dans les URL, tandis que les relations internes utilisent les identifiants de base. Les compétences, liens et métadonnées sont sérialisés dans des champs JSON. Le constructeur de requêtes Laravel centralise les accès SQL et les jointures nécessaires aux objets retournés aux vues \cite{laravel-database}. Cette organisation évite de disperser des requêtes SQL textuelles dans les templates.
+
+Certaines créations combinant plusieurs enregistrements sont placées dans une transaction. C'est notamment le cas de l'inscription et de la création d'un profil étudiant par le magasin SQL. La mise à jour d'un profil procède, en revanche, par modifications successives du compte, du profil et éventuellement du document. Le déplacement physique du fichier précède aussi l'écriture métier. Ces opérations ne constituent pas une transaction atomique unique : une erreur intermédiaire peut laisser un document orphelin ou un état partiellement actualisé. Le chapitre~\ref{chap:validation} précise les essais à réaliser dans une base isolée pour caractériser ces situations.
+
+Le système sélectionne automatiquement \code{SqlStore} lorsque la connexion et plusieurs tables sont disponibles ; sinon il utilise \code{DemoStore}. Ce repli est utile pour la présentation, mais il s'agit d'un changement de magasin, sans synchronisation automatique des écritures entre JSON et MySQL. Les formulaires de connexion et d'inscription exigent d'ailleurs SQL. Il faut donc éviter de décrire le mode JSON comme une continuité de service équivalente. Pour une exploitation réelle, un mode explicitement configuré et un état d'indisponibilité visible seraient préférables à un basculement implicite.
+
+La lecture globale des données SQL déclenche également la synchronisation du jeu de démonstration. Les comptes et objets de démonstration absents peuvent ainsi être recréés lors de la consultation. Cette facilité doit être retirée du chemin normal des requêtes avant une mise en production et remplacée par une commande d'amorçage volontaire. Les données de présentation, les données de tests et les données réelles doivent avoir des cycles de vie séparés. Le prototype rend le scénario reproductible ; la version exploitable devra garantir que cette reproductibilité ne modifie pas silencieusement les données métier.
+
+\section{Extraction des CV et intégration du moteur}
+
+\subsection{Chaîne d'extraction}
+
+Le composant \code{CvParser} construit un nom de fichier simplifié, puis choisit la méthode d'extraction selon l'extension. Pour un PDF, il demande d'abord au service Python le texte du document. Le client envoie le fichier dans une requête multipart avec un délai maximal configuré de six secondes. Il s'agit d'une limite de configuration, et non d'une latence mesurée. Si le service répond correctement et fournit un texte non vide, ce texte est utilisé. Sinon, le parseur applique son traitement local.
+
+Le service Python essaie l'extraction avec \code{pdfminer.six}, puis un autre lecteur s'il est disponible, avant un dernier décodage des octets. Le premier mécanisme est adapté à la lecture des objets et flux d'un PDF textuel \cite{pdfminer-docs}. Le repli local PHP peut lire directement les fichiers textuels ; pour les PDF, son nettoyage par expressions régulières ne remplace pas une analyse de structure. Aucun moteur OCR n'est mis en œuvre. Un CV scanné peut donc rester inexploitable malgré un fichier correctement reçu.
+
+Le texte extrait est combiné au texte manuel. Le parseur recherche ensuite des compétences, une formation, une expérience et des coordonnées. Si le fichier produit moins de quarante caractères et qu'aucun texte manuel ne compense cette faiblesse, un avertissement invite à compléter le profil. Ce seuil est un indicateur pratique, pas une mesure de validité du document : une chaîne suffisamment longue peut être incohérente. La validation du fichier, la qualité de l'extraction et la justesse des métadonnées doivent être testées séparément \cite{owasp-upload}.
+
+\subsection{Calcul local et appel distant}
+
+Le rapprochement commence par un calcul PHP. Si la réponse de santé Python annonce un service disponible, l'application lui transmet le texte de l'offre, le texte du profil et les listes de compétences. Les champs du résultat distant remplacent alors plusieurs valeurs locales, notamment le score et les couvertures. La source du calcul est conservée dans la réponse. Les requêtes JSON utilisent un délai configuré de 0,4 seconde. Les calculs de classement sont exécutés de manière synchrone dans des boucles sur les profils et les offres.
+
+Cette stratégie permet un résultat local lorsque le service externe est inaccessible. Toutefois, les deux moteurs ne sont pas exactement équivalents : leurs dictionnaires, la canonicalisation des listes et les pondérations diffèrent. Le moteur PHP inclut notamment un bonus d'expérience absent du calcul Python. Une indisponibilité peut donc modifier l'ordre des recommandations, au-delà du changement technique de fournisseur. L'intégration gagnerait à définir un contrat de score versionné et une configuration de compétences commune. Le protocole d'évaluation doit conserver la source et la version de chaque résultat.
+
+Lorsqu'une candidature existe, \code{SqlStore} peut mémoriser le score et faire passer automatiquement une candidature reçue à l'état présélectionné à partir d'un seuil de 70. Cette écriture peut survenir pendant une consultation qui recalcule un classement. Elle doit être distinguée de la décision humaine exprimée par les boutons. Une séparation future entre calcul, enregistrement du score et changement de statut rendrait le cycle de décision plus prévisible, testable et traçable.
+
+\section{Configurations d'exécution et déploiement}
+
+La figure~\ref{fig:deployment} représente les services et les ports déclarés dans la composition de démonstration.
+
+\begin{figure}[htbp]
+\centering
+\input{figures/deployment.tex}
+\caption{Configuration de démonstration décrite par Docker Compose}
+\label{fig:deployment}
+\end{figure}
+
+\subsection{Exécution locale, Apache et conteneurs}
+
+Le dépôt propose un démarrage local avec le serveur intégré de PHP et un script de routage. Ce mode facilite la démonstration sur un poste de développement. Le fichier \path{server.php} laisse toutefois le serveur servir directement les fichiers existants sous la racine du projet. La distinction entre ressources publiques et fichiers internes n'est donc pas assurée par ce mode. Le serveur intégré est destiné au développement ; il ne doit pas devenir, par simple réutilisation de la commande, le serveur d'une exploitation ouverte \cite{php-server}.
+
+Une configuration Apache est également présente dans \path{.htaccess}. Elle contient des interdictions visant des fichiers de configuration et plusieurs répertoires internes, puis réécrit les demandes vers le point d'entrée. Ces règles sont spécifiques à Apache et dépendent de son paramétrage ; le serveur intégré PHP ne les applique pas. Leur présence dans le dépôt ne démontre donc pas que tous les modes d'exécution protègent les mêmes chemins. Une racine publique dédiée, conforme à l'organisation recommandée pour le déploiement Laravel, simplifierait cette frontière \cite{laravel-deployment}.
+
+Docker Compose décrit trois services : application Laravel, service Python et base MySQL. Le service Web construit une image PHP, installe les dépendances et démarre le même serveur intégré. Le service Python installe ses bibliothèques et expose les routes d'analyse ; lorsqu'il est disponible, Waitress sert l'application Flask. Un volume conserve les données MySQL et les services partagent un réseau Compose. Cette description matérialise l'architecture distribuée, mais les déclarations de dépendances de démarrage ne remplacent pas une vérification de disponibilité opérationnelle \cite{docker-compose,flask-docs}.
+
+Les fichiers livrés décrivent un environnement de démonstration avec ports publiés et paramètres de développement. Aucune construction d'image ni exécution de cette composition n'est revendiquée dans l'évaluation présentée. La préparation d'un déploiement réel nécessitera de vérifier la compatibilité des dépendances, de maîtriser les secrets, de restreindre les services accessibles et de définir les vérifications de santé. Ces actions sont des travaux proposés, pas des propriétés déjà validées de l'installation.
+
+\subsection{Frontière entre démonstration et production}
+
+Le prototype réunit les principales interactions attendues : création d'un compte, enrichissement d'un profil, publication d'une offre, recommandation, candidature et suivi. Cette continuité fonctionnelle constitue son apport concret. La production ajoute des exigences différentes : conservation fiable des documents, autorisations vérifiables, reprise après incident, politique de sauvegarde, diagnostic exploitable et contrôle des versions du moteur. Il convient de traiter ces exigences comme des critères d'acceptation explicites, plutôt que comme des conséquences automatiques du choix de Laravel ou de Docker.
+
+La démarche retenue consiste ainsi à préserver les mécanismes utiles, à isoler les facilités de démonstration et à mesurer les limites avant d'ajouter des fonctionnalités. Le chapitre~\ref{chap:validation} relie les vérifications réellement effectuées aux scénarios encore à exécuter. Il fournit une base de progression où chaque correction proposée peut être associée à une preuve attendue, sans confondre réalisation du prototype et qualification complète d'un système de recrutement.
+

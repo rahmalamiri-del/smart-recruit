@@ -1,0 +1,20 @@
+\begingroup\singlespacing
+\begin{tikzpicture}[x=1cm,y=1cm]
+\node[block,text width=4.3cm] (u) at (0,0) {\textbf{sr\_users}\\id (PK), public\_id (UQ)\\email (UQ), role, password};
+\node[block,text width=4.3cm] (s) at (-3.1,-2.8) {\textbf{sr\_student\_profiles}\\id (PK), user\_id (FK)\\skills, cv\_text, experience\_years};
+\node[block,text width=4.3cm] (r) at (3.1,-2.8) {\textbf{sr\_recruiter\_profiles}\\id (PK), user\_id (FK)\\company\_name, position};
+\node[block,text width=4.3cm] (cv) at (-3.1,-5.6) {\textbf{sr\_cv\_documents}\\id (PK), student\_profile\_id (FK)\\stored\_path, parser\_result};
+\node[block,text width=4.3cm] (o) at (3.1,-5.6) {\textbf{sr\_offers}\\id (PK), recruiter\_profile\_id (FK)\\description, required\_skills, status};
+\node[block,text width=6.5cm] (a) at (0,-8.6) {\textbf{sr\_applications}\\id (PK), offer\_id (FK), student\_profile\_id (FK)\\UQ(offer\_id, student\_profile\_id), status};
+\node[block,text width=6.5cm] (m) at (0,-11.3) {\textbf{sr\_match\_scores}\\id (PK), application\_id (FK)\\score, matched\_skills, raw\_response};
+\draw[arr] (u.south west) -- node[note,above left,fill=white,inner sep=2pt]{1 / 0..*} (s.north);
+\draw[arr] (u.south east) -- node[note,above right,fill=white,inner sep=2pt]{1 / 0..*} (r.north);
+\draw[arr] (s) -- node[note,left,fill=white,inner sep=2pt]{1 / 0..*} (cv);
+\draw[arr] (r) -- node[note,right,fill=white,inner sep=2pt]{0..1 / 0..*} (o);
+\draw[arr] (s.west) -- ++(-0.8,0) |- (a.west);
+\node[note,fill=white,inner sep=2pt] at (-5.2,-7.7){1 / 0..*};
+\draw[arr] (o.south) -- node[note,right,fill=white,inner sep=2pt]{1 / 0..*} (a.north east);
+\draw[arr] (a) -- node[note,right,fill=white,inner sep=2pt]{1 / 0..*} (m);
+\node[note,text width=12cm] at (0,-13.1) {Cardinalités autorisées par le schéma SQL. PK : clé primaire ; FK : clé étrangère ; UQ : unicité. Les contraintes métier supplémentaires sont discutées dans le texte.};
+\end{tikzpicture}
+\endgroup

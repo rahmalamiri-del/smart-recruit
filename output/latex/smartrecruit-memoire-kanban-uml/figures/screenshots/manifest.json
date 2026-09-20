@@ -1,0 +1,121 @@
+[
+  {
+    "file": "01-connexion.png",
+    "templatePreview": "login.html",
+    "heading": "Connexion",
+    "height": 720,
+    "title": "Connexion · SmartRecruit",
+    "width": 1280,
+    "date": "2026-09-13",
+    "data": "Fixtures entièrement fictives; actions désactivées"
+  },
+  {
+    "file": "02-inscription.png",
+    "templatePreview": "register.html",
+    "heading": "Créer un compte",
+    "height": 720,
+    "title": "Créer un compte · SmartRecruit",
+    "width": 1280,
+    "date": "2026-09-13",
+    "data": "Fixtures entièrement fictives; actions désactivées"
+  },
+  {
+    "file": "03-espace-administrateur.png",
+    "templatePreview": "dashboard-admin.html",
+    "heading": "Le recrutement, en un coup d’œil.",
+    "height": 720,
+    "title": "Tableau de bord administrateur",
+    "width": 1280,
+    "date": "2026-09-13",
+    "data": "Fixtures entièrement fictives; actions désactivées"
+  },
+  {
+    "file": "04-espace-recruteur.png",
+    "templatePreview": "dashboard-recruiter.html",
+    "heading": "Vos offres. Vos prochains talents.",
+    "height": 720,
+    "title": "Mon espace recruteur",
+    "width": 1280,
+    "date": "2026-09-13",
+    "data": "Fixtures entièrement fictives; actions désactivées"
+  },
+  {
+    "file": "05-espace-etudiant.png",
+    "templatePreview": "dashboard-student.html",
+    "heading": "Faites avancer votre candidature.",
+    "height": 720,
+    "title": "Mon espace candidat",
+    "width": 1280,
+    "date": "2026-09-13",
+    "data": "Fixtures entièrement fictives; actions désactivées"
+  },
+  {
+    "file": "06-offres-etudiant.png",
+    "templatePreview": "offers-index-student.html",
+    "heading": "Offres de stage",
+    "height": 720,
+    "title": "Offres de stage",
+    "width": 1280,
+    "date": "2026-09-13",
+    "data": "Fixtures entièrement fictives; actions désactivées"
+  },
+  {
+    "file": "07-detail-offre.png",
+    "templatePreview": "offers-show-student.html",
+    "heading": "Stage PFE — Développement full-stack Laravel & React",
+    "height": 720,
+    "title": "Stage PFE — Développement full-stack Laravel & React",
+    "width": 1280,
+    "date": "2026-09-13",
+    "data": "Fixtures entièrement fictives; actions désactivées"
+  },
+  {
+    "file": "09-profil-etudiant.png",
+    "templatePreview": "students-show-student.html",
+    "heading": "Lina Exemple",
+    "height": 720,
+    "title": "Lina Exemple",
+    "width": 1280,
+    "date": "2026-09-13",
+    "data": "Fixtures entièrement fictives; actions désactivées"
+  },
+  {
+    "file": "10-creation-offre.png",
+    "templatePreview": "offers-create.html",
+    "heading": "Créer une offre de stage",
+    "height": 720,
+    "title": "Créer une offre",
+    "width": 1280,
+    "date": "2026-09-13",
+    "data": "Fixtures entièrement fictives; actions désactivées"
+  },
+  {
+    "file": "11-candidatures.png",
+    "templatePreview": "admin-applications.html",
+    "heading": "Candidatures",
+    "height": 720,
+    "title": "Gestion des candidatures",
+    "width": 1280,
+    "date": "2026-09-13",
+    "data": "Fixtures entièrement fictives; actions désactivées"
+  },
+  {
+    "file": "12-profils.png",
+    "templatePreview": "students-index-recruiter.html",
+    "heading": "Profils candidats",
+    "height": 720,
+    "title": "Profils candidats",
+    "width": 1280,
+    "date": "2026-09-13",
+    "data": "Fixtures entièrement fictives; actions désactivées"
+  },
+  {
+    "file": "08-classement.png",
+    "templatePreview": "offers-show-recruiter.html",
+    "date": "2026-09-13",
+    "width": 1280,
+    "height": 720,
+    "data": "Fixtures entièrement fictives; actions désactivées",
+    "framing": "Page défilée vers le classement"
+  }
+]

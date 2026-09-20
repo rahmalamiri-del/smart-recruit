@@ -1,0 +1,22 @@
+\begingroup\setstretch{1}
+\begin{tikzpicture}[font=\fontsize{10}{12}\selectfont,act/.style={draw=navy,fill=lightgray,rounded corners=8pt,text width=5.8cm,align=center,minimum height=.85cm},dec/.style={diamond,aspect=3,draw=navy,fill=white,align=center,inner sep=3pt},flow/.style={-{Stealth[length=2mm]},draw=navy}]
+\fill[navy] (0,0) circle (.12);
+\node[act] (v) at (0,-1) {Valider le formulaire, le rôle et les champs};
+\node[dec] (f) at (0,-2.5) {Fichier fourni ?};
+\node[act] (x) at (0,-4.1) {Extraire le texte du fichier\\PDF : Python, puis repli local si vide};
+\node[act] (m) at (0,-5.8) {Associer les deux sources de texte};
+\node[act] (s) at (0,-7.2) {Détecter compétences, formation,\\expérience et coordonnées};
+\node[act] (db) at (0,-8.7) {Déplacer le fichier s'il existe,\\enregistrer le profil dans MySQL};
+\node[dec] (q) at (0,-10.3) {Extraction peu fiable ?};
+\node[act,text width=3.8cm] (w) at (-3.5,-12) {Afficher un avertissement\\et permettre la correction};
+\node[act,text width=3.8cm] (ok) at (3.5,-12) {Afficher le profil\\et la confirmation};
+\draw[flow] (0,-.12)--(v);\draw[flow] (v)--(f);\draw[flow] (f)--node[right,pos=.2]{[oui]}(x);\draw[flow] (x)--(m);
+\draw[flow] (f.east)--node[above]{[non]}(5,-2.5)|-(m.east);
+\draw[flow] (m)--(s);\draw[flow] (s)--(db);\draw[flow] (db)--(q);
+\draw[flow] (q.west)-|node[pos=.25,above]{[oui]}(w.north);\draw[flow] (q.east)-|node[pos=.25,above]{[non]}(ok.north);
+\node[dec,minimum size=.25cm,inner sep=0] (merge) at (0,-13.6) {};
+\draw[flow] (w.south)|-(merge.west);\draw[flow] (ok.south)|-(merge.east);
+\draw[flow] (merge)--(0,-14.3);\draw[navy] (0,-14.5) circle (.19);\fill[navy] (0,-14.5) circle (.12);
+\end{tikzpicture}
+
+\endgroup

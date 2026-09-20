@@ -1,0 +1,28 @@
+\begingroup\setstretch{1}
+\begin{tikzpicture}[font=\small,state/.style={draw=navy,rounded corners=6pt,fill=lightgray,align=center,minimum width=2.6cm,minimum height=1cm},tr/.style={-{Stealth[length=2mm]},draw=navy,line width=.65pt}]
+\draw[navy,rounded corners=6pt] (-7,1.5) rectangle (6,-8.2);
+\node[anchor=west,font=\bfseries] at (-6.6,1) {Candidature active};
+\fill[navy] (0,.15) circle (.1);
+\node[state,minimum width=3.5cm] (s) at (0,-1.1) {Reçue\\\texttt{submitted}};
+\node[diamond,draw=navy,aspect=2,minimum width=.6cm] (choice) at (0,-3.1) {};
+\node[state] (p) at (-3.2,-5) {Présélection\\\texttt{shortlisted}};
+\node[state] (i) at (0,-5) {Acceptée\\\texttt{interview}};
+\node[state] (r) at (3.2,-5) {Refusée\\\texttt{rejected}};
+\draw[tr] (0,.05)--(s);
+\draw[tr] (s)--node[right,pos=.25,font=\footnotesize]{modifierStatut(s)}(choice);
+\draw[tr] (choice)-|node[pos=.68,left,font=\footnotesize]{[s=shortlisted]}(p);
+\draw[tr] (choice)--node[right,font=\footnotesize]{[s=interview]}(i);
+\draw[tr] (choice)-|node[pos=.68,right,font=\footnotesize]{[s=rejected]}(r);
+\draw[tr] (choice.west)--(-4.8,-3.1)|-node[pos=.78,above,font=\footnotesize]{[s=submitted]}(s.west);
+\draw[navy] (p.south)--(-3.2,-6.2)--(5.2,-6.2);
+\draw[navy] (i.south)--(0,-6.2);\fill[navy] (0,-6.2) circle (.055);
+\draw[navy] (r.south)--(3.2,-6.2);\fill[navy] (3.2,-6.2) circle (.055);
+\draw[tr] (5.2,-6.2)--(5.2,-2.7)--node[above,font=\footnotesize]{modifierStatut(s)}(1,-2.7)--(choice.north east);
+\draw[tr,draw=teal] (s.north west)--(-6.2,-.6)--(-6.2,-5)--(p.west);
+\node[font=\footnotesize,text=teal,align=center,fill=white,text width=2.1cm] at (-6.1,-2.2) {score enregistré\\{}[score ≥ 70]};
+\node[align=center,font=\footnotesize,text width=11.6cm,text=midgray] at (-.4,-7.3) {Les mises à jour manuelles supposent un acteur habilité. Les retours et les changements entre les quatre valeurs sont admis ; aucun ordre linéaire n'est imposé.};
+\node[state,minimum width=5.6cm] (del) at (-.5,-10.4) {Candidature supprimée logiquement\\statut métier conservé};
+\draw[tr] (-3,-8.2)--node[left,align=right,font=\footnotesize]{suppression\\administrateur}(del.north west);
+\draw[tr] (del.north east)--node[right,align=left,font=\footnotesize]{restauration\\statut antérieur}(2,-8.2);
+\end{tikzpicture}
+\endgroup

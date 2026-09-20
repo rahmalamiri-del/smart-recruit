@@ -1,0 +1,26 @@
+\begingroup\setstretch{1}
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small,
+uc/.style={ellipse,draw=navy,fill=lightgray,minimum width=7cm,minimum height=.82cm,align=center},
+assoc/.style={draw=navy,line width=.6pt}]
+\draw[draw=navy,rounded corners=2pt] (2.3,.8) rectangle (13,-12.5);
+\node[anchor=north west,font=\bfseries\small,text=navy] at (2.5,.65) {SmartRecruit};
+\foreach \y/\role in {-1.5/Étudiant,-5.7/Recruteur,-9.9/Administrateur}{
+  \draw[assoc] (.45,\y+.6) circle (.17);
+  \draw[assoc] (.45,\y+.43)--(.45,\y-.15) (.07,\y+.17)--(.83,\y+.17) (.45,\y-.15)--(.1,\y-.6) (.45,\y-.15)--(.8,\y-.6);
+  \node[align=center] at (.45,\y-.9) {\role};
+}
+\node[uc] (s1) at (7.5,-.9) {Gérer son profil et son CV};
+\node[uc] (s2) at (7.5,-2.1) {Consulter les offres recommandées};
+\node[uc] (s3) at (7.5,-3.3) {Postuler et consulter le suivi};
+\node[uc] (r1) at (7.5,-5.1) {Créer et gérer ses offres};
+\node[uc] (r2) at (7.5,-6.3) {Consulter les profils et leur classement};
+\node[uc] (r3) at (7.5,-7.5) {Accepter ou refuser une candidature};
+\node[uc] (a1) at (7.5,-9.3) {Administrer comptes et droits};
+\node[uc] (a2) at (7.5,-10.5) {Superviser offres, profils et candidatures};
+\node[uc] (a3) at (7.5,-11.7) {Supprimer, restaurer et réaffecter};
+\foreach \n in {s1,s2,s3}{\draw[assoc] (.85,-1.5)--(1.8,-1.5)|-(\n.west);}
+\foreach \n in {r1,r2,r3}{\draw[assoc] (.85,-5.7)--(1.8,-5.7)|-(\n.west);}
+\foreach \n in {a1,a2,a3}{\draw[assoc] (.85,-9.9)--(1.8,-9.9)|-(\n.west);}
+\end{tikzpicture}
+
+\endgroup

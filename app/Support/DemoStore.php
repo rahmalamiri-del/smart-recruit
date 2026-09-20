@@ -1,0 +1,209 @@
+<?php
+
+namespace SmartRecruit\Support;
+
+/**
+ * Fournisseur des donnees de demonstration.
+ *
+ * MySQL (SqlStore) est desormais l'unique source de verite de l'application :
+ * cette classe ne stocke plus rien et ne sert qu'a decrire le jeu de donnees
+ * initial (utilise par SqlStore::syncDemoData) ainsi que l'utilisateur invite.
+ */
+class DemoStore
+{
+    public static function demoUsers(): array
+    {
+        return [
+            [
+                'id' => 'usr_admin',
+                'name' => 'Admin Smart-Recruit',
+                'email' => 'admin@smart-recruit.test',
+                'role' => 'admin',
+                'student_id' => null,
+            ],
+            [
+                'id' => 'usr_recruiter',
+                'name' => 'Recruteur Smart-Recruit',
+                'email' => 'recruteur@smart-recruit.test',
+                'role' => 'recruiter',
+                'student_id' => null,
+            ],
+            [
+                'id' => 'usr_student',
+                'name' => 'Amira Ben Salem',
+                'email' => 'amira.bensalem@example.com',
+                'role' => 'student',
+                'student_id' => 'stu_amira',
+            ],
+        ];
+    }
+
+
+    public static function guestUser(): array
+    {
+        return [
+            'id' => 'guest',
+            'name' => 'Invité',
+            'email' => null,
+            'role' => 'guest',
+            'student_id' => null,
+        ];
+    }
+
+
+    public static function seedData(): array
+    {
+        $base = [
+            'users' => self::demoUsers(),
+            'students' => [
+                [
+                    'id' => 'stu_amira',
+                    'name' => 'Amira Ben Salem',
+                    'email' => 'amira.bensalem@example.com',
+                    'headline' => 'Développeuse Full-Stack Java / React',
+                    'location' => 'Tunis',
+                    'experience_years' => 2,
+                    'education' => 'Master Génie Logiciel',
+                    'skills' => ['java', 'spring boot', 'react', 'sql', 'git', 'agile'],
+                    'links' => [
+                        'github' => 'https://github.com/amira-demo',
+                        'linkedin' => 'https://linkedin.com/in/amira-demo',
+                        'portfolio' => 'https://amira-demo.dev',
+                    ],
+                    'cv_text' => 'Master Génie Logiciel. Expérience J2EE, Spring Boot, REST API, ReactJS, SQL, Git, Scrum. Réalisation d une plateforme de gestion de stages avec tableaux de bord.',
+                    'file_name' => null,
+                    'metadata' => [
+                        'emails' => ['amira.bensalem@example.com'],
+                        'phones' => [],
+                        'detected_skills' => ['java', 'react', 'sql', 'git', 'agile'],
+                    ],
+                    'created_at' => '2026-05-27 09:00:00',
+                ],
+                [
+                    'id' => 'stu_yassine',
+                    'name' => 'Yassine Trabelsi',
+                    'email' => 'yassine.trabelsi@example.com',
+                    'headline' => 'Data Scientist Junior NLP',
+                    'location' => 'Sfax',
+                    'experience_years' => 1,
+                    'education' => 'Mastère Data Science',
+                    'skills' => ['python', 'machine learning', 'nlp', 'sql', 'data analysis'],
+                    'links' => [
+                        'github' => 'https://github.com/yassine-demo',
+                        'linkedin' => 'https://linkedin.com/in/yassine-demo',
+                    ],
+                    'cv_text' => 'Mastère Data Science. Projets Python, scikit-learn, TF-IDF, NLP, analyse de données, extraction d entités avec spaCy, dashboards Power BI.',
+                    'file_name' => null,
+                    'metadata' => [
+                        'emails' => ['yassine.trabelsi@example.com'],
+                        'phones' => [],
+                        'detected_skills' => ['python', 'machine learning', 'nlp', 'data analysis'],
+                    ],
+                    'created_at' => '2026-05-27 09:10:00',
+                ],
+                [
+                    'id' => 'stu_ines',
+                    'name' => 'Ines Kammoun',
+                    'email' => 'ines.kammoun@example.com',
+                    'headline' => 'Développeuse Front-End Vue / UI',
+                    'location' => 'Ariana',
+                    'experience_years' => 1,
+                    'education' => 'Licence Informatique',
+                    'skills' => ['javascript', 'typescript', 'vue', 'frontend', 'git'],
+                    'links' => [
+                        'github' => 'https://github.com/ines-demo',
+                    ],
+                    'cv_text' => 'Licence Informatique. Développement front-end avec Vue.js, TypeScript, composants UI, intégration API REST, tests utilisateurs et Git.',
+                    'file_name' => null,
+                    'metadata' => [
+                        'emails' => ['ines.kammoun@example.com'],
+                        'phones' => [],
+                        'detected_skills' => ['javascript', 'typescript', 'vue', 'frontend', 'git'],
+                    ],
+                    'created_at' => '2026-05-27 09:20:00',
+                ],
+            ],
+            'offers' => [
+                [
+                    'id' => 'off_java_react',
+                    'title' => 'Stage PFE Développeur Full-Stack Java / React',
+                    'company' => 'Smart Business Solutions',
+                    'location' => 'Tunis hybride',
+                    'type' => 'Stage PFE',
+                    'description' => 'Nous cherchons un stagiaire capable de participer à une plateforme SaaS. Le profil doit comprendre Java Enterprise, Spring Boot, API REST, ReactJS, SQL, Git et méthodes Agile.',
+                    'required_skills' => ['java', 'spring boot', 'react', 'sql', 'git', 'agile'],
+                    'status' => 'published',
+                    'created_at' => '2026-05-27 10:00:00',
+                ],
+                [
+                    'id' => 'off_nlp',
+                    'title' => 'Stage Matching CV-Offres NLP',
+                    'company' => 'Smart-Recruit Lab',
+                    'location' => 'Tunis',
+                    'type' => 'Stage recherche appliquée',
+                    'description' => 'Mission NLP: parsing de CV PDF, TF-IDF, similarité cosinus, extraction de compétences, expérimentation BERT et tableau de bord de recommandations.',
+                    'required_skills' => ['python', 'nlp', 'machine learning', 'data analysis'],
+                    'status' => 'published',
+                    'created_at' => '2026-05-27 10:15:00',
+                ],
+            ],
+            'applications' => [
+                [
+                    'id' => 'app_001',
+                    'offer_id' => 'off_java_react',
+                    'student_id' => 'stu_amira',
+                    'status' => 'submitted',
+                    'applied_at' => '2026-05-27 10:30:00',
+                ],
+                [
+                    'id' => 'app_002',
+                    'offer_id' => 'off_java_react',
+                    'student_id' => 'stu_ines',
+                    'status' => 'submitted',
+                    'applied_at' => '2026-05-27 10:35:00',
+                ],
+                [
+                    'id' => 'app_003',
+                    'offer_id' => 'off_nlp',
+                    'student_id' => 'stu_yassine',
+                    'status' => 'submitted',
+                    'applied_at' => '2026-05-27 10:40:00',
+                ],
+            ],
+        ];
+
+        $extra = self::extraSeedData();
+
+        return [
+            'users' => array_values(array_merge($base['users'], $extra['users'] ?? [])),
+            'students' => array_values(array_merge($base['students'], $extra['students'] ?? [])),
+            'offers' => array_values(array_merge($base['offers'], $extra['offers'] ?? [])),
+            'applications' => array_values(array_merge($base['applications'], $extra['applications'] ?? [])),
+        ];
+    }
+
+
+    private static function extraSeedData(): array
+    {
+        $path = dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'database'.DIRECTORY_SEPARATOR.'demo_dataset.php';
+
+        if (! is_file($path)) {
+            return [
+                'users' => [],
+                'students' => [],
+                'offers' => [],
+                'applications' => [],
+            ];
+        }
+
+        $data = require $path;
+
+        return is_array($data) ? $data : [
+            'users' => [],
+            'students' => [],
+            'offers' => [],
+            'applications' => [],
+        ];
+    }
+}
+

@@ -1,0 +1,121 @@
+\hypersetup{pageanchor=false}
+\begin{titlepage}
+\thispagestyle{empty}
+\centering
+{\small République Tunisienne\\Ministère de l'Enseignement Supérieur et de la Recherche Scientifique\par}
+\vspace{0.5cm}
+{\large\bfseries Université Tunis El Manar\par}
+{\Large\sffamily\bfseries\color{navy}Institut Supérieur d'Informatique\par}
+{\large ISI\par}
+\vspace{0.8cm}
+{\Large\sffamily MÉMOIRE DE MASTÈRE\par}
+\vspace{0.15cm}
+{\normalsize Présenté dans le cadre du\par}
+{\large\bfseries Master Développement Logiciel\par}
+\vspace{0.75cm}
+{\color{teal}\rule{\textwidth}{1.2pt}\par}
+\vspace{0.35cm}
+{\Huge\sffamily\bfseries\color{navy}SmartRecruit\par}
+\vspace{0.35cm}
+{\Large\bfseries Conception et réalisation d'une plateforme de mise en relation étudiants-entreprises assistée par un moteur de recommandation intelligent\par}
+\vspace{0.4cm}
+{\color{teal}\rule{\textwidth}{1.2pt}\par}
+\vspace{0.65cm}
+{\normalsize Réalisé par\par}
+{\LARGE\bfseries\nomEtudiante\par}
+\vspace{0.65cm}
+\begin{tabularx}{0.94\textwidth}{@{}P{5.3cm}Y@{}}
+\textbf{Code du stage} & MDL/26/12\\
+\textbf{Organisme d'accueil} & Best Solutions\\
+\textbf{Encadrant professionnel} & Hammami Houssem\\
+\textbf{Période du stage} & Du 02 mars 2026 au 02 juillet 2026\\
+\end{tabularx}
+\vfill
+{\normalsize Année universitaire 2025--2026\par}
+\end{titlepage}
+\pagenumbering{roman}
+\hypersetup{pageanchor=true}
+\chapter*{Remerciements}
+\markboth{Remerciements}{}
+\addcontentsline{toc}{chapter}{Remerciements}
+Je remercie Best Solutions pour l'accueil de ce stage et pour le cadre professionnel dans lequel s'inscrit le projet SmartRecruit. Ce travail représente une occasion de relier les connaissances acquises en développement logiciel à une problématique concrète de mise en relation entre étudiants et entreprises.
+
+J'adresse mes remerciements à mon encadrant professionnel, Hammami Houssem, pour l'encadrement du projet. La conception d'une plateforme de recrutement demande de mettre en relation plusieurs dimensions : les parcours des utilisateurs, l'organisation des données, l'intégration des services et l'interprétation des résultats produits par un algorithme.
+
+Je remercie également l'Institut Supérieur d'Informatique de l'Université Tunis El Manar et l'équipe pédagogique du Master Développement Logiciel pour la formation qui constitue le socle de ce mémoire. Mes remerciements s'adressent enfin à mes proches pour leur soutien, ainsi qu'aux personnes qui consacreront du temps à la lecture et à l'évaluation de ce travail.
+
+\chapter*{Résumé}
+\markboth{Résumé}{}
+\addcontentsline{toc}{chapter}{Résumé}
+La mise en relation entre étudiants et entreprises exige de rapprocher des profils hétérogènes et des offres dont les compétences ne sont pas toujours formulées avec le même vocabulaire. Une recherche littérale ignore des équivalences utiles, tandis qu'un score insuffisamment expliqué peut rendre la présélection difficile à discuter. Ce mémoire présente SmartRecruit, une plateforme conçue pour centraliser les profils, les curriculum vitæ, les offres et les candidatures, puis assister leur comparaison par un classement explicable.
+
+Le prototype associe une application Laravel, une interface Blade, une base MySQL et un service Python consacré à l'extraction de texte et au matching. Le moteur combine une pondération TF-IDF, une similarité cosinus, la couverture de compétences et une taxonomie de domaines techniques. Un moteur PHP assure une continuité de calcul lorsque le service Python est indisponible. Le mémoire décrit les besoins, la conception des données et des échanges, l'implémentation des parcours et les mécanismes de recommandation.
+
+L'évaluation repose sur l'examen du code et sur des sondes locales reproductibles. Elle confirme la présence du socle applicatif tout en révélant des écarts entre les deux moteurs, des limites de parsing et des points à corriger dans le stockage de secours et le déploiement. Les scores sont présentés comme des indicateurs de rapprochement, sans prétention à mesurer une probabilité de réussite professionnelle. Le travail propose enfin une trajectoire d'amélioration fondée sur la cohérence des contrats, la protection des données, la validation humaine et une évaluation de classement sur un corpus annoté.
+
+\noindent\textbf{Mots-clés :} recrutement étudiant, recommandation, traitement automatique du langage, TF-IDF, similarité cosinus, Laravel, Python, explicabilité.
+
+\chapter*{Abstract}
+\markboth{Abstract}{}
+\addcontentsline{toc}{chapter}{Abstract}
+\begin{otherlanguage}{english}
+Matching students with companies requires comparing heterogeneous profiles and job descriptions that often express related skills using different terms. Literal keyword searches may miss useful equivalences, while an unexplained score can make candidate screening difficult to assess. This dissertation presents SmartRecruit, a platform that centralizes profiles, résumés, opportunities and applications, and supports comparison through an interpretable ranking mechanism.
+
+The prototype combines a Laravel application, a Blade interface, a MySQL database and a Python service for text extraction and matching. Its scoring mechanism uses TF-IDF weighting, cosine similarity, skill coverage and a taxonomy of technical domains. A PHP implementation provides a fallback when the Python service is unavailable. The dissertation covers requirements, data and interaction design, implementation and the recommendation pipeline.
+
+Evaluation is based on source-code inspection and reproducible local probes. It confirms the application's foundations while identifying inconsistencies between the two engines, parsing limitations, and issues in fallback persistence and deployment. Scores are treated as matching indicators rather than estimates of professional success. Proposed improvements focus on consistent service contracts, data protection, human oversight and a ranking evaluation protocol using an independently annotated corpus. No large-scale performance benchmark or user-study result is claimed.
+
+\noindent\textbf{Keywords:} student recruitment, recommendation, natural language processing, TF-IDF, cosine similarity, Laravel, Python, explainability.
+\end{otherlanguage}
+
+\chapter*{Note de périmètre et de traçabilité}
+\markboth{Périmètre du mémoire}{}
+\addcontentsline{toc}{chapter}{Note de périmètre et de traçabilité}
+Le présent mémoire concerne le stage MDL/26/12, réalisé par Rahma Amiri au sein de Best Solutions du 02/03/2026 au 02/07/2026. Les informations institutionnelles et administratives de la couverture correspondent aux éléments communiqués pour ce travail. Aucune composition de jury, identité d'encadrant académique ou caractéristique commerciale de l'organisme d'accueil n'est supposée.
+
+La description technique porte sur les fichiers du projet SmartRecruit disponibles lors de la rédaction. L'analyse initiale a été conduite le 10 septembre 2026 et les sondes accompagnant cette version du mémoire ont été rejouées le 11 septembre 2026. Ces vérifications postérieures au stage constituent une évaluation rétrospective du prototype ; elles ne sont pas présentées comme un journal d'exécution établi pendant le stage.
+
+Trois niveaux de discours sont distingués : les fonctionnalités et règles observées dans le code, les comportements effectivement reproduits par des essais locaux, et les améliorations proposées. Une fonctionnalité visible dans le code n'est pas automatiquement qualifiée de validée de bout en bout. Les parcours avec une base MySQL réelle, les essais de charge et les études utilisateurs nécessitent un protocole complémentaire. Les scénarios synthétiques des annexes sont des exemples de test, sans données personnelles réelles.
+
+Le dossier livré contient les sources LaTeX, la bibliographie et les scripts de sondes. Les figures sont des schémas techniques construits à partir de l'implémentation ou de la conception explicitement proposée. Elles ne sont pas présentées comme des captures d'un déploiement en production. Les écarts constatés sont intégrés à l'analyse critique afin de rendre le bilan vérifiable et utile à la poursuite du projet.
+
+\tableofcontents
+\clearpage
+\addcontentsline{toc}{chapter}{Liste des figures}
+\listoffigures
+\clearpage
+\addcontentsline{toc}{chapter}{Liste des tableaux}
+\listoftables
+\chapter*{Liste des abréviations}
+\markboth{Abréviations}{}
+\addcontentsline{toc}{chapter}{Liste des abréviations}
+\begingroup
+\small
+\setstretch{1.08}
+\begin{longtable}{@{}P{2.5cm}P{11.8cm}@{}}
+\toprule\textbf{Sigle} & \textbf{Signification}\\\midrule\endhead
+API & Application Programming Interface : interface de programmation.\\
+ATS & Applicant Tracking System : système de suivi des candidatures.\\
+BERT & Bidirectional Encoder Representations from Transformers.\\
+CI/CD & Intégration continue et livraison ou déploiement continu.\\
+CRUD & Création, lecture, modification et suppression.\\
+CSRF & Cross-Site Request Forgery : falsification de requête intersite.\\
+CV & Curriculum vitæ.\\
+HTTP & Hypertext Transfer Protocol.\\
+IDF & Inverse Document Frequency : fréquence documentaire inverse.\\
+JSON & JavaScript Object Notation : format d'échange de données.\\
+MVP & Minimum Viable Product : version minimale viable.\\
+NDCG & Normalized Discounted Cumulative Gain : gain cumulé actualisé normalisé.\\
+NLP / TAL & Natural Language Processing / traitement automatique du langage.\\
+OCR & Optical Character Recognition : reconnaissance optique de caractères.\\
+ORM & Object-Relational Mapping : correspondance objet-relationnel.\\
+PDF & Portable Document Format.\\
+REST & Representational State Transfer : style d'architecture d'API.\\
+SQL & Structured Query Language.\\
+TF-IDF & Term Frequency--Inverse Document Frequency.\\
+UML & Unified Modeling Language : langage de modélisation unifié.\\
+WSGI & Web Server Gateway Interface : interface serveur Python.\\
+XSS & Cross-Site Scripting : injection de script dans une page web.\\
+\bottomrule
+\end{longtable}
+\endgroup

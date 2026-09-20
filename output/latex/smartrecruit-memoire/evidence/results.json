@@ -1,0 +1,259 @@
+{
+  "php_version": "8.2.12",
+  "cases": [
+    {
+      "id": "angular_cloud_nosql",
+      "offer_text": "angular aws mongodb",
+      "cv_text": "angular aws mongodb",
+      "required": [],
+      "candidate": [],
+      "experience": 0,
+      "php": {
+        "score": 95,
+        "matched_skills": [
+          "angular",
+          "nosql",
+          "cloud"
+        ],
+        "missing_skills": [],
+        "semantic_coverage": 100,
+        "text_similarity": 100,
+        "algorithm": "tf-idf-cosine+semantic-skill-taxonomy",
+        "source": "local-php",
+        "explanation": "Très forte compatibilité, les compétences clés sont bien couvertes."
+      },
+      "python": {
+        "score": 32,
+        "matched_skills": [],
+        "missing_skills": [],
+        "text_similarity": 100,
+        "semantic_coverage": 0,
+        "algorithm": "tf-idf-cosine+semantic-skill-taxonomy",
+        "source": "python-ai"
+      }
+    },
+    {
+      "id": "alias_explicit",
+      "offer_text": "Laravel",
+      "cv_text": "PHP",
+      "required": [
+        "Laravel"
+      ],
+      "candidate": [
+        "PHP"
+      ],
+      "experience": 0,
+      "php": {
+        "score": 95,
+        "matched_skills": [
+          "php"
+        ],
+        "missing_skills": [],
+        "semantic_coverage": 100,
+        "text_similarity": 100,
+        "algorithm": "tf-idf-cosine+semantic-skill-taxonomy",
+        "source": "local-php",
+        "explanation": "Très forte compatibilité, les compétences clés sont bien couvertes."
+      },
+      "python": {
+        "score": 71,
+        "matched_skills": [
+          "php"
+        ],
+        "missing_skills": [
+          "Laravel"
+        ],
+        "text_similarity": 100,
+        "semantic_coverage": 100,
+        "algorithm": "tf-idf-cosine+semantic-skill-taxonomy",
+        "source": "python-ai"
+      }
+    },
+    {
+      "id": "worked_example",
+      "offer_text": "java react",
+      "cv_text": "java sql",
+      "required": [],
+      "candidate": [],
+      "experience": 2,
+      "php": {
+        "score": 45,
+        "matched_skills": [
+          "java"
+        ],
+        "missing_skills": [
+          "react"
+        ],
+        "semantic_coverage": 50,
+        "text_similarity": 34,
+        "algorithm": "tf-idf-cosine+semantic-skill-taxonomy",
+        "source": "local-php",
+        "explanation": "Compatibilité partielle: le profil couvre une partie du besoin."
+      },
+      "python": {
+        "score": 45,
+        "matched_skills": [
+          "java"
+        ],
+        "missing_skills": [
+          "react"
+        ],
+        "text_similarity": 34,
+        "semantic_coverage": 50,
+        "algorithm": "tf-idf-cosine+semantic-skill-taxonomy",
+        "source": "python-ai"
+      }
+    },
+    {
+      "id": "identical_java",
+      "offer_text": "java",
+      "cv_text": "java",
+      "required": [],
+      "candidate": [],
+      "experience": 0,
+      "php": {
+        "score": 95,
+        "matched_skills": [
+          "java"
+        ],
+        "missing_skills": [],
+        "semantic_coverage": 100,
+        "text_similarity": 100,
+        "algorithm": "tf-idf-cosine+semantic-skill-taxonomy",
+        "source": "local-php",
+        "explanation": "Très forte compatibilité, les compétences clés sont bien couvertes."
+      },
+      "python": {
+        "score": 100,
+        "matched_skills": [
+          "java"
+        ],
+        "missing_skills": [],
+        "text_similarity": 100,
+        "semantic_coverage": 100,
+        "algorithm": "tf-idf-cosine+semantic-skill-taxonomy",
+        "source": "python-ai"
+      }
+    },
+    {
+      "id": "unrelated",
+      "offer_text": "java react",
+      "cv_text": "python sql",
+      "required": [],
+      "candidate": [],
+      "experience": 0,
+      "php": {
+        "score": 5,
+        "matched_skills": [],
+        "missing_skills": [
+          "java",
+          "react"
+        ],
+        "semantic_coverage": 50,
+        "text_similarity": 0,
+        "algorithm": "tf-idf-cosine+semantic-skill-taxonomy",
+        "source": "local-php",
+        "explanation": "Faible compatibilité avec les exigences principales."
+      },
+      "python": {
+        "score": 5,
+        "matched_skills": [],
+        "missing_skills": [
+          "java",
+          "react"
+        ],
+        "text_similarity": 0,
+        "semantic_coverage": 50,
+        "algorithm": "tf-idf-cosine+semantic-skill-taxonomy",
+        "source": "python-ai"
+      }
+    },
+    {
+      "id": "empty",
+      "offer_text": "",
+      "cv_text": "",
+      "required": [],
+      "candidate": [],
+      "experience": 0,
+      "php": {
+        "score": 0,
+        "matched_skills": [],
+        "missing_skills": [],
+        "semantic_coverage": 0,
+        "text_similarity": 0,
+        "algorithm": "tf-idf-cosine+semantic-skill-taxonomy",
+        "source": "local-php",
+        "explanation": "Score basé surtout sur la similarité textuelle."
+      },
+      "python": {
+        "score": 0,
+        "matched_skills": [],
+        "missing_skills": [],
+        "text_similarity": 0,
+        "semantic_coverage": 0,
+        "algorithm": "tf-idf-cosine+semantic-skill-taxonomy",
+        "source": "python-ai"
+      }
+    }
+  ],
+  "age_probe": {
+    "file_name": null,
+    "text": "Age : 24 ans. Licence en informatique.",
+    "skills": [],
+    "experience_years": 24,
+    "education": "Licence",
+    "metadata": {
+      "emails": [],
+      "phones": [],
+      "detected_skills": []
+    },
+    "extraction_unreliable": false
+  },
+  "punctuation_probe": [],
+  "token_probe": [
+    "react.javascript"
+  ],
+  "python_version": "3.12.3",
+  "date_utc": "2026-09-11T02:01:16.249620+00:00",
+  "scope": "Synthetic local probes, no database, no external HTTP calls",
+  "python_punctuation_probe": [],
+  "python_token_probe": [
+    "react.javascript"
+  ],
+  "invalid_pdf": {
+    "input_bytes": 173,
+    "http_status": 200,
+    "text_length": 173
+  },
+  "invalid_payloads": [
+    {
+      "input": {
+        "offer_text": 5
+      },
+      "http_status": 500
+    },
+    {
+      "input": {
+        "required_skills": "java"
+      },
+      "http_status": 500
+    },
+    {
+      "input": [
+        "java"
+      ],
+      "http_status": 500
+    }
+  ],
+  "sha256": {
+    "app/Support/SemanticMatcher.php": "4e7e128eddab0b62af3c575ab61ecb3fc30d4de428f6d2799a1a6924e984bba8",
+    "app/Support/CvParser.php": "65274bb7f19e9d9cc10dc4132fdc0bed748b55e22d5a6240044087c159f28806",
+    "app/Support/AiClient.php": "7617a8f5636857049729d8c923510184671c5e38ed462ed8615cb20a3e1a6ab6",
+    "config/smart_recruit.php": "3b70a9501174b8464aab782adb1b53918a580812715c16bd82119b7e206feb3b",
+    "ai-service/app.py": "b0c4a794595d5e354469a5bbbad2949f712b45eb292a900fc311167d2e58c5b5",
+    "routes/web.php": "a3b92ee66ed163919392ad1e07d2fd6b4003f5ebe05a48690bb9b322c30eeeeb",
+    "app/Support/SqlStore.php": "8e5ccfc75b2d433325ba18813c30b8669dfe526a3cbc59567c42ef4360d84064",
+    "app/Support/DemoStore.php": "98d4c6a6ccd6c4cb1a602896589f59b501255c96b33fd0d779558db67a2e5a62",
+    "server.php": "505a397a581524b526a7599b3738516c2768b121d043c6d3c2971d847c9d9b15"
+  }
+}

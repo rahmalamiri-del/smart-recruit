@@ -1,0 +1,126 @@
+{
+  "date": "2026-09-13",
+  "scope": "Read-only hashes of report-related code; not an execution of historical probes.",
+  "files": {
+    "ai-service/app.py": {
+      "sha256": "a1db9378b5c9e2afa0108f1e88821767503cbb9f71475a388a49dd477eea523c",
+      "matches_historical_2026_09_11": false
+    },
+    "app/Support/AiClient.php": {
+      "sha256": "95943a60e7c71d8f4d960e6a8623526fc3691aa87f75d15df31a6e84070f9996",
+      "matches_historical_2026_09_11": false
+    },
+    "app/Support/CvParser.php": {
+      "sha256": "65274bb7f19e9d9cc10dc4132fdc0bed748b55e22d5a6240044087c159f28806",
+      "matches_historical_2026_09_11": true
+    },
+    "app/Support/DemoStore.php": {
+      "sha256": "fc87e2c4b7d93800614c34727860d5e47edd6d087e4270ab6b4936856ba6c8f0",
+      "matches_historical_2026_09_11": false
+    },
+    "app/Support/SemanticMatcher.php": {
+      "sha256": "4e7e128eddab0b62af3c575ab61ecb3fc30d4de428f6d2799a1a6924e984bba8",
+      "matches_historical_2026_09_11": true
+    },
+    "app/Support/SqlStore.php": {
+      "sha256": "51f0b3cbb2c7dd3bc346a33044cf6e055bfd5182f3ac5e5b58d179569167e0ad",
+      "matches_historical_2026_09_11": false
+    },
+    "config/smart_recruit.php": {
+      "sha256": "1ff3e45a35d93bfaf1810a6b30ccddb7b46840c8061b8c7d7207a60e400738c5",
+      "matches_historical_2026_09_11": false
+    },
+    "database/migrations/2026_05_27_000001_create_smart_recruit_tables.php": {
+      "sha256": "b7e6d64675f7d1d78c15f436bdc141710cfaf230c2f0791af88bed2e40005cb5"
+    },
+    "database/migrations/2026_09_11_000001_add_soft_deletes.php": {
+      "sha256": "2c583100fab96b3357327576f1f6faac1da1b2b1ecadaf5896d0e215ed0ed190"
+    },
+    "database/migrations/2026_09_11_000002_increase_deleted_at_precision.php": {
+      "sha256": "fd0e03e7f0492f7c91cf9eff52801528d6e08203209edfe2684a794dea16aaf6"
+    },
+    "resources/views/admin/applications.blade.php": {
+      "sha256": "fb0d5c598b0fd7b34099c032b81f4cca8526a4bbc7e194b085db45303f91fe72"
+    },
+    "resources/views/admin/confirm.blade.php": {
+      "sha256": "6735348c991fe775e8380d285b7b2864d4284aa247ac39e59ee525e0cc73f842"
+    },
+    "resources/views/admin/index.blade.php": {
+      "sha256": "662ad20d307b0eefd0e54b159dbaad56567cd9877556634eaedd1e3603b988cf"
+    },
+    "resources/views/admin/users/form.blade.php": {
+      "sha256": "d17f58ff5f041d161d7a1647f4d9e82499b0645deb607c80668182f8cc94155e"
+    },
+    "resources/views/admin/users/index.blade.php": {
+      "sha256": "b554c85ddd6b0fc46625475067338d5fabdd4b459d87c6d687098f1e3ea89a16"
+    },
+    "resources/views/auth/login.blade.php": {
+      "sha256": "bd781c576a673c618f2e12a349b4049268060a3c95f75db901c4d6332b7b0a33"
+    },
+    "resources/views/auth/register.blade.php": {
+      "sha256": "924f99ab128729474416330333d73d469993810ed0e8e61b7d7c01d0a932cef4"
+    },
+    "resources/views/dashboard/admin.blade.php": {
+      "sha256": "b6fa8958d9a03c81c838155319561f5085508b6206c23e77acfd61a832ecb017"
+    },
+    "resources/views/dashboard/guest.blade.php": {
+      "sha256": "af49310915d9e6c97eeea7d94a93bb68083cb203483a4f57945edc490b7dac02"
+    },
+    "resources/views/dashboard/recruiter.blade.php": {
+      "sha256": "efcb0697257ade0732f558c05e94ab223d25a53d0b0317a4907f0ec5fc1d6eaa"
+    },
+    "resources/views/dashboard/student.blade.php": {
+      "sha256": "ed0e42ddb01d767ec44b6b9ef96d30ec013c5859d0f746758acc32557b19505d"
+    },
+    "resources/views/layout.blade.php": {
+      "sha256": "f5bdc559221f5bde8e0e72910b73252d2273f3e3c47e39c43566ae6e8b661812"
+    },
+    "resources/views/offers/create.blade.php": {
+      "sha256": "ef0d7f4e9be879643640913ed091dbc429bd78c10992d29a18b474bc005aab5c"
+    },
+    "resources/views/offers/edit.blade.php": {
+      "sha256": "8086a7286569fec6ee0a1cb246fac5f826d78353f11fdfc550e5b2d2bbf8c36a"
+    },
+    "resources/views/offers/index.blade.php": {
+      "sha256": "3a306beb39939081f2f31d108275f57d84e55cf72b0eda6768cb6b6681e27fb0"
+    },
+    "resources/views/offers/show.blade.php": {
+      "sha256": "e14b3ff8d0cb396bbb36d6dbb4776b23ca57e11b6fd0641e3daee5270536c51e"
+    },
+    "resources/views/partials/icon.blade.php": {
+      "sha256": "31887c36c3c283c50ab65f5a014574233ed3ccdc9a3cafad454c63d821eeb83f"
+    },
+    "resources/views/partials/logo.blade.php": {
+      "sha256": "21a6bb23c42a467762ea78606a78f11d7737c82900e02417b828250c9b48fbe3"
+    },
+    "resources/views/partials/logout.blade.php": {
+      "sha256": "6797544f72b46c2401bd51bef84140a4b51b3ee21cdff1419bafc77654ce7e09"
+    },
+    "resources/views/partials/main.blade.php": {
+      "sha256": "e8f2345ea487624f56420a7b6001972cec09dde2df71eca833a75e1775f05aa7"
+    },
+    "resources/views/partials/navigation.blade.php": {
+      "sha256": "c78fe279aa2e2806f9ae1fbbb609222722564bcf0a71d53ceff5ebee5fd53730"
+    },
+    "resources/views/students/create.blade.php": {
+      "sha256": "6c8c35bde4d7cb7a86d4dbe197920ed6bacdd87b0ec4bf01c963fed29a241ed4"
+    },
+    "resources/views/students/edit.blade.php": {
+      "sha256": "73a788258b364e96dbff39251439e826b10f84867f772345af66dfa76c4657d8"
+    },
+    "resources/views/students/index.blade.php": {
+      "sha256": "c31bcd815cba6e650ed865e335d49ea19a453faf29cae27c3d9ec76424f370e4"
+    },
+    "resources/views/students/show.blade.php": {
+      "sha256": "f68056a041bfb15b9c043c937bfb55bb5cd6cf329355fcb62dfa8b83d7f98f4d"
+    },
+    "routes/web.php": {
+      "sha256": "22c03260747259f4a3268ce950e5d93d1ea7544dad17a7ca0fb93d51546a1fd1",
+      "matches_historical_2026_09_11": false
+    },
+    "server.php": {
+      "sha256": "505a397a581524b526a7599b3738516c2768b121d043c6d3c2971d847c9d9b15",
+      "matches_historical_2026_09_11": true
+    }
+  }
+}

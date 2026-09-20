@@ -1,0 +1,30 @@
+{
+    "name": "smartbs/smart-recruit",
+    "type": "project",
+    "description": "Plateforme de recrutement intelligente étudiants-entreprises avec scoring sémantique.",
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "SmartRecruit\\": "app/"
+        }
+    },
+    "scripts": {
+        "serve": "php -S 127.0.0.1:8088 -t . server.php",
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ]
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    }
+}

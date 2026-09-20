@@ -1,0 +1,161 @@
+\chapter{Analyse et spécification des besoins}
+\label{chap:besoins}
+
+Ce chapitre établit le contrat fonctionnel de SmartRecruit et les conditions dans lesquelles son fonctionnement peut être évalué. Le projet porte sur la mise en relation d'étudiants et de recruteurs, avec une assistance au rapprochement entre les profils et les offres. Il est présenté dans le cadre du mémoire de Master en Développement Logiciel de Rahma Amiri à l'Institut Supérieur d'Informatique de Tunis El Manar, associé à un stage chez Best Solutions du 2 mars au 2 juillet 2026, sous l'encadrement professionnel de Hammami Houssem. Ces éléments situent le travail ; ils ne permettent pas, à eux seuls, de reconstituer des entretiens, des décisions d'entreprise ou un historique de développement.
+
+La spécification repose donc sur les parcours visibles dans le dépôt, les contrôles des routes, le modèle de données et la documentation disponible. Elle distingue systématiquement trois catégories : une capacité effectivement présente, une exigence nécessaire pour rendre cette capacité fiable et une évolution proposée. Un critère d'acceptation exprime un résultat à vérifier ; sa présence dans ce chapitre ne constitue pas une preuve de réussite d'un test.
+
+\section{Problématique et périmètre fonctionnel}
+
+Un dossier de candidature réunit des informations structurées, comme une adresse électronique ou une liste de compétences, et un document largement non structuré, le curriculum vitæ. De son côté, une offre décrit un poste ou un stage au moyen d'un intitulé, d'un texte libre et de compétences recherchées. Le rapprochement de ces informations exige de reconnaître certaines variantes de vocabulaire et de rendre les résultats comparables. Une simple liste chronologique de candidatures ne répond pas à ce besoin d'orientation.
+
+SmartRecruit organise cette relation autour de quatre objets métier : le compte, le profil étudiant, l'offre et la candidature. L'analyse du CV complète le profil ; le calcul de compatibilité relie un profil à une offre ; le suivi de candidature représente une démarche explicite de l'étudiant. Cette dernière distinction est essentielle. Un profil peut être recommandé pour une offre sans avoir candidaté. Le classement proposé au recruteur ne doit donc pas être présenté comme une liste de personnes ayant manifesté leur intérêt lorsque le calcul porte sur l'ensemble du vivier.
+
+Le périmètre du MVP comprend l'inscription d'étudiants et de recruteurs, l'authentification par mot de passe, la modification des profils, le dépôt de CV, la création et la modification d'offres, la candidature en un clic, le classement des profils et le changement d'état des candidatures. Les interfaces affichent des informations adaptées au rôle connecté. Le projet comporte également une vue d'administration et un point de diagnostic de la communication avec le service Python.
+
+Le périmètre ne comprend pas une chaîne complète de recrutement jusqu'à la contractualisation. Aucun module de visioconférence, de messagerie entre utilisateurs, de calendrier d'entretiens, de notification automatique ou de signature n'est établi par le code étudié. L'état \code{interview} représente une catégorie de suivi, pas une réservation de rendez-vous. De même, une valeur numérique de compatibilité constitue une aide à l'examen des dossiers ; elle ne démontre ni la qualité future du travail d'une personne ni la probabilité de réussite de son recrutement.
+
+\section{Acteurs et responsabilités}
+
+L'acteur principal du parcours candidat est l'étudiant. Il crée un compte, décrit son profil, apporte son CV, consulte les offres publiées et suit ses candidatures. Le recruteur constitue l'autre acteur principal : il publie des offres, consulte les profils accessibles, examine les classements et renseigne les états de candidature associés à ses offres. L'administrateur dispose d'une visibilité plus large et peut intervenir sur les profils et les offres. Le visiteur accède à l'accueil et aux formulaires d'entrée dans le système.
+
+Le service d'analyse Python intervient comme système secondaire sollicité par l'application. Il n'est pas un utilisateur authentifié de l'interface et ne décide pas de l'autorisation d'une opération métier. La base de données et le stockage de fichiers sont, quant à eux, des moyens internes de persistance. Cette séparation permet de ne pas confondre les droits d'une personne, les échanges entre applications et la localisation physique des informations.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Responsabilités principales des acteurs}
+\label{tab:acteurs-besoins}
+\begin{tabularx}{\textwidth}{@{}P{0.19\textwidth}XX@{}}
+\toprule
+Acteur & Actions attendues & Limite de responsabilité \\
+\midrule
+Étudiant & Compléter son profil et candidater. & Ne pas modifier un autre profil. \\
+Recruteur & Gérer ses offres et leur suivi. & Ne pas décider pour les offres d'un autre recruteur. \\
+Administrateur & Consulter la synthèse et gérer les objets autorisés. & Ne pas confondre administration et validation du score. \\
+Visiteur & Consulter l'accueil, s'inscrire, se connecter. & Aucun accès implicite aux opérations protégées. \\
+Service Python & Extraire du texte et calculer un rapprochement. & Aucun accès direct aux décisions métier. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+La figure~\ref{fig:usecases-besoins} présente les interactions principales. La notation UML facilite la distinction entre acteurs et services rendus par le système~\cite{omg-uml}. Ce diagramme constitue une vue synthétique ; les contrôles portant sur la propriété d'un objet, les erreurs de validation et les conséquences d'une indisponibilité sont détaillés dans les scénarios suivants.
+
+\begin{figure}[htbp]
+\centering
+\input{figures/usecases.tex}
+\caption{Vue synthétique des cas d'utilisation de SmartRecruit}
+\label{fig:usecases-besoins}
+\end{figure}
+
+\section{Spécification des cas d'utilisation}
+
+\subsection{UC01 : créer un compte et ouvrir une session}
+
+\textbf{Préconditions.} L'utilisateur n'a pas besoin d'être connecté pour accéder à l'inscription. La base SQL doit être disponible, car les routes d'inscription et de connexion refusent ces opérations lorsque ce stockage est inaccessible. L'inscription publique accepte les rôles étudiant et recruteur ; elle ne propose pas de créer un administrateur.
+
+\textbf{Scénario nominal.} L'utilisateur choisit son rôle, fournit son identité de connexion, renseigne les informations requises pour son type de profil et confirme son mot de passe. Laravel vérifie les champs, notamment le format et l'unicité de l'adresse électronique, la longueur minimale du mot de passe et sa confirmation. Le compte et le profil associé sont créés ensemble dans une transaction. Le système place ensuite les informations nécessaires dans la session et présente le tableau de bord du rôle retenu. Lors d'une connexion ultérieure, il recherche le compte puis vérifie le mot de passe à partir de son empreinte.
+
+\textbf{Alternatives et postconditions.} Un formulaire invalide ne doit pas créer de compte partiel. Une adresse déjà utilisée doit produire une erreur exploitable, sans attribuer le compte existant à une nouvelle personne. Une connexion échouée conserve un message générique. La session ouverte identifie un seul utilisateur et son rôle. Les routes actuelles limitent la fréquence des demandes de connexion et d'inscription ; la régénération de l'identifiant de session et l'invalidation complète à la déconnexion restent des exigences de durcissement, conformément aux recommandations relatives aux sessions~\cite{owasp-session}.
+
+\subsection{UC02 : compléter le profil et déposer un CV}
+
+\textbf{Préconditions.} L'étudiant est connecté et agit sur le profil associé à son compte. L'administrateur dispose d'un parcours distinct pour créer ou modifier un profil. Un recruteur peut consulter les profils accessibles, mais ne bénéficie pas de l'autorisation de les modifier.
+
+\textbf{Scénario nominal.} L'étudiant renseigne un intitulé, sa formation, son expérience, ses compétences et, éventuellement, des liens professionnels. Il fournit un fichier ou du texte de CV. Le formulaire vérifie les types et les longueurs ; les formats annoncés par la validation sont PDF, TXT et Markdown, avec une limite de 4~Mo. Le parseur tente d'extraire le texte et des informations utiles. Les compétences déclarées et détectées peuvent être combinées, puis le profil est enregistré avec ses métadonnées. La page de détail permet de relire le résultat et de corriger les informations.
+
+\textbf{Alternatives et postconditions.} Un document peu lisible ne doit pas être transformé silencieusement en profil complet. Le code prévoit un avertissement lorsque l'extraction paraît insuffisante et invite à compléter le texte manuellement. Cette possibilité est indispensable pour un PDF composé d'images, puisque l'OCR n'est pas établi dans le MVP. Le contrôle du type MIME et de la taille constitue une première barrière, mais ne garantit pas, à lui seul, un traitement sûr de tout document~\cite{owasp-upload}. La postcondition attendue est un profil cohérent avec les informations réellement conservées, accompagné d'un état explicite de l'extraction.
+
+\subsection{UC03 : publier et maintenir une offre}
+
+\textbf{Préconditions.} Le recruteur ou l'administrateur est connecté. Pour une modification par un recruteur, l'offre doit appartenir à ce compte. L'offre comprend au minimum un intitulé, une entreprise et une description ; les compétences recherchées peuvent être saisies séparément.
+
+\textbf{Scénario nominal.} L'acteur complète le formulaire, soumet les informations et reçoit la confirmation de création. Dans l'état actuel, une offre nouvelle est publiée par défaut. Le formulaire de modification permet ensuite de choisir un état parmi \code{draft}, \code{published} et \code{closed}. Le recruteur retrouve ses offres dans une liste filtrable par état et peut isoler celles qui ont reçu des candidatures. Les étudiants disposent d'une liste limitée aux offres publiées.
+
+\textbf{Alternatives et postconditions.} Une offre inexistante donne lieu à une réponse d'absence ; la tentative de modification d'une offre appartenant à un autre recruteur est refusée. Une validation incorrecte préserve les données déjà enregistrées. La fermeture d'une offre doit signifier qu'aucune nouvelle candidature ne peut être reçue. Cette dernière règle constitue une exigence à compléter : le contrôle existe pour la consultation d'une offre par un étudiant, mais la route de candidature ne revalide pas explicitement son état.
+
+\subsection{UC04 : candidater à une offre}
+
+\textbf{Préconditions.} L'étudiant possède une session et un profil valides. L'offre existe et, selon la règle métier attendue, son état est publié. La candidature désigne le profil de la session ; son identité ne doit pas être choisie librement dans une valeur envoyée par le navigateur.
+
+\textbf{Scénario nominal.} L'étudiant ouvre une offre, déclenche l'action de candidature et reçoit un message de confirmation. Le système relie l'offre au profil, affecte l'état initial \code{submitted} et enregistre la date de candidature. Le tableau de bord étudiant permet ensuite de retrouver cette démarche et son état. Le dépôt d'un nouveau CV relève du parcours de mise à jour du profil ; aucun formulaire distinct de candidature avec création simultanée de profil ne doit être supposé sur la base d'une ancienne description documentaire.
+
+\textbf{Alternatives et postconditions.} Une seconde demande concernant le même couple doit rester sans effet sur le nombre de candidatures. Le stockage SQL possède une contrainte unique pour ce couple et la méthode de candidature vérifie préalablement son existence. Cependant, deux requêtes simultanées peuvent franchir cette vérification ; il reste nécessaire de convertir le conflit SQL en réponse métier stable. Après réussite, une candidature unique relie les deux objets, sans modifier l'identité du candidat ni les caractéristiques de l'offre.
+
+\subsection{UC05 : examiner un classement explicable}
+
+\textbf{Préconditions.} Le recruteur consulte une offre qui lui appartient, ou l'administrateur ouvre une offre accessible. Des profils sont disponibles. Une candidature préalable n'est pas nécessaire au calcul d'une recommandation, puisque les classements actuels peuvent porter sur tout le vivier.
+
+\textbf{Scénario nominal.} Le système rapproche la description de l'offre et chaque profil, attribue un score, produit des listes de compétences reconnues ou manquantes, puis trie les résultats. Il utilise le service Python lorsqu'il obtient une réponse exploitable ; sinon, le moteur PHP fournit un résultat local. Les recommandations d'offres à destination des étudiants suivent le raisonnement symétrique : un profil est comparé aux offres publiées.
+
+\textbf{Alternatives et postconditions.} Une indisponibilité du service ne doit pas provoquer une présentation trompeuse de l'origine du calcul. Le classement doit identifier la méthode utilisée et distinguer un texte inexploitable d'une faible compatibilité réellement calculée. L'absence de compétences détectées ne prouve pas leur absence chez la personne. Dans le MVP, un score peut être enregistré lorsqu'une candidature existe et provoquer une présélection automatique. L'exigence cible consiste à séparer cette assistance de la décision humaine et à rendre toute transition automatique explicite et traçable.
+
+\subsection{UC06 : suivre et qualifier une candidature}
+
+\textbf{Préconditions.} La candidature existe. Le recruteur est propriétaire de l'offre associée, ou l'acteur est administrateur. L'état demandé appartient à la liste reconnue : soumise, présélectionnée, entretien ou rejetée.
+
+\textbf{Scénario nominal.} Le recruteur examine le dossier et son explication de score, choisit l'état approprié et soumet sa décision. Le système contrôle le rôle, l'appartenance de l'offre et la valeur demandée, puis actualise la candidature. L'étudiant retrouve cet état dans son espace. Le terme présélection signifie une étape intermédiaire ; aucun état de recrutement définitif n'existe dans le schéma étudié.
+
+\textbf{Alternatives et postconditions.} Une tentative sur la candidature d'un autre recruteur est refusée. Une valeur non reconnue est rejetée. La conception cible devra aussi définir les transitions autorisées entre états et conserver l'auteur, la date et la raison éventuelle d'un changement. Le code actuel valide une liste de valeurs, sans machine à états ni journal des décisions ; l'historique complet ne peut donc pas être présenté comme une fonctionnalité acquise.
+
+\section{Exigences identifiées et critères d'acceptation}
+
+Les exigences du tableau~\ref{tab:exigences-fonctionnelles} servent de repères pour relier les parcours, la conception et une future campagne de tests. Le mot attendu désigne une obligation de résultat à vérifier. Une fonctionnalité visible peut satisfaire une partie du critère sans satisfaire ses cas limites, notamment en présence de concurrence, d'un fichier inattendu ou d'un service indisponible.
+
+\begin{longtable}{@{}P{0.13\textwidth}P{0.30\textwidth}P{0.50\textwidth}@{}}
+\caption{Exigences fonctionnelles et observations vérifiables}\label{tab:exigences-fonctionnelles}\\
+\toprule
+Identifiant & Exigence & Critère d'acceptation attendu \\
+\midrule
+\endfirsthead
+\toprule
+Identifiant & Exigence & Critère d'acceptation attendu \\
+\midrule
+\endhead
+EF01 & Authentifier les comptes. & Des identifiants valides ouvrent le bon espace ; les identifiants invalides sont refusés. \\
+EF02 & Limiter les modifications au propriétaire. & Un étudiant ne peut modifier un autre profil ; un recruteur ne peut modifier une offre tierce. \\
+EF03 & Permettre la correction du CV. & Les champs corrigés sont restitués après sauvegarde ; une extraction insuffisante est signalée. \\
+EF04 & Gérer la publication. & Une offre fermée ou en brouillon ne reçoit aucune nouvelle candidature étudiante. \\
+EF05 & Assurer l'unicité des candidatures. & Deux soumissions, même simultanées, conservent un seul couple offre/profil. \\
+EF06 & Expliquer les rapprochements. & Le résultat indique un score, les éléments de rapprochement et la source du calcul. \\
+EF07 & Contrôler le suivi. & Seul un acteur habilité change l'état ; une valeur inconnue est refusée. \\
+EF08 & Distinguer vivier et candidatures. & L'interface permet d'identifier si un profil classé a effectivement candidaté. \\
+\bottomrule
+\end{longtable}
+
+Les exigences non fonctionnelles concernent d'abord la confidentialité des CV et l'intégrité des décisions. Une route protégée par rôle ne suffit pas lorsque l'opération vise un objet individuel : il faut aussi vérifier le droit sur cet objet. La validation serveur doit s'appliquer à chaque entrée, même si le formulaire la contrôle déjà dans le navigateur~\cite{laravel-validation}. Les fichiers doivent disposer de règles d'accès et d'un cycle de conservation cohérents avec les profils auxquels ils se rapportent.
+
+La disponibilité doit être définie par fonction. Un moteur de score local peut maintenir une aide au classement en cas de panne Python. En revanche, une bascule automatique de MySQL vers un fichier de démonstration ne garantit pas la continuité des données métier. L'exigence cible est de rendre cette indisponibilité explicite et de ne confirmer une écriture que dans le stockage de référence. Elle ne se confond pas avec l'objectif pédagogique de lancer facilement une démonstration.
+
+La performance doit être mesurée sur un volume décrit de profils, d'offres et de documents, avec une configuration matérielle connue. Aucun temps de réponse garanti n'est déduit du dépôt. Les critères à construire portent sur la durée de l'extraction, la latence d'un classement et le nombre de requêtes par page. La maintenabilité sera appréciée par la séparation des responsabilités, la stabilité des contrats entre PHP et Python et la possibilité de tester les règles sans lancer tout le système.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Exigences de qualité à vérifier lors de la consolidation}
+\label{tab:exigences-qualite}
+\begin{tabularx}{\textwidth}{@{}P{0.13\textwidth}P{0.25\textwidth}X@{}}
+\toprule
+Identifiant & Qualité attendue & Critère d'acceptation proposé \\
+\midrule
+ENF01 & Confidentialité & Une demande sans autorisation ne permet pas d'obtenir un document privé. \\
+ENF02 & Intégrité & Une modification interrompue ne laisse pas un profil partiellement mis à jour. \\
+ENF03 & Disponibilité maîtrisée & Une panne SQL est annoncée ; aucune écriture métier n'est confirmée dans un stockage de démonstration. \\
+ENF04 & Diagnostic & Un échec réseau est distingué d'un document dont le texte est inexploitable. \\
+ENF05 & Performance mesurable & Chaque mesure précise volume, configuration, méthode et distribution des durées observées. \\
+ENF06 & Reproductibilité & Des entrées identiques et une même version de moteur donnent un résultat vérifiable. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Le tableau~\ref{tab:exigences-qualite} complète les exigences fonctionnelles sans attribuer au prototype des garanties non mesurées. Il permet de préparer des essais d'échec et de reprise, au même titre que les parcours nominaux. Les seuils quantitatifs de performance restent à fixer à partir d'un contexte d'utilisation explicite et d'une première mesure reproductible.
+
+\section{Contraintes, priorités et démarche rétrospective}
+
+Le projet utilise PHP et Laravel pour l'application, Python pour l'analyse, MySQL pour la persistance principale et Blade pour les vues. Ces choix constituent des contraintes de continuité : une évolution doit préserver les parcours existants et éviter de disperser davantage les règles. Le délai de stage fixe par ailleurs un cadre académique borné. Il justifie un MVP démontrable, mais pas la présentation comme achevées de fonctions absentes ou d'essais non documentés.
+
+La priorité de consolidation porte sur les règles qui empêchent une action incorrecte : accès aux objets, état d'une offre au moment de candidater, unicité en concurrence, cohérence d'une modification de profil et séparation entre score et décision. Viennent ensuite la qualité de l'information extraite et la maîtrise du coût des classements. L'introduction d'un modèle linguistique plus complexe appartient aux évolutions possibles ; elle ne résout pas ces questions de fonctionnement et de traçabilité.
+
+La démarche présentée ici est rétrospective. Elle ne prétend pas reconstituer des sprints, des réunions ou des validations par l'entreprise dont aucune trace n'a été examinée. Elle organise les éléments disponibles en quatre ensembles de travail : identification des parcours, formalisation des règles, confrontation avec le code et définition des écarts à vérifier. Pour chaque exigence, un lien peut ainsi être établi avec un cas d'utilisation, un composant technique et un scénario de contrôle. Cette organisation rend le mémoire exploitable même lorsque l'historique détaillé des décisions n'est pas disponible.
+
+Le chapitre suivant traduit ces besoins en structures applicatives et en relations de données. Il décrit d'abord l'architecture réellement présente, puis formule une architecture cible. Cette distinction garantit que les choix proposés restent évaluables et que la conception ne masque pas les limites observées du MVP.

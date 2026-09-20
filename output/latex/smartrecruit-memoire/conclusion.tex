@@ -1,0 +1,14 @@
+\chapter*{Conclusion générale}
+\markboth{Conclusion générale}{}
+\addcontentsline{toc}{chapter}{Conclusion générale}
+SmartRecruit structure la mise en relation entre étudiants et entreprises. Le prototype réunit profils, CV, offres et candidatures dans une application qui fournit un classement accompagné d'indicateurs sur les compétences. Le projet articule ainsi développement web, stockage relationnel, extraction de texte et recherche d'information au sein d'un même parcours utilisateur.
+
+L'architecture associe Laravel, Blade, MySQL et un service Python. La séparation du traitement de texte facilite l'évolution du moteur, tandis que le calcul PHP fournit un chemin de secours. La représentation par compétences, TF-IDF et catégories rend le score inspectable. Ces choix permettent d'expliquer les étapes du rapprochement et de construire un protocole de comparaison.
+
+L'évaluation nuance ce bilan. Les deux implémentations du moteur ne sont pas équivalentes : leurs dictionnaires et pondérations modifient les résultats. Le parsing peut interpréter des informations hors contexte ou accepter du contenu inexploitable. Le stockage JSON ne garantit pas la cohérence avec MySQL. Enfin, la configuration de lancement et les opérations de démonstration doivent être isolées du fonctionnement destiné à de vrais utilisateurs.
+
+Ces limites touchent la confiance accordée au résultat. Un score de matching indique une proximité entre des informations disponibles ; il ne mesure ni la valeur d'une personne ni sa réussite future. La présélection doit rester interprétable, contestable et soumise à une appréciation humaine des éléments professionnels pertinents.
+
+La poursuite du projet doit commencer par le déploiement et l'intégrité des données, puis unifier le contrat de matching et transformer les sondes en tests de régression. Un corpus annoté permettra ensuite de comparer la méthode actuelle à des encodeurs de phrases adaptés au français. L'OCR et les traitements asynchrones seront évalués selon des critères explicites.
+
+Le mémoire fournit une réalisation documentée et une méthode de progression. L'articulation entre conception, preuve et réflexion critique constitue l'apport central de ce travail dans le cadre du Master Développement Logiciel.

@@ -1,0 +1,131 @@
+\chapter{Conception et architecture de la solution}
+\label{chap:conception}
+
+La conception de SmartRecruit doit répondre à deux questions complémentaires : comment les fonctions du MVP sont-elles réparties dans le système existant, et quelles modifications rendraient cette organisation plus fiable ? Le présent chapitre décrit d'abord les composants et les structures effectivement présents dans le dépôt. Il expose ensuite les écarts entre les règles métier du chapitre~\ref{chap:besoins} et les garanties techniques actuelles. Les éléments qualifiés de cibles ou de propositions ne correspondent pas à des développements déjà réalisés.
+
+\section{Architecture générale observée}
+
+L'application comporte trois ensembles principaux : un serveur Laravel, un service Python et une base MySQL. Le navigateur communique avec Laravel pour consulter les pages et soumettre les formulaires. Laravel gère la session, contrôle les rôles, valide les entrées, accède aux données et prépare les vues Blade. Il appelle le service Python pour certaines opérations d'extraction et de rapprochement. Python retourne des résultats de calcul ; il ne manipule pas directement les comptes ou les candidatures en base.
+
+Cette organisation introduit une frontière de service claire pour l'analyse de documents, mais ne constitue pas un découpage de tout le domaine métier en microservices. Le recrutement reste concentré dans une application Laravel. Il est donc plus exact de décrire un noyau applicatif avec un service spécialisé que d'attribuer au projet toutes les propriétés d'une architecture de microservices. La littérature souligne que la séparation en services implique aussi des responsabilités d'exploitation et des contrats entre composants, au-delà de l'utilisation de processus distincts~\cite{fowler2014}.
+
+La figure~\ref{fig:architecture-conception} situe les flux et les principaux stockages. Les CV sont conservés dans un répertoire de fichiers, tandis que leurs références et informations d'analyse sont enregistrées en base. Le fichier JSON de démonstration représente une solution de repli présente dans le code. Il doit être distingué de MySQL, car les deux supports ne forment ni une réplication ni un système de synchronisation bidirectionnelle.
+
+\begin{figure}[htbp]
+\centering
+\input{figures/architecture.tex}
+\caption{Architecture applicative observée et échanges entre composants}
+\label{fig:architecture-conception}
+\end{figure}
+
+Le fichier de composition Docker déclare les services web, IA et MySQL, leur réseau et les volumes nécessaires. Il fournit une description de lancement distribuée et reproductible en principe~\cite{docker-compose}. Son existence ne prouve toutefois pas que le déploiement a été exécuté avec succès dans l'environnement étudié. Les contrôles de disponibilité, les sauvegardes, les paramètres de production et la gestion des secrets doivent être examinés séparément ; ils ne sont pas déduits d'un diagramme d'architecture.
+
+\section{Organisation du noyau Laravel}
+
+Les routes et une partie importante de l'orchestration métier sont réunies dans \path{routes/web.php}. Les fonctions auxiliaires sélectionnent le stockage, construisent les textes de comparaison, calculent les classements et fournissent l'utilisateur courant. Des fermetures de routes enchaînent validation, contrôle d'appartenance, appel aux classes de support et création de la réponse. Laravel autorise cette forme de définition des routes~\cite{laravel-routing} ; le choix devient cependant plus coûteux à maintenir lorsque les mêmes règles interviennent dans plusieurs parcours.
+
+La classe \code{SqlStore} regroupe les accès relationnels et convertit les lignes SQL en tableaux utilisés par les vues. Le projet emploie le constructeur de requêtes Laravel plutôt qu'un ensemble de modèles Eloquent représentant les entités. \code{DemoStore} propose des opérations proches sur un document JSON. Aucune interface commune explicite ne formalise leur contrat, et certaines fonctions, comme l'inscription ou la sauvegarde des scores, ne sont pas disponibles sur les deux supports. Le code appelant teste parfois la présence d'une méthode avant de l'utiliser.
+
+Les autres classes de support ont des responsabilités plus spécialisées. \code{CvParser} coordonne l'extraction et construit les informations du profil. \code{AiClient} encapsule les appels au service Python. \code{SemanticMatcher} fournit le calcul local. Le middleware \code{EnsureRole} vérifie que le rôle de session appartient à la liste autorisée ; les contrôles concernant le propriétaire d'une offre ou d'un profil sont ensuite exécutés dans les routes. Cette répartition donne un point d'entrée identifiable à chaque responsabilité, tout en laissant plusieurs décisions transversales dispersées.
+
+L'identité est stockée dans une valeur de session propre au projet. Elle comprend le rôle et, pour un étudiant, l'identifiant public du profil. Les routes ne doivent donc jamais assimiler la possession d'une session à un droit sur tous les objets. L'étudiant peut atteindre son propre profil, tandis qu'un recruteur est limité à ses offres pour leur modification et la qualification de leurs candidatures. La consultation du vivier est plus large : elle correspond à une fonctionnalité distincte, dont la politique de visibilité doit être assumée explicitement.
+
+\section{Modèle relationnel et cardinalités}
+
+\subsection{Entités persistées}
+
+La migration principale définit sept tables préfixées par \code{sr_}. Le tableau~\ref{tab:entites-conception} décrit leur rôle sans reproduire de données de comptes ou de CV. Les clés numériques assurent les jointures internes ; les identifiants publics sont utilisés dans les échanges applicatifs pour plusieurs entités. L'existence d'un identifiant public distinct ne constitue pas un contrôle d'accès : l'autorisation reste requise pour chaque opération.
+
+\begin{longtable}{@{}P{0.27\textwidth}P{0.30\textwidth}P{0.36\textwidth}@{}}
+\caption{Tables du modèle relationnel existant}\label{tab:entites-conception}\\
+\toprule
+Table & Responsabilité & Informations principales \\
+\midrule
+\endfirsthead
+\toprule
+Table & Responsabilité & Informations principales \\
+\midrule
+\endhead
+\code{sr_users} & Identité de connexion. & Identifiant public, nom, adresse électronique unique, rôle, empreinte du mot de passe. \\
+\code{sr_student_profiles} & Description du candidat. & Référence utilisateur, formation, expérience, compétences, texte CV, métadonnées. \\
+\code{sr_recruiter_profiles} & Contexte du recruteur. & Référence utilisateur, entreprise, fonction et site. \\
+\code{sr_cv_documents} & Référence des documents. & Profil étudiant, nom, chemin, type, taille et résultat du parseur. \\
+\code{sr_offers} & Description du besoin. & Recruteur, intitulé, entreprise, description, compétences et état. \\
+\code{sr_applications} & Démarche de candidature. & Offre, profil étudiant, état et date de candidature. \\
+\code{sr_match_scores} & Résultat associé à une candidature. & Score, composantes, compétences rapprochées ou manquantes et réponse détaillée. \\
+\bottomrule
+\end{longtable}
+
+La figure~\ref{fig:donnees-conception} représente les relations principales. Les cardinalités doivent être lues en distinguant la règle métier attendue de ce que les contraintes SQL imposent réellement. Cette distinction est particulièrement importante pour les profils utilisateur et les résultats de matching.
+
+\begin{figure}[htbp]
+\centering
+\input{figures/data-model.tex}
+\caption{Modèle de données des sept tables de SmartRecruit}
+\label{fig:donnees-conception}
+\end{figure}
+
+\subsection{Relations et garanties effectives}
+
+Chaque profil étudiant référence exactement un utilisateur, et chaque profil recruteur référence également un utilisateur. En revanche, la colonne de référence n'est pas unique dans ces tables. La base permet donc plusieurs profils du même type pour un utilisateur, alors que les parcours applicatifs supposent généralement un seul profil correspondant au rôle. Une cardinalité métier de zéro ou un profil par type nécessiterait une contrainte supplémentaire. Les clés étrangères ne vérifient pas non plus que le rôle du compte correspond au type de profil associé.
+
+Un profil étudiant peut disposer de plusieurs documents CV. Chaque document appartient à un seul profil. Une offre référence au plus un profil recruteur : cette référence est nullable. Un recruteur peut être lié à plusieurs offres. Une candidature associe exactement une offre et un profil étudiant ; une contrainte unique interdit de répéter ce couple. Cette unicité exprime une règle métier importante à un niveau indépendant du formulaire et protège aussi contre les écritures concurrentes~\cite{mysql-unique}.
+
+Une candidature peut posséder plusieurs lignes dans \code{sr_match_scores}, car aucune unicité n'est définie sur sa référence. Pourtant, le code recherche la dernière ligne puis la met à jour, et n'ajoute une ligne que s'il n'en trouve pas. Le schéma permet donc un historique que l'implémentation ne construit pas de manière organisée. Il faut choisir entre un résultat courant unique et un historique versionné ; conserver une multiplicité implicite n'offre ni une garantie d'unicité ni une traçabilité complète.
+
+Les suppressions d'utilisateurs entraînent celles des profils associés ; les documents et candidatures concernés bénéficient également de relations avec suppression en cascade. Les scores suivent la suppression de leur candidature. La suppression d'un profil recruteur met à null la référence portée par ses offres, au lieu de supprimer ces dernières. Ces règles sont inscrites dans le schéma, même si l'interface du MVP ne propose pas tous les parcours de suppression. Une future fonction d'effacement devra aussi traiter les fichiers, que les cascades SQL ne peuvent pas retirer du disque.
+
+\subsection{Champs structurés, JSON et évolution du schéma}
+
+Les attributs stables, comme les états et les références, sont représentés par des colonnes dédiées. Les listes de compétences, liens, métadonnées du CV et réponses de calcul utilisent des champs JSON. Cette combinaison évite de créer de nombreuses tables pour des informations variables dans un prototype. Elle limite en revanche la validation relationnelle fine et complique certaines recherches transversales, par exemple compter les profils associés à une compétence canonique avec une même règle de normalisation.
+
+Les états d'offre sont bornés à brouillon, publié et fermé ; les états de candidature à soumise, présélectionnée, rejetée et entretien. Cette contrainte restreint les valeurs stockées, mais ne décrit pas les transitions autorisées. Les dates de création et de modification permettent de situer une ligne ; elles ne constituent pas un journal des opérations. De même, les colonnes prévues pour le type et la taille du CV sont présentes, mais les insertions du store renseignent actuellement une valeur nulle et zéro. La présence d'une colonne ne prouve donc pas que son information est exploitée.
+
+La migration comporte aussi une adaptation des tables existantes, centrée sur l'ajout et le remplissage de l'identifiant public. Ce chemin ne reconstitue pas nécessairement les mêmes contraintes qu'une création neuve, notamment son unicité. La conception cible doit séparer création initiale et migrations d'évolution, avec vérification des doublons avant l'ajout d'un index. Une installation issue d'un schéma ancien doit être évaluée comme un cas particulier, sans supposer son équivalence automatique à une base neuve.
+
+\section{Contrats d'API et flux de traitement}
+
+\subsection{Interface entre Laravel et Python}
+
+Le service Python expose trois opérations. \code{GET /health} indique que le service répond et annonce son algorithme. \code{POST /match} reçoit un objet JSON contenant les textes de l'offre et du CV ainsi que les listes de compétences requises et candidates. Il retourne le score et des informations explicatives. \code{POST /parse-cv} reçoit un fichier dans un formulaire multipart, extrait son texte et retourne notamment des compétences et des adresses détectées. L'absence du champ fichier donne lieu à une réponse d'erreur dédiée.
+
+Ce contrat réalise une séparation utile : Laravel conserve les décisions d'accès et les relations métier, Python traite un contenu transmis. Le service d'analyse n'a pas besoin de connaître le mot de passe ou l'identifiant SQL d'un étudiant pour calculer un rapprochement. Une architecture cible devrait conserver cette minimisation des données et éviter de transmettre des informations sans utilité pour le traitement. La réponse de l'analyse doit, réciproquement, être considérée comme une entrée externe à valider avant toute persistance.
+
+Les mécanismes d'appel ne sont pas uniformes dans le client actuel. L'extraction multipart utilise le client HTTP Laravel et un délai configuré de six secondes, tandis que les échanges JSON reposent sur un flux HTTP PHP avec un délai de 0,4 seconde. Ces valeurs sont des paramètres du code, pas des mesures de performance. Les erreurs conduisent généralement à une valeur nulle et à un repli local. La cible devrait distinguer indisponibilité réseau, réponse invalide, dépassement de délai et document inexploitable afin d'afficher un état compréhensible et d'établir un diagnostic utile.
+
+\subsection{Enchaînement du dépôt et du classement}
+
+La saisie du profil, la candidature et la consultation du classement constituent des actions distinctes. L'utilisateur soumet d'abord les informations à Laravel ; l'application contrôle leur recevabilité, sollicite l'analyse si nécessaire et conserve le profil. Une candidature peut ensuite relier ce profil à une offre. La figure~\ref{fig:sequence-conception} détaille la consultation du classement : Laravel compare chaque profil à l'offre, utilise le résultat Python lorsqu'il est exploitable, puis transmet à la vue le score et ses explications. Un résultat peut être conservé dans la table des scores si une candidature existe.
+
+\begin{figure}[htbp]
+\centering
+\input{figures/sequence.tex}
+\caption{Séquence observée de consultation du classement d'une offre}
+\label{fig:sequence-conception}
+\end{figure}
+
+Dans l'implémentation présente, le résultat local est calculé avant l'éventuel appel au moteur distant. Des champs de la réponse distante remplacent ensuite ceux du calcul local. Le service est interrogé au cours des demandes web, sans file de traitement établie dans le dépôt. Cette conception facilite la lecture d'un parcours complet, mais lie la durée de la réponse au nombre de comparaisons demandées. Elle exige aussi de vérifier la cohérence des réponses des deux moteurs, car leur interchangeabilité ne résulte pas seulement d'un nom de méthode commun.
+
+Une particularité mérite d'être explicitée : la consultation du classement peut écrire un score et faire évoluer une candidature vers \code{shortlisted} lorsque son score atteint 70. Une page de consultation possède donc un effet métier. Si une personne ouvre le classement après une modification de CV, elle peut déclencher un changement d'état sans action de décision séparée. La conception cible doit rendre les lectures sans effet sur le suivi, ou formaliser distinctement la règle d'automatisation avec un événement identifiable et une politique de transition.
+
+\section{Transactions, concurrence et cohérence}
+
+Les créations de compte avec profil, de profil étudiant et d'offre utilisent des transactions SQL. Elles permettent d'annuler ensemble les opérations relationnelles d'un même ensemble lorsque l'une échoue~\cite{laravel-database}. À l'inverse, la modification d'un profil met à jour l'utilisateur, le profil et éventuellement la référence du CV sans transaction globale. Un échec intermédiaire peut donc laisser une identité modifiée avec des informations de profil plus anciennes. L'ensemble de ces changements représente une unité de travail métier et devrait être traité comme telle.
+
+Une transaction SQL ne couvre pas le déplacement d'un fichier ni un appel HTTP. Le parcours de dépôt peut déplacer le document avant l'enregistrement final du profil. Si cette écriture échoue, un fichier peut subsister sans référence exploitable. La cible proposée consiste à utiliser un emplacement temporaire, enregistrer un état de traitement et prévoir une opération compensatoire de suppression ou de reprise. Elle évite de maintenir une transaction relationnelle ouverte durant une extraction potentiellement lente.
+
+Les vérifications préalables d'existence n'éliminent pas toutes les courses. Deux candidatures simultanées peuvent toutes deux constater l'absence du couple avant l'insertion ; la contrainte unique décide alors laquelle est conservée. L'application doit reconnaître le conflit et retourner une confirmation cohérente. De même, la création concurrente d'un premier score peut produire deux lignes. Enfin, la présélection automatique se fonde sur un état lu avant l'écriture ; une décision humaine concurrente peut être écrasée si l'actualisation ne filtre que l'identifiant. Un contrôle conditionnel sur l'état ou une version de ligne protège cette transition.
+
+Le stockage JSON ajoute un autre problème : la lecture, la modification en mémoire et l'écriture complète du fichier ne sont pas protégées par un verrou commun. Deux requêtes peuvent perdre leurs modifications respectives. Une lecture invalide provoque en outre le remplacement par des données de démonstration. Ce mécanisme ne peut donc pas être assimilé à une stratégie de haute disponibilité. Le passage automatique d'un support à l'autre fragmente les données, puisque les écritures du fichier ne sont pas réintégrées au retour de MySQL.
+
+Le cycle de lecture SQL contient également une synchronisation automatique du dataset démo. La méthode appelée \code{seedIfEmpty} n'exige pas réellement que la base soit vide avant cette synchronisation. Une lecture globale peut ainsi réintroduire des enregistrements de démonstration et multiplier les vérifications SQL. La cible doit réserver le peuplement à des commandes explicites, séparées du parcours utilisateur, et rendre le choix du mode de stockage stable pour un environnement donné.
+
+\section{Architecture cible proposée}
+
+La première évolution consiste à extraire l'orchestration des routes vers des contrôleurs et des services applicatifs. Un service de profil coordonnerait validation métier, document et persistance ; un service de candidature porterait les règles d'ouverture d'offre et d'unicité ; un service de décision contrôlerait les transitions d'état. Des politiques d'autorisation centraliseraient les règles de propriété. Cette organisation vise une application Laravel plus lisible, sans imposer un découpage en nouveaux services réseau.
+
+Le stockage de production reposerait sur MySQL comme référence unique. Le mode démonstration serait choisi explicitement et isolé des comptes utilisés réellement. Les dépôts de données disposeraient d'un contrat stable et de méthodes ciblées plutôt que d'un chargement systématique de toutes les entités. Les listes seraient filtrées et paginées en base. Les derniers documents et résultats seraient récupérés en groupe pour éviter une requête supplémentaire par profil ou candidature.
+
+Pour le traitement IA, la cible proposée associe un calcul à une version de profil, une version d'offre et une version d'algorithme. Un changement pertinent rendrait le résultat antérieur obsolète et déclencherait un nouveau traitement. Une file de travaux pourrait exécuter l'extraction et les comparaisons, tandis que l'interface présenterait des états en attente, disponible ou en échec. Ces états et cette file n'existent pas dans le MVP examiné ; leur intérêt devra être confirmé par des mesures de charge et des besoins de réactivité.
+
+Enfin, le suivi métier devrait conserver un historique séparé des décisions, avec leur auteur et leur origine humaine ou automatique. Les traces techniques seraient limitées aux informations nécessaires au diagnostic, sans reproduire inutilement le texte des CV. Des tests de contrat vérifieraient les réponses Python, des tests d'intégration les transactions et autorisations, et des scénarios concurrents l'unicité et la préservation des décisions. Cette cible prépare une consolidation progressive : elle traite les garanties fondamentales avant d'accroître la complexité du moteur de rapprochement.

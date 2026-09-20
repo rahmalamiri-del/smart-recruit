@@ -1,0 +1,18 @@
+\begingroup\singlespacing
+\begin{tikzpicture}[node distance=12mm]
+\node[block,text width=10.8cm] (client) {\textbf{Navigateur de démonstration}\\Accès HTTP au service web};
+\node[block,text width=4.4cm,below left=16mm and -20mm of client] (web) {\textbf{laravel-app}\\PHP 8.2 CLI / Laravel\\Hôte 8080 vers conteneur 8000};
+\node[block,text width=4.4cm,right=14mm of web] (ai) {\textbf{ai-service}\\Python / Flask / Waitress\\Port 8010};
+\node[block,text width=4.4cm,below=19mm of web] (db) {\textbf{mysql-db}\\MySQL 8.0\\Hôte 3307 vers conteneur 3306};
+\node[block,text width=4.4cm,below=19mm of ai] (vol) {\textbf{Volumes}\\Code monté depuis l'hôte\\Volume persistant MySQL};
+\draw[arr] (client.south -| web.north)--node[note,left]{HTTP}(web);
+\draw[arr] (web)--node[note,above]{HTTP interne}(ai);
+\draw[arr] (web)--node[note,left]{SQL interne}(db);
+\draw[arr,dashed] (db)--node[note,above]{persistance}(vol);
+\begin{scope}[on background layer]
+\node[draw=teal,rounded corners,fit=(web)(ai)(db)(vol),inner sep=6mm] (frame) {};
+\end{scope}
+\node[note,text width=11cm,below=7mm of frame] {Configuration de démonstration décrite par Docker Compose. Un déploiement cible doit utiliser une racine web publique, isoler les services internes et externaliser les secrets.};
+\end{tikzpicture}
+
+\endgroup

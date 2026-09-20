@@ -1,0 +1,422 @@
+{
+  "mobile375": [
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/dashboard-admin.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/dashboard-student.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/dashboard-recruiter.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/dashboard-guest.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/login.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/register.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/register-student.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/register-recruiter.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/offers-index-admin.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/offers-show-admin.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/students-show-admin.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/offers-index-recruiter.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/offers-show-recruiter.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/students-show-recruiter.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/offers-index-student.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/offers-show-student.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/students-show-student.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/offers-create.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/offers-edit.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/students-index-admin.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/students-index-recruiter.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/students-create.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/students-edit.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/admin-index.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/admin-applications.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/admin-users-index.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/admin-users-create.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/admin-users-edit.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/admin-confirm.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/offers-empty.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/admin-applications-empty.html"
+    },
+    {
+      "brokenImages": 0,
+      "clippedMetrics": [],
+      "headings": 1,
+      "overflow": false,
+      "page": "/login-errors.html"
+    }
+  ],
+  "narrow320": [
+    {
+      "clippedMetrics": [],
+      "overflow": false,
+      "page": "/dashboard-admin.html"
+    },
+    {
+      "clippedMetrics": [],
+      "overflow": false,
+      "page": "/offers-create.html"
+    },
+    {
+      "clippedMetrics": [],
+      "overflow": false,
+      "page": "/students-edit.html"
+    },
+    {
+      "clippedMetrics": [],
+      "overflow": false,
+      "page": "/admin-users-edit.html"
+    },
+    {
+      "clippedMetrics": [],
+      "overflow": false,
+      "page": "/register-recruiter.html"
+    },
+    {
+      "clippedMetrics": [],
+      "overflow": false,
+      "page": "/offers-index-student.html"
+    }
+  ],
+  "desktop": [
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/dashboard-admin.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/dashboard-student.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/dashboard-recruiter.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/dashboard-guest.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/login.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/register.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/register-student.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/register-recruiter.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/offers-index-admin.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/offers-show-admin.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/students-show-admin.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/offers-index-recruiter.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/offers-show-recruiter.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/students-show-recruiter.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/offers-index-student.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/offers-show-student.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/students-show-student.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/offers-create.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/offers-edit.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/students-index-admin.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/students-index-recruiter.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/students-create.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/students-edit.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/admin-index.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/admin-applications.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/admin-users-index.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/admin-users-create.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/admin-users-edit.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/admin-confirm.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/offers-empty.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/admin-applications-empty.html"
+    },
+    {
+      "brokenImages": 0,
+      "overflow": false,
+      "page": "/login-errors.html"
+    }
+  ]
+}

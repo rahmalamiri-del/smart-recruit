@@ -1,0 +1,216 @@
+{
+    "fixture_notice": "All names, documents, companies, accounts and scores are fictional preview fixtures.",
+    "environment": {
+        "dotenv_loaded": false,
+        "database_provider_registered": false,
+        "route_handlers_dispatched": 0,
+        "network_calls": 0,
+        "php": "8.2.12"
+    },
+    "asset_files_copied": 4,
+    "pages": [
+        {
+            "file": "dashboard-admin.html",
+            "view": "dashboard.admin",
+            "role": "admin",
+            "bytes": 13212
+        },
+        {
+            "file": "dashboard-student.html",
+            "view": "dashboard.student",
+            "role": "student",
+            "bytes": 8915
+        },
+        {
+            "file": "dashboard-recruiter.html",
+            "view": "dashboard.recruiter",
+            "role": "recruiter",
+            "bytes": 12901
+        },
+        {
+            "file": "dashboard-guest.html",
+            "view": "dashboard.guest",
+            "role": "guest",
+            "bytes": 4817
+        },
+        {
+            "file": "login.html",
+            "view": "auth.login",
+            "role": "guest",
+            "bytes": 4160
+        },
+        {
+            "file": "register.html",
+            "view": "auth.register",
+            "role": "guest",
+            "bytes": 3964
+        },
+        {
+            "file": "register-student.html",
+            "view": "auth.register",
+            "role": "guest",
+            "bytes": 5393
+        },
+        {
+            "file": "register-recruiter.html",
+            "view": "auth.register",
+            "role": "guest",
+            "bytes": 5581
+        },
+        {
+            "file": "offers-index-admin.html",
+            "view": "offers.index",
+            "role": "admin",
+            "bytes": 16823
+        },
+        {
+            "file": "offers-show-admin.html",
+            "view": "offers.show",
+            "role": "admin",
+            "bytes": 27521
+        },
+        {
+            "file": "students-show-admin.html",
+            "view": "students.show",
+            "role": "admin",
+            "bytes": 11716
+        },
+        {
+            "file": "offers-index-recruiter.html",
+            "view": "offers.index",
+            "role": "recruiter",
+            "bytes": 12445
+        },
+        {
+            "file": "offers-show-recruiter.html",
+            "view": "offers.show",
+            "role": "recruiter",
+            "bytes": 24130
+        },
+        {
+            "file": "students-show-recruiter.html",
+            "view": "students.show",
+            "role": "recruiter",
+            "bytes": 8629
+        },
+        {
+            "file": "offers-index-student.html",
+            "view": "offers.index",
+            "role": "student",
+            "bytes": 8983
+        },
+        {
+            "file": "offers-show-student.html",
+            "view": "offers.show",
+            "role": "student",
+            "bytes": 7813
+        },
+        {
+            "file": "students-show-student.html",
+            "view": "students.show",
+            "role": "student",
+            "bytes": 8978
+        },
+        {
+            "file": "offers-create.html",
+            "view": "offers.create",
+            "role": "recruiter",
+            "bytes": 8543
+        },
+        {
+            "file": "offers-edit.html",
+            "view": "offers.edit",
+            "role": "recruiter",
+            "bytes": 9479
+        },
+        {
+            "file": "students-index-admin.html",
+            "view": "students.index",
+            "role": "admin",
+            "bytes": 17424
+        },
+        {
+            "file": "students-index-recruiter.html",
+            "view": "students.index",
+            "role": "recruiter",
+            "bytes": 16831
+        },
+        {
+            "file": "students-create.html",
+            "view": "students.create",
+            "role": "admin",
+            "bytes": 12433
+        },
+        {
+            "file": "students-edit.html",
+            "view": "students.edit",
+            "role": "student",
+            "bytes": 11029
+        },
+        {
+            "file": "admin-index.html",
+            "view": "admin.index",
+            "role": "admin",
+            "bytes": 14855
+        },
+        {
+            "file": "admin-applications.html",
+            "view": "admin.applications",
+            "role": "admin",
+            "bytes": 24184
+        },
+        {
+            "file": "admin-users-index.html",
+            "view": "admin.users.index",
+            "role": "admin",
+            "bytes": 18243
+        },
+        {
+            "file": "admin-users-create.html",
+            "view": "admin.users.form",
+            "role": "admin",
+            "bytes": 12778
+        },
+        {
+            "file": "admin-users-edit.html",
+            "view": "admin.users.form",
+            "role": "admin",
+            "bytes": 12912
+        },
+        {
+            "file": "admin-confirm.html",
+            "view": "admin.confirm",
+            "role": "admin",
+            "bytes": 10109
+        },
+        {
+            "file": "offers-empty.html",
+            "view": "offers.index",
+            "role": "student",
+            "bytes": 6817
+        },
+        {
+            "file": "admin-applications-empty.html",
+            "view": "admin.applications",
+            "role": "admin",
+            "bytes": 10534
+        },
+        {
+            "file": "login-errors.html",
+            "view": "auth.login",
+            "role": "guest",
+            "bytes": 4335
+        }
+    ],
+    "errors": [],
+    "screen_view_count": 19,
+    "rendered_view_count": 19,
+    "uncovered_views": [],
+    "page_count": 32,
+    "limits": [
+        "Static rendering is not a controller, authorization, persistence or service test.",
+        "Filters and actions are visual only; submissions are blocked and business URLs are replaced.",
+        "CV filenames are fictional; there is no document download.",
+        "Re-run to copy updated CSS/assets and render updated Blade files."
+    ]
+}

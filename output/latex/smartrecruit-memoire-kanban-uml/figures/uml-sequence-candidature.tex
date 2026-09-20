@@ -1,0 +1,21 @@
+\begingroup\setstretch{1}
+\begin{tikzpicture}[font=\small,msg/.style={-{Stealth[length=2mm]},draw=navy},ret/.style={-{Stealth[length=2mm]},dashed,draw=navy},head/.style={draw=navy,fill=lightgray,minimum width=2.3cm,minimum height=.8cm,align=center}]
+\foreach \x/\id/\txt in {0/e/Étudiant,4/w/Route Laravel,8/s/SqlStore,12/b/MySQL}{\node[head] (\id) at (\x,0) {\txt};\draw[dashed,gray] (\x,-.4)--(\x,-11.5);}
+\draw[msg] (0,-1.2)--node[above]{POST candidature + CSRF}(4,-1.2);
+\draw[msg] (4,-2)--(5,-2)--node[right,align=left,font=\footnotesize]{Session, rôle,\\offre et profil} (5,-2.8)--(4,-2.8);
+\draw[msg] (4,-3.5)--node[above]{apply(offre, profil)}(8,-3.5);
+\draw[msg] (8,-4.3)--node[above,font=\footnotesize]{Chercher le couple}(12,-4.3);
+\draw[ret] (12,-5)--node[above,font=\footnotesize]{Résultat}(8,-5);
+\draw[navy] (3.2,-5.6) rectangle (13.4,-9.8);
+\node[anchor=north west,fill=lightgray,font=\bfseries\footnotesize] at (3.2,-5.6) {alt};
+\node[anchor=west,font=\footnotesize] at (4,-6.1) {[candidature existante]};
+\draw[ret] (8,-6.8)--node[above,font=\footnotesize]{Restituer / réactiver selon le store}(4,-6.8);
+\draw[dashed,gray] (3.2,-7.35)--(13.4,-7.35);
+\node[anchor=west,font=\footnotesize] at (4,-7.7) {[aucune candidature]};
+\draw[msg] (8,-8.5)--node[above,font=\footnotesize]{INSERT submitted}(12,-8.5);
+\draw[ret] (12,-9.1)--(8,-9.1);
+\draw[ret] (8,-9.6)--(4,-9.6);
+\draw[ret] (4,-10.5)--node[above]{Redirection et message de suivi}(0,-10.5);
+\end{tikzpicture}
+
+\endgroup

@@ -1,0 +1,108 @@
+\babel@toc {french}{}\relax 
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{Remerciements}{i}{chapter*.1}%
+\contentsline {chapter}{Résumé}{ii}{chapter*.2}%
+\contentsline {chapter}{Abstract}{iii}{chapter*.3}%
+\babel@toc {english}{}\relax 
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{Note de périmètre et de traçabilité}{iv}{chapter*.4}%
+\contentsline {chapter}{Liste des figures}{ix}{chapter*.5}%
+\contentsline {chapter}{Liste des tableaux}{x}{chapter*.6}%
+\contentsline {chapter}{Liste des abréviations}{xi}{chapter*.8}%
+\contentsline {chapter}{Introduction générale}{1}{chapter*.9}%
+\contentsline {chapter}{\numberline {1}Contexte du projet et fondements scientifiques}{3}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Cadre académique et professionnel}{3}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Enjeux d'une plateforme de recrutement étudiant}{4}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}Des informations hétérogènes à rendre comparables}{4}{subsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.2.2}Trois points de vue sur le même processus}{4}{subsection.1.2.2}%
+\contentsline {section}{\numberline {1.3}Problématique et objectifs}{5}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Question centrale}{5}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {1.3.2}Objectifs fonctionnels et techniques}{6}{subsection.1.3.2}%
+\contentsline {section}{\numberline {1.4}État de l'art et approches de rapprochement}{6}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Gestion des candidatures et recommandation}{6}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {1.4.2}Représentation lexicale par TF-IDF et cosinus}{7}{subsection.1.4.2}%
+\contentsline {subsection}{\numberline {1.4.3}Word2Vec : apprendre des représentations de mots}{7}{subsection.1.4.3}%
+\contentsline {subsection}{\numberline {1.4.4}BERT et contextualisation du langage}{8}{subsection.1.4.4}%
+\contentsline {subsection}{\numberline {1.4.5}CamemBERT et prise en compte du français}{8}{subsection.1.4.5}%
+\contentsline {subsection}{\numberline {1.4.6}Sentence-BERT et similarité entre textes}{9}{subsection.1.4.6}%
+\contentsline {section}{\numberline {1.5}Positionnement retenu pour le prototype}{9}{section.1.5}%
+\contentsline {subsection}{\numberline {1.5.1}Une combinaison explicable de signaux}{9}{subsection.1.5.1}%
+\contentsline {subsection}{\numberline {1.5.2}Explicabilité, responsabilité et limites des preuves}{10}{subsection.1.5.2}%
+\contentsline {chapter}{\numberline {2}Analyse et spécification des besoins}{12}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Problématique et périmètre fonctionnel}{12}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Acteurs et responsabilités}{13}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Spécification des cas d'utilisation}{13}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}UC01 : créer un compte et ouvrir une session}{15}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}UC02 : compléter le profil et déposer un CV}{15}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}UC03 : publier et maintenir une offre}{16}{subsection.2.3.3}%
+\contentsline {subsection}{\numberline {2.3.4}UC04 : candidater à une offre}{16}{subsection.2.3.4}%
+\contentsline {subsection}{\numberline {2.3.5}UC05 : examiner un classement explicable}{17}{subsection.2.3.5}%
+\contentsline {subsection}{\numberline {2.3.6}UC06 : suivre et qualifier une candidature}{17}{subsection.2.3.6}%
+\contentsline {section}{\numberline {2.4}Exigences identifiées et critères d'acceptation}{18}{section.2.4}%
+\contentsline {section}{\numberline {2.5}Contraintes, priorités et démarche rétrospective}{20}{section.2.5}%
+\contentsline {chapter}{\numberline {3}Conception et architecture de la solution}{21}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Architecture générale observée}{21}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Organisation du noyau Laravel}{22}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Modèle relationnel et cardinalités}{23}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Entités persistées}{23}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Relations et garanties effectives}{24}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.3}Champs structurés, JSON et évolution du schéma}{26}{subsection.3.3.3}%
+\contentsline {section}{\numberline {3.4}Contrats d'API et flux de traitement}{26}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Interface entre Laravel et Python}{27}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Enchaînement du dépôt et du classement}{27}{subsection.3.4.2}%
+\contentsline {section}{\numberline {3.5}Transactions, concurrence et cohérence}{29}{section.3.5}%
+\contentsline {section}{\numberline {3.6}Architecture cible proposée}{30}{section.3.6}%
+\contentsline {chapter}{\numberline {4}Réalisation et intégration de SmartRecruit}{32}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Du besoin fonctionnel au prototype exécutable}{32}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Organisation du code et responsabilités}{32}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Une application Laravel à organisation compacte}{32}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Circulation d'une requête}{34}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}Authentification et maîtrise des accès}{34}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Connexion et création de compte actuelles}{34}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Rôles et contrôle de propriété}{35}{subsection.4.3.2}%
+\contentsline {section}{\numberline {4.4}Parcours d'interface}{35}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Navigation et tableaux de bord}{35}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Profil étudiant et dépôt du CV}{36}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}Offres et candidatures}{36}{subsection.4.4.3}%
+\contentsline {section}{\numberline {4.5}Persistance et cohérence métier}{37}{section.4.5}%
+\contentsline {section}{\numberline {4.6}Extraction des CV et intégration du moteur}{38}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}Chaîne d'extraction}{38}{subsection.4.6.1}%
+\contentsline {subsection}{\numberline {4.6.2}Calcul local et appel distant}{38}{subsection.4.6.2}%
+\contentsline {section}{\numberline {4.7}Configurations d'exécution et déploiement}{39}{section.4.7}%
+\contentsline {subsection}{\numberline {4.7.1}Exécution locale, Apache et conteneurs}{40}{subsection.4.7.1}%
+\contentsline {subsection}{\numberline {4.7.2}Frontière entre démonstration et production}{40}{subsection.4.7.2}%
+\contentsline {chapter}{\numberline {5}Conception et fonctionnement du moteur de matching}{42}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Organisation de la chaîne de traitement}{42}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Extraction et préparation du CV}{42}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Sources textuelles et extraction PDF}{42}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Compétences, formation et expérience}{44}{subsection.5.2.2}%
+\contentsline {section}{\numberline {5.3}Normalisation, alias et catégories}{45}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}Traitement lexical effectivement implémenté}{45}{subsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.3.2}Rôle du dictionnaire et de la taxonomie}{46}{subsection.5.3.2}%
+\contentsline {section}{\numberline {5.4}Définition des composantes mathématiques}{46}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Couverture des compétences et des catégories}{46}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}TF-IDF calculé sur une paire de documents}{47}{subsection.5.4.2}%
+\contentsline {section}{\numberline {5.5}Formules finales PHP et Python}{48}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Exemple numérique reproductible}{49}{section.5.6}%
+\contentsline {section}{\numberline {5.7}Contrat HTTP et mécanisme de repli}{50}{section.5.7}%
+\contentsline {section}{\numberline {5.8}Divergences constatées et trajectoire de correction}{51}{section.5.8}%
+\contentsline {chapter}{\numberline {6}Validation du prototype et perspectives d'amélioration}{52}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Périmètre et statut des résultats}{52}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Méthodologie de vérification}{52}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}Trois niveaux de preuve}{52}{subsection.6.2.1}%
+\contentsline {subsection}{\numberline {6.2.2}Reproductibilité et protection des données}{53}{subsection.6.2.2}%
+\contentsline {section}{\numberline {6.3}Résultats des contrôles techniques locaux}{53}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Comportements du moteur de rapprochement}{54}{section.6.4}%
+\contentsline {subsection}{\numberline {6.4.1}Sondes de cohérence entre PHP et Python}{54}{subsection.6.4.1}%
+\contentsline {subsection}{\numberline {6.4.2}Expérience et qualité de l'extraction}{55}{subsection.6.4.2}%
+\contentsline {section}{\numberline {6.5}Accès, sessions et frontière de déploiement}{56}{section.6.5}%
+\contentsline {subsection}{\numberline {6.5.1}Exposition observée avec le serveur intégré}{56}{subsection.6.5.1}%
+\contentsline {subsection}{\numberline {6.5.2}Confiance proxy et authentification}{56}{subsection.6.5.2}%
+\contentsline {section}{\numberline {6.6}Cohérence métier et persistance : constats statiques}{57}{section.6.6}%
+\contentsline {section}{\numberline {6.7}Protocole proposé d'évaluation de la pertinence}{58}{section.6.7}%
+\contentsline {subsection}{\numberline {6.7.1}Constitution du corpus et annotations}{58}{subsection.6.7.1}%
+\contentsline {subsection}{\numberline {6.7.2}Mesures de classement}{59}{subsection.6.7.2}%
+\contentsline {subsection}{\numberline {6.7.3}Comparaisons et analyse des erreurs}{59}{subsection.6.7.3}%
+\contentsline {section}{\numberline {6.8}Plan de validation complémentaire et progression}{60}{section.6.8}%
+\contentsline {chapter}{Conclusion générale}{61}{chapter*.24}%
+\contentsline {chapter}{Bibliographie}{63}{section*.25}%

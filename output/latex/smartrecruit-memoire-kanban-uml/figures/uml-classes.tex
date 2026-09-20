@@ -1,0 +1,21 @@
+\begingroup\setstretch{1}
+\begin{tikzpicture}[font=\fontsize{9}{11}\selectfont,
+cl/.style={draw=navy,fill=lightgray,align=left,text width=4.4cm,inner sep=7pt},
+rel/.style={draw=navy,line width=.65pt}]
+\node[cl] (u) at (0,0) {\textbf{Compte}\\\rule{4.35cm}{.3pt}\\id : entier\\identifiantPublic : chaîne\\nom, email : chaîne\\rôle : Rôle\\motDePasse : hash};
+\node[cl] (s) at (6,0) {\textbf{ProfilÉtudiant}\\\rule{4.35cm}{.3pt}\\id : entier\\titre, formation : chaîne\\compétences : liste\\texteCV : texte\\expérience : entier};
+\node[cl] (r) at (12,0) {\textbf{ProfilRecruteur}\\\rule{4.35cm}{.3pt}\\id : entier\\entreprise : chaîne\\poste : chaîne\\siteWeb : URL};
+\node[cl] (d) at (6,-5.5) {\textbf{DocumentCV}\\\rule{4.35cm}{.3pt}\\id : entier\\nomOriginal : chaîne\\chemin : chaîne\\typeMIME : chaîne\\résultatExtraction : JSON};
+\node[cl] (o) at (12,-5.5) {\textbf{Offre}\\\rule{4.35cm}{.3pt}\\id : entier\\titre, description : texte\\compétences : liste\\statut : ÉtatOffre\\localisation : chaîne};
+\node[cl] (c) at (6,-11) {\textbf{Candidature}\\\rule{4.35cm}{.3pt}\\id : entier\\statut : ÉtatCandidature\\dateCandidature : date\\suppression : marqueur};
+\node[cl] (m) at (0,-11) {\textbf{Score de correspondance}\\\rule{4.35cm}{.3pt}\\score : entier\\similaritéTexte : entier\\couverture : entier\\réponseBrute : JSON};
+\draw[rel] (u.east)--node[above,pos=.15]{1} node[above,pos=.85]{0..*}(s.west);
+\draw[rel] (u.north)--++(0,1.15)-|node[above,pos=.1]{1} node[right,pos=.96]{0..*}(r.north);
+\draw[rel] (s.south)--node[left,pos=.12]{1} node[left,pos=.88]{0..*}(d.north);
+\draw[rel] (r.south)--node[left,pos=.12]{0..1} node[left,pos=.88]{0..*}(o.north);
+\draw[rel] (s.south west)--++(-.45,-.45) node[left]{1} |-($(c.north west)+(0,.75)$)--node[left,pos=.7]{0..*}(c.north west);
+\draw[rel] (o.south)--++(0,-1.0)-|node[right,pos=.05]{1} node[right,pos=.93]{0..*}(c.north);
+\draw[rel] (c.west)--node[above,pos=.15]{1} node[above,pos=.85]{0..*}(m.east);
+\node[align=left,font=\fontsize{9}{11}\selectfont,text=midgray,text width=16cm,anchor=north west] at (-2.15,-13.5) {Contrainte : un couple (offre, profil étudiant) identifie au plus une candidature.\\Les multiplicités compte/profil suivent les contraintes SQL observées ; l'interface crée un profil adapté au rôle.};
+\end{tikzpicture}
+\endgroup

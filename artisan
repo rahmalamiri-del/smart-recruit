@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+<?php
+
+use Illuminate\Foundation\Application;
+use Symfony\Component\Console\Input\ArgvInput;
+
+define('LARAVEL_START', microtime(true));
+
+$autoload = __DIR__.'/vendor/autoload.php';
+
+if (! file_exists($autoload)) {
+    fwrite(STDERR, "Smart-Recruit dependencies are missing. Run composer install inside smart-recruit.\n");
+    exit(1);
+}
+
+$loader = require $autoload;
+
+if (method_exists($loader, 'addPsr4')) {
+    $loader->addPsr4('SmartRecruit\\', __DIR__.'/app/');
+}
+
+/** @var Application $app */
+$app = require_once __DIR__.'/bootstrap/app.php';
+
+$status = $app->handleCommand(new ArgvInput);
+
+exit($status);

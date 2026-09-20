@@ -1,0 +1,60 @@
+[2026-09-10 23:23:07] production.ERROR: Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1052 Column 'TABLE_NAME' in field list is ambiguous in H:\smart-recruit\vendor\laravel\framework\src\Illuminate\Database\Connection.php:420
+Stack trace:
+#0 H:\smart-recruit\vendor\laravel\framework\src\Illuminate\Database\Connection.php(420): PDO->prepare('SELECT TABLE_NA...')
+#1 H:\smart-recruit\vendor\laravel\framework\src\Illuminate\Database\Connection.php(827): Illuminate\Database\Connection->Illuminate\Database\{closure}('SELECT TABLE_NA...', Array)
+#2 H:\smart-recruit\vendor\laravel\framework\src\Illuminate\Database\Connection.php(794): Illuminate\Database\Connection->runQueryCallback('SELECT TABLE_NA...', Array, Object(Closure))
+#3 H:\smart-recruit\vendor\laravel\framework\src\Illuminate\Database\Connection.php(411): Illuminate\Database\Connection->run('SELECT TABLE_NA...', Array, Object(Closure))
+#4 H:\smart-recruit\vendor\laravel\framework\src\Illuminate\Database\DatabaseManager.php(491): Illuminate\Database\Connection->select('SELECT TABLE_NA...', Array)
+#5 H:\smart-recruit\vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php(363): Illuminate\Database\DatabaseManager->__call('select', Array)
+#6 Command line code(9): Illuminate\Support\Facades\Facade::__callStatic('select', Array)
+#7 {main}
+
+Next Illuminate\Database\QueryException: SQLSTATE[23000]: Integrity constraint violation: 1052 Column 'TABLE_NAME' in field list is ambiguous (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: recruit, SQL: SELECT TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, DELETE_RULE
+    FROM information_schema.REFERENTIAL_CONSTRAINTS rc
+    JOIN information_schema.KEY_COLUMN_USAGE kcu
+      ON rc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME AND rc.CONSTRAINT_SCHEMA = kcu.TABLE_SCHEMA
+    WHERE rc.CONSTRAINT_SCHEMA = recruit AND kcu.TABLE_NAME LIKE "sr_%") in H:\smart-recruit\vendor\laravel\framework\src\Illuminate\Database\Connection.php:838
+Stack trace:
+#0 H:\smart-recruit\vendor\laravel\framework\src\Illuminate\Database\Connection.php(794): Illuminate\Database\Connection->runQueryCallback('SELECT TABLE_NA...', Array, Object(Closure))
+#1 H:\smart-recruit\vendor\laravel\framework\src\Illuminate\Database\Connection.php(411): Illuminate\Database\Connection->run('SELECT TABLE_NA...', Array, Object(Closure))
+#2 H:\smart-recruit\vendor\laravel\framework\src\Illuminate\Database\DatabaseManager.php(491): Illuminate\Database\Connection->select('SELECT TABLE_NA...', Array)
+#3 H:\smart-recruit\vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php(363): Illuminate\Database\DatabaseManager->__call('select', Array)
+#4 Command line code(9): Illuminate\Support\Facades\Facade::__callStatic('select', Array)
+#5 {main}
+  thrown {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1052 Column 'TABLE_NAME' in field list is ambiguous in H:\\smart-recruit\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php:420
+Stack trace:
+#0 H:\\smart-recruit\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(420): PDO->prepare('SELECT TABLE_NA...')
+#1 H:\\smart-recruit\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(827): Illuminate\\Database\\Connection->Illuminate\\Database\\{closure}('SELECT TABLE_NA...', Array)
+#2 H:\\smart-recruit\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(794): Illuminate\\Database\\Connection->runQueryCallback('SELECT TABLE_NA...', Array, Object(Closure))
+#3 H:\\smart-recruit\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(411): Illuminate\\Database\\Connection->run('SELECT TABLE_NA...', Array, Object(Closure))
+#4 H:\\smart-recruit\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\DatabaseManager.php(491): Illuminate\\Database\\Connection->select('SELECT TABLE_NA...', Array)
+#5 H:\\smart-recruit\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\Facades\\Facade.php(363): Illuminate\\Database\\DatabaseManager->__call('select', Array)
+#6 Command line code(9): Illuminate\\Support\\Facades\\Facade::__callStatic('select', Array)
+#7 {main}
+
+Next Illuminate\\Database\\QueryException: SQLSTATE[23000]: Integrity constraint violation: 1052 Column 'TABLE_NAME' in field list is ambiguous (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: recruit, SQL: SELECT TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, DELETE_RULE
+    FROM information_schema.REFERENTIAL_CONSTRAINTS rc
+    JOIN information_schema.KEY_COLUMN_USAGE kcu
+      ON rc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME AND rc.CONSTRAINT_SCHEMA = kcu.TABLE_SCHEMA
+    WHERE rc.CONSTRAINT_SCHEMA = recruit AND kcu.TABLE_NAME LIKE \"sr_%\") in H:\\smart-recruit\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php:838
+Stack trace:
+#0 H:\\smart-recruit\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(794): Illuminate\\Database\\Connection->runQueryCallback('SELECT TABLE_NA...', Array, Object(Closure))
+#1 H:\\smart-recruit\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(411): Illuminate\\Database\\Connection->run('SELECT TABLE_NA...', Array, Object(Closure))
+#2 H:\\smart-recruit\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\DatabaseManager.php(491): Illuminate\\Database\\Connection->select('SELECT TABLE_NA...', Array)
+#3 H:\\smart-recruit\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\Facades\\Facade.php(363): Illuminate\\Database\\DatabaseManager->__call('select', Array)
+#4 Command line code(9): Illuminate\\Support\\Facades\\Facade::__callStatic('select', Array)
+#5 {main}
+  thrown at H:/smart-recruit/vendor/laravel/framework/src/Illuminate/Database/Connection.php:838)
+[stacktrace]
+#0 {main}
+"} 
+[2026-09-11 16:07:56] production.ERROR: There are no commands defined in the "sr" namespace. {"exception":"[object] (Symfony\\Component\\Console\\Exception\\NamespaceNotFoundException(code: 0): There are no commands defined in the \"sr\" namespace. at H:/smart-recruit/vendor/symfony/console/Application.php:694)
+[stacktrace]
+#0 H:/smart-recruit/vendor/symfony/console/Application.php(743): Symfony/Component/Console/Application->findNamespace('sr')
+#1 H:/smart-recruit/vendor/symfony/console/Application.php(298): Symfony/Component/Console/Application->find('sr:render')
+#2 H:/smart-recruit/vendor/symfony/console/Application.php(195): Symfony/Component/Console/Application->doRun(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#3 H:/smart-recruit/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony/Component/Console/Application->run(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#4 H:/smart-recruit/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate/Foundation/Console/Kernel->handle(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#5 H:/smart-recruit/artisan(25): Illuminate/Foundation/Application->handleCommand(Object(Symfony/Component/Console/Input/ArgvInput))
+#6 {main}
+"} 
