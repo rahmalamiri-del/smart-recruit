@@ -1,0 +1,73 @@
+@startuml
+!include _style.iuml
+title Diagramme de cas d'utilisation global — SmartRecruit
+
+actor "Utilisateur" as U
+actor "Candidat" as C
+actor "Recruteur" as R
+actor "Administrateur" as A
+component "Microservice\nde matching" as MS <<système>>
+
+C -up-|> U
+R -up-|> U
+A -up-|> U
+
+rectangle "Système SmartRecruit" {
+  usecase "S'inscrire" as UC_Register
+  usecase "Se connecter" as UC_Login
+  usecase "Consulter son tableau de bord" as UC_Dash
+  usecase "Se déconnecter" as UC_Logout
+
+  usecase "Compléter son profil" as UC_Profile
+  usecase "Déposer son CV" as UC_Upload
+  usecase "Consulter les offres recommandées" as UC_Reco
+  usecase "Postuler à une offre" as UC_Apply
+  usecase "Suivre ses candidatures" as UC_Track
+
+  usecase "Publier une offre" as UC_Publish
+  usecase "Gérer ses offres\n(modifier, changer le statut)" as UC_Offers
+  usecase "Consulter les candidats classés" as UC_Ranking
+  usecase "Découvrir les profils compatibles" as UC_RecoProfiles
+  usecase "Traiter une candidature\n(présélection, entretien, refus)" as UC_Decide
+
+  usecase "Gérer les utilisateurs" as UC_Users
+  usecase "Inscrire un candidat avec son CV" as UC_AddStudent
+  usecase "Superviser les offres\net les candidatures" as UC_Supervise
+  usecase "Supprimer ou restaurer\ndes données" as UC_Delete
+
+  usecase "Analyser le CV" as UC_Parse
+  usecase "Calculer le score\nde compatibilité" as UC_Match
+}
+
+U -- UC_Login
+U -- UC_Dash
+U -- UC_Logout
+
+C -- UC_Register
+C -- UC_Profile
+C -- UC_Upload
+C -- UC_Reco
+C -- UC_Apply
+C -- UC_Track
+
+R -- UC_Register
+R -- UC_Publish
+R -- UC_Offers
+R -- UC_Ranking
+R -- UC_RecoProfiles
+R -- UC_Decide
+
+A -- UC_Users
+A -- UC_AddStudent
+A -- UC_Supervise
+A -- UC_Delete
+
+UC_Upload ..> UC_Parse : <<include>>
+UC_AddStudent ..> UC_Parse : <<include>>
+UC_Reco ..> UC_Match : <<include>>
+UC_Ranking ..> UC_Match : <<include>>
+UC_RecoProfiles ..> UC_Match : <<include>>
+
+UC_Parse -- MS
+UC_Match -- MS
+@enduml

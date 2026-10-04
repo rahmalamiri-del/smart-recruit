@@ -1,0 +1,28 @@
+@startuml
+!include _style.iuml
+title Cas d'utilisation « Rechercher une offre et postuler »
+
+actor "Candidat" as C
+component "Microservice\nde matching" as MS <<système>>
+
+rectangle "Offres et candidatures" {
+  usecase "Découvrir les offres\nqui lui correspondent" as UC_Reco
+  usecase "Calculer le score\nde compatibilité" as UC_Match
+  usecase "Consulter le détail\nd'une offre" as UC_View
+  usecase "Postuler en un clic" as UC_Apply
+  usecase "Suivre l'avancement\nde ses candidatures" as UC_Track
+}
+
+C -- UC_Reco
+C -- UC_View
+C -- UC_Track
+
+UC_Reco ..> UC_Match : <<include>>
+UC_Apply .> UC_View : <<extend>>
+UC_Match -- MS
+
+legend bottom left
+  Utilise le CV déjà présent
+  dans le profil du candidat.
+endlegend
+@enduml

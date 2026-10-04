@@ -1,0 +1,24 @@
+@startuml
+!include _style.iuml
+title Cas d'utilisation « Évaluer les candidats »
+
+actor "Recruteur" as R
+component "Microservice\nde matching" as MS <<système>>
+
+rectangle "Évaluation des candidats" {
+  usecase "Consulter le classement\ndes candidats d'une offre" as UC_Ranking
+  usecase "Découvrir les profils\nles plus compatibles" as UC_Reco
+  usecase "Calculer le score\nde compatibilité" as UC_Match
+  usecase "Consulter le CV\nd'un candidat" as UC_Cv
+  usecase "Faire avancer une candidature\n(présélection, entretien, refus)" as UC_Decide
+}
+
+R -- UC_Ranking
+R -- UC_Reco
+
+UC_Ranking ..> UC_Match : <<include>>
+UC_Reco ..> UC_Match : <<include>>
+UC_Cv .> UC_Ranking : <<extend>>
+UC_Decide .> UC_Ranking : <<extend>>
+UC_Match -- MS
+@enduml

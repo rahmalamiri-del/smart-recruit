@@ -1,0 +1,36 @@
+@startuml
+!include _style.iuml
+title Cas d'utilisation « Administrer la plateforme »
+
+actor "Administrateur" as A
+component "Microservice\nde matching" as MS <<système>>
+
+rectangle "Administration" {
+  usecase "Gérer les comptes\n(créer, modifier)" as UC_Accounts
+  usecase "Réinitialiser\nun mot de passe" as UC_Password
+  usecase "Inscrire un candidat\navec son CV" as UC_AddStudent
+  usecase "Analyser le CV" as UC_Parse
+  usecase "Superviser les offres\net les candidatures" as UC_Supervise
+  usecase "Réaffecter une offre\nà un autre recruteur" as UC_Reassign
+  usecase "Supprimer un élément\n(compte, offre, profil,\ncandidature)" as UC_Delete
+  usecase "Confirmer la\nsuppression" as UC_Confirm
+  usecase "Restaurer un\nélément supprimé" as UC_Restore
+}
+
+A -- UC_Accounts
+A -- UC_AddStudent
+A -- UC_Supervise
+A -- UC_Delete
+A -- UC_Restore
+
+UC_Password .> UC_Accounts : <<extend>>
+UC_AddStudent ..> UC_Parse : <<include>>
+UC_Reassign .> UC_Supervise : <<extend>>
+UC_Delete ..> UC_Confirm : <<include>>
+UC_Parse -- MS
+
+legend bottom left
+  Suppression logique : l'élément
+  reste restaurable.
+endlegend
+@enduml
