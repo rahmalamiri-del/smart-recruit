@@ -1,0 +1,26 @@
+@startuml
+!include _style.iuml
+title Cas d'utilisation « Gérer ses offres de stage »
+
+actor "Recruteur" as R
+
+rectangle "Gestion des offres" {
+  usecase "Publier une offre\nde stage" as UC_Create
+  usecase "Consulter ses offres" as UC_List
+  usecase "Filtrer et trier ses offres\n(statut, candidatures reçues)" as UC_Filter
+  usecase "Modifier une offre" as UC_Edit
+  usecase "Changer le statut de l'offre\n(brouillon, publiée, clôturée)" as UC_Status
+}
+
+R -- UC_Create
+R -- UC_List
+R -- UC_Edit
+
+UC_Filter .> UC_List : <<extend>>
+UC_Status .> UC_Edit : <<extend>>
+
+legend bottom left
+  Un recruteur ne peut modifier
+  que les offres qu'il a publiées.
+endlegend
+@enduml

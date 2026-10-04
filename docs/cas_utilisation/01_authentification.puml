@@ -1,0 +1,31 @@
+@startuml
+!include _style.iuml
+title Cas d'utilisation « S'authentifier »
+
+actor "Utilisateur" as U
+actor "Candidat" as C
+actor "Recruteur" as R
+C -up-|> U
+R -up-|> U
+
+rectangle "Accès à la plateforme" {
+  usecase "S'inscrire\n(candidat ou recruteur)" as UC_Register
+  usecase "Se connecter" as UC_Login
+  usecase "Vérifier les\nidentifiants" as UC_Check
+  usecase "Consulter son\ntableau de bord" as UC_Dash
+  usecase "Se déconnecter" as UC_Logout
+}
+
+C -- UC_Register
+R -- UC_Register
+U -- UC_Login
+U -- UC_Dash
+U -- UC_Logout
+
+UC_Login ..> UC_Check : <<include>>
+
+legend bottom left
+  Le compte de l'administrateur
+  est créé par un autre administrateur.
+endlegend
+@enduml

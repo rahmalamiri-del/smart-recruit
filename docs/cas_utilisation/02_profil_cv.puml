@@ -1,0 +1,28 @@
+@startuml
+!include _style.iuml
+title Cas d'utilisation « Gérer son profil et son CV »
+
+actor "Candidat" as C
+component "Microservice\nde matching" as MS <<système>>
+
+rectangle "Profil candidat" {
+  usecase "Compléter son profil\n(formation, compétences, liens)" as UC_Profile
+  usecase "Déposer ou remplacer\nson CV (PDF, TXT)" as UC_Upload
+  usecase "Consulter son CV" as UC_View
+  usecase "Retirer son CV" as UC_Delete
+  usecase "Analyser le CV\n(extraction des compétences,\nformation, expérience)" as UC_Parse
+}
+
+C -- UC_Profile
+C -- UC_View
+
+UC_Upload .> UC_Profile : <<extend>>
+UC_Delete .> UC_Profile : <<extend>>
+UC_Upload ..> UC_Parse : <<include>>
+UC_Parse -- MS
+
+legend bottom left
+  Si le microservice est indisponible,
+  une extraction locale (PHP) prend le relais.
+endlegend
+@enduml
