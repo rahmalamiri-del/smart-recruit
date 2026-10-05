@@ -1,0 +1,67 @@
+@startuml
+!include _style_sequence.iuml
+
+title Diagramme de séquence — Création d'une offre de stage
+
+actor "Recruteur" as R
+boundary "Interface web" as UI
+control "Contrôle\nd'accès" as MW
+control "Contrôleur\nLaravel" as CTRL
+database "Base de données\nMySQL" as DB
+participant "Microservice\nde matching" as MS
+
+R -> UI : Cliquer sur « Publier une offre »
+activate UI
+UI -> MW : GET /offers/create
+activate MW
+alt rôle recruteur ou administrateur
+  MW -> CTRL : Transmettre la requête
+  deactivate MW
+  activate CTRL
+  CTRL --> UI : Formulaire de création
+  deactivate CTRL
+  UI --> R : Afficher le formulaire
+else autre rôle
+  MW --> UI : Erreur 403 / redirection vers la connexion
+  deactivate MW
+  UI --> R : Accès refusé
+end
+
+R -> UI : Saisir le titre, l'entreprise, le lieu, le type,\nles compétences requises et la description
+R -> UI : Valider le formulaire
+UI -> MW : POST /offers (données + jeton CSRF)
+activate MW
+MW -> CTRL : Rôle vérifié : transmettre la requête
+deactivate MW
+activate CTRL
+CTRL -> CTRL : Valider les champs\n(titre, entreprise et description obligatoires)
+
+alt données invalides
+  CTRL --> UI : Retour au formulaire\navec les messages d'erreur
+  UI --> R : Corriger les champs signalés
+else données valides
+  CTRL -> CTRL : Préparer l'offre\n(compétences séparées par des virgules,\nvaleurs par défaut : Tunisie, Stage)
+  CTRL -> DB : Enregistrer l'offre\n(propriétaire = recruteur connecté)
+  activate DB
+  DB -> DB : Retrouver le profil recruteur\nTransaction : insérer l'offre\n(statut « publiée »)
+  DB --> CTRL : offre créée
+  deactivate DB
+  CTRL --> UI : Redirection vers le détail de l'offre\n+ message « Offre publiée »
+  deactivate CTRL
+
+  UI -> CTRL : GET /offers/{offre}
+  activate CTRL
+  CTRL -> DB : Charger l'offre, ses candidatures\net les profils candidats
+  activate DB
+  DB --> CTRL : données
+  deactivate DB
+  CTRL -> CTRL : Vérifier que le recruteur\nest propriétaire de l'offre
+
+  ref over CTRL, MS : Calcul du matching entre chaque candidat et l'offre\n(voir diagramme « Calcul du matching »)
+
+  CTRL --> UI : Détail de l'offre\n+ classement des candidats
+  deactivate CTRL
+  UI --> R : Afficher l'offre publiée\net les candidats les plus compatibles
+end
+deactivate UI
+@enduml

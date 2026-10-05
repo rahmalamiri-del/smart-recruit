@@ -1,0 +1,71 @@
+@startuml
+skinparam dpi 200
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 14
+skinparam ArrowColor #1F3A5F
+skinparam activity {
+  BackgroundColor #F4F7FB
+  BorderColor #1F3A5F
+  DiamondBackgroundColor #E8EEF6
+  DiamondBorderColor #1F3A5F
+  StartColor #1F3A5F
+  EndColor #1F3A5F
+  BarColor #1F3A5F
+}
+skinparam swimlane {
+  BorderColor #8AA1BD
+  TitleFontColor #1F3A5F
+  TitleFontStyle bold
+}
+
+title Diagramme d'activité — Préparation des données du CV
+
+|Candidat|
+start
+:Déposer son CV (PDF, TXT, MD)\net enregistrer le profil;
+
+|Plateforme Laravel|
+if (Fichier valide ?\n(format, 4 Mo max)) then (non)
+  |Candidat|
+  :Voir le message d'erreur;
+  stop
+endif
+
+|Plateforme Laravel|
+if (Fichier PDF ?) then (non)
+  :Lire le texte\ndu fichier;
+else (oui)
+  |Microservice de matching|
+  :Extraire le texte du PDF\n(pdfminer / PyPDF2);
+  |Plateforme Laravel|
+  if (Texte reçu ?) then (non)
+    :Extraction locale\n(repli PHP);
+  endif
+endif
+
+:Assembler texte extrait\net texte saisi;
+
+fork
+  :Compétences;
+fork again
+  :Expérience;
+fork again
+  :Formation;
+fork again
+  :E-mails et\ntéléphones;
+end fork
+
+:Fusionner avec les données saisies,\nstocker le CV et mettre à jour le profil;
+
+if (Texte exploitable ?\n(≥ 40 caractères ou texte saisi)) then (oui)
+  |Candidat|
+  :Voir « Profil mis à jour »;
+  stop
+else (non)
+  |Candidat|
+  :Voir l'avertissement :\ncompléter le texte du CV;
+  stop
+endif
+@enduml

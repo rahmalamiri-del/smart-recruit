@@ -1,0 +1,75 @@
+@startuml
+!include _style_sequence.iuml
+
+title Diagramme de séquence — Dépôt d'une candidature
+
+actor "Candidat" as C
+boundary "Interface web" as UI
+control "Contrôle\nd'accès" as MW
+control "Contrôleur\nLaravel" as CTRL
+database "Base de données\nMySQL" as DB
+
+C -> UI : Ouvrir le détail d'une offre
+activate UI
+UI --> C : Offre affichée avec le bouton\n« Postuler en un clic »
+
+C -> UI : Cliquer sur « Postuler en un clic »
+UI -> MW : POST /offers/{offre}/apply\n(jeton CSRF)
+activate MW
+
+alt utilisateur non connecté
+  MW --> UI : Redirection vers la page de connexion
+  UI --> C : « Connectez-vous pour accéder à cette page »
+else connecté mais pas candidat
+  MW --> UI : Erreur 403 (accès refusé)
+  UI --> C : Accès refusé
+else rôle candidat
+  MW -> CTRL : Transmettre la requête
+  deactivate MW
+  activate CTRL
+
+  CTRL -> DB : Rechercher l'offre
+  activate DB
+  DB --> CTRL : offre
+  deactivate DB
+  CTRL -> DB : Rechercher le profil du candidat\n(identifiant de la session)
+  activate DB
+  DB --> CTRL : profil candidat
+  deactivate DB
+
+  alt offre ou profil introuvable
+    CTRL --> UI : Erreur 404
+    UI --> C : Page introuvable
+  else offre et profil valides
+    CTRL -> DB : Chercher une candidature existante\n(même offre, même candidat)
+    activate DB
+    DB --> CTRL : résultat
+    deactivate DB
+
+    alt aucune candidature
+      CTRL -> DB : Créer la candidature\n(statut « envoyée », date du jour)
+      activate DB
+      DB --> CTRL : candidature créée
+      deactivate DB
+    else candidature retirée auparavant
+      CTRL -> DB : Restaurer la candidature\n(statut remis à « envoyée »)
+      activate DB
+      DB --> CTRL : candidature restaurée
+      deactivate DB
+    else candidature déjà active
+      CTRL -> CTRL : Aucune modification\n(pas de doublon)
+    end
+
+    CTRL --> UI : Retour à l'offre\n+ message de succès
+    deactivate CTRL
+    UI --> C : « Candidature envoyée en un clic »
+  end
+end
+deactivate UI
+
+note over C, DB
+  La candidature réutilise le CV et les compétences déjà enregistrés dans le profil :
+  aucun fichier n'est envoyé à cette étape. Le score de compatibilité sera calculé
+  lorsque le recruteur consultera le classement des candidats de l'offre.
+end note
+@enduml

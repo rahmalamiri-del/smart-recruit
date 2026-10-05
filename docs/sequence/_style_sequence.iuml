@@ -1,0 +1,24 @@
+!pragma teoz true
+skinparam dpi 200
+skinparam style strictuml
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 14
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 220
+skinparam roundcorner 8
+skinparam sequence {
+  LifeLineBorderColor #8AA1BD
+  ParticipantBorderColor #1F3A5F
+  ParticipantBackgroundColor #F4F7FB
+  ActorBorderColor #1F3A5F
+  ActorBackgroundColor #F4F7FB
+  ArrowColor #1F3A5F
+  GroupBorderColor #8AA1BD
+  GroupBackgroundColor #E8EEF6
+}
+skinparam note {
+  BackgroundColor #FFFDF0
+  BorderColor #B8A86A
+}

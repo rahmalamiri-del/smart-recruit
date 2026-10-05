@@ -1,0 +1,43 @@
+@startuml
+skinparam dpi 200
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 14
+skinparam ArrowColor #1F3A5F
+skinparam activity {
+  BackgroundColor #F4F7FB
+  BorderColor #1F3A5F
+  DiamondBackgroundColor #E8EEF6
+  DiamondBorderColor #1F3A5F
+  StartColor #1F3A5F
+  EndColor #1F3A5F
+}
+
+title Diagramme d'activité : Pipeline de préparation des données CV
+
+start
+:Le candidat téléverse son CV\n(PDF, TXT ou MD — 4 Mo max);
+
+if (Fichier PDF ?) then (oui)
+  :Extraire le texte via le microservice\n(pdfminer / PyPDF2) ;
+  note right: Repli local en PHP si le\nmicroservice est indisponible
+else (non)
+  :Lire le texte brut du fichier;
+endif
+
+:Nettoyer le texte\n(caractères parasites, espaces multiples);
+:Détecter les compétences\n(alias + taxonomie des compétences);
+:Extraire l'expérience, la formation,\nles e-mails et les téléphones\n(expressions régulières + mots-clés);
+:Construire les données structurées\n(fusion avec les données saisies, sans doublons);
+:Sauvegarder les données\n(sr_cv_documents + sr_student_profiles);
+:Afficher le profil candidat pré-rempli;
+
+if (Données correctes ?) then (oui)
+else (non)
+  :Corriger manuellement le profil\n(compétences, formation, texte du CV);
+  :Mettre à jour le profil\n(sr_student_profiles);
+endif
+
+stop
+@enduml
