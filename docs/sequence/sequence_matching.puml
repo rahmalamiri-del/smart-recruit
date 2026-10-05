@@ -1,0 +1,62 @@
+@startuml
+!include _style_sequence.iuml
+
+title Diagramme de séquence — Calcul du matching entre un candidat et une offre
+
+actor "Candidat" as C
+boundary "Interface web" as UI
+control "Contrôleur\nLaravel" as CTRL
+entity "Moteur de matching\nlocal (PHP)" as PHP
+participant "Microservice\nde matching (Python)" as MS
+database "Base de données\nMySQL" as DB
+
+C -> UI : Consulter les offres recommandées
+activate UI
+UI -> CTRL : GET /offers
+activate CTRL
+
+CTRL -> DB : Charger le profil du candidat\net les offres publiées
+activate DB
+DB --> CTRL : profil (compétences, texte du CV)\n+ liste des offres
+deactivate DB
+
+CTRL -> MS : GET /health
+activate MS
+MS --> CTRL : état du service (ok / indisponible)
+deactivate MS
+
+loop pour chaque offre publiée
+  CTRL -> PHP : score(offre, profil)
+  activate PHP
+  PHP -> PHP : Normaliser les textes\net extraire les compétences
+  PHP -> PHP : Similarité TF-IDF (cosinus)\n+ couverture des compétences
+  PHP --> CTRL : score local
+  deactivate PHP
+
+  alt microservice disponible
+    CTRL -> MS : POST /match\n(texte offre, texte CV, compétences)
+    activate MS
+    MS -> MS : Comparer les compétences requises\net celles du candidat
+    MS -> MS : score = 58 % compétences\n+ 32 % similarité du texte\n+ 10 % proximité des domaines
+    MS --> CTRL : score, compétences trouvées\net manquantes
+    deactivate MS
+    CTRL -> CTRL : Retenir le résultat du microservice
+  else microservice indisponible
+    CTRL -> CTRL : Conserver le score local
+  end
+
+  opt le candidat a déjà postulé à cette offre
+    CTRL -> DB : Enregistrer le score de matching
+    activate DB
+    DB --> CTRL : score enregistré
+    deactivate DB
+  end
+end
+
+CTRL -> CTRL : Trier les offres\npar score décroissant
+CTRL --> UI : offres classées avec leur score
+deactivate CTRL
+UI --> C : Afficher les offres les plus\ncompatibles en premier
+deactivate UI
+
+@enduml
